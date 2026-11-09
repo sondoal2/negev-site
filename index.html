@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OFF—MAP · Naqab Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;700;800&family=Alexandria:wght@400;600;800&family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<style>
+:root{
+  --ink:#0d0d0d; --slab:#1b1b1b; --concrete:#8a8a86; --bone:#e9e6df; --fog:#c9c7c1;
+  --red:#e8452c; --red-deep:#b8301c; --line:#3a3a38;
+  --font: "Jost","Alexandria","Rubik",system-ui,sans-serif;
+}
+html[lang=ar]{--font:"Alexandria","Jost",system-ui,sans-serif}
+html[lang=he]{--font:"Rubik","Jost",system-ui,sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--ink);color:var(--bone);font-family:var(--font)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+/* ---------- top slab ---------- */
+header{position:fixed;inset:0 0 auto 0;height:64px;background:#000;display:flex;align-items:center;gap:6px;padding:0 18px;z-index:20;border-bottom:3px solid #000}
+.nav{display:flex;gap:4px;align-items:center}
+.nav button{width:46px;height:46px;display:grid;place-items:center;opacity:.55}
+.nav button.on,.nav button:hover{opacity:1}
+.nav svg{width:28px;height:28px;stroke:var(--bone);fill:none;stroke-width:1.8}
+.section{font-weight:500;letter-spacing:.12em;text-transform:uppercase;font-size:17px;margin-inline-start:10px}
+.brand{margin-inline-start:auto;font-weight:800;font-size:30px;letter-spacing:-.01em;font-family:"Jost",sans-serif;direction:ltr;white-space:nowrap}
+.brand b{color:var(--red);font-weight:800}
+.lang{position:relative;margin-inline-start:14px}
+.lang>button{width:38px;height:38px;border:2px solid var(--bone);font-weight:800;font-size:17px}
+.lang .menu{position:absolute;top:44px;inset-inline-end:0;display:none;flex-direction:column;background:#000;border:2px solid var(--bone)}
+.lang.open .menu{display:flex}
+.lang .menu button{width:38px;height:36px;font-weight:700}
+.lang .menu button:hover,.lang .menu button.on{background:var(--red)}
+
+/* ---------- map ---------- */
+#stage{position:fixed;inset:64px 0 0 0}
+#map,#map2{position:absolute;inset:0}
+#map2{pointer-events:none;display:none}
+body.compare #map2{display:block}
+.grain{position:absolute;inset:0;pointer-events:none;z-index:5;opacity:.22;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.4 -.2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+body.nograin .grain{display:none}
+
+/* ---------- panel (concrete slab) ---------- */
+#panel{position:absolute;top:16px;inset-inline-start:16px;width:300px;max-height:calc(100% - 32px);overflow:auto;z-index:10;background:rgba(14,14,14,.94);border:1px solid var(--line);backdrop-filter:blur(2px)}
+#panel h3{margin:0;padding:12px 14px 8px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--concrete);font-weight:600;border-top:1px solid var(--line)}
+#panel h3:first-child{border-top:0}
+.row{display:flex;align-items:center;gap:10px;padding:7px 14px;cursor:pointer;font-size:14px;line-height:1.25}
+.row:hover{background:#1f1f1f}
+.row input{display:none}
+.box{width:16px;height:16px;border:2px solid var(--concrete);flex:none;position:relative}
+.row input:checked+.box{background:var(--bone);border-color:var(--bone)}
+.sw{width:22px;height:12px;flex:none;margin-inline-start:auto}
+.live{font-size:10px;font-weight:700;letter-spacing:.1em;background:var(--red);color:#000;padding:1px 4px;margin-inline-start:4px}
+.note{font-size:11px;color:var(--concrete);padding:0 14px 10px;line-height:1.4}
+#panelToggle{display:none}
+
+/* ---------- stats (SOS counter logic) ---------- */
+#stats{position:absolute;bottom:18px;inset-inline-start:16px;z-index:10;display:flex;gap:0;background:#000;border:1px solid var(--line)}
+.stat{padding:10px 16px;border-inline-start:1px solid var(--line)}
+.stat:first-child{border:0}
+.stat .n{font-family:"Jost",sans-serif;font-weight:800;font-size:28px;line-height:1}
+.stat .n.red{color:var(--red)}
+.stat .l{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--concrete);margin-top:4px;max-width:150px}
+
+/* ---------- tools ---------- */
+#tools{position:absolute;top:16px;inset-inline-end:16px;z-index:10;display:flex;flex-direction:column;gap:6px}
+#tools button{width:44px;height:44px;background:#000;border:1px solid var(--line);display:grid;place-items:center;font-weight:800;font-size:13px}
+#tools button:hover,#tools button.on{background:var(--bone);color:#000}
+#tools svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* ---------- compare ---------- */
+#swipe{position:absolute;top:0;bottom:0;width:0;z-index:8;display:none}
+body.compare #swipe{display:block}
+#swipe .bar{position:absolute;inset:0 -2px;background:var(--red)}
+#swipe .knob{position:absolute;top:50%;left:-22px;width:44px;height:44px;background:var(--red);color:#000;display:grid;place-items:center;font-weight:800;cursor:ew-resize;transform:translateY(-50%)}
+.yearTag{position:absolute;top:16px;z-index:9;background:#000;padding:6px 10px;font-family:"Jost";font-weight:800;font-size:22px;display:none;direction:ltr}
+body.compare .yearTag{display:block}
+.yearTag select{background:#000;color:var(--bone);border:1px solid var(--line);font:inherit;font-size:20px}
+#yearL{left:340px} #yearR{right:76px}
+#drawBar{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);z-index:10;background:#000;border:1px solid var(--line);display:none;gap:0}
+body.compare #drawBar{display:flex}
+#drawBar button{padding:10px 14px;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;border-inline-start:1px solid var(--line)}
+#drawBar button:first-child{border:0}
+#drawBar button.on{background:var(--red);color:#000}
+body.compare #stats{display:none}
+
+/* ---------- popup card ---------- */
+.maplibregl-popup-content{background:var(--bone);color:#000;border-radius:0;padding:0;font-family:var(--font);min-width:220px;box-shadow:0 8px 0 rgba(0,0,0,.6)}
+.maplibregl-popup-tip{display:none}
+.card .hd{background:var(--red);padding:6px 12px;font-weight:700;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.card .hd.grey{background:var(--concrete)} .card .hd.bone{background:#000;color:var(--bone)}
+.card .bd{padding:10px 12px 12px;font-size:14px;line-height:1.45}
+.card .bd b{font-size:18px;display:block;margin-bottom:2px}
+.card .src{font-size:11px;color:#555;margin-top:6px}
+.maplibregl-popup-close-button{font-size:18px;color:#000}
+
+/* ---------- about overlay ---------- */
+#about{position:fixed;inset:64px 0 0 0;z-index:15;background:#2b2b2b;overflow:auto;display:none}
+body.about #about{display:block}
+#about .hero{height:46vh;min-height:280px;background:#000 center/cover;position:relative;display:grid;place-items:center;overflow:hidden}
+#about .hero h1{font-family:"Jost";font-weight:800;font-size:clamp(48px,9vw,130px);margin:0;letter-spacing:-.02em;direction:ltr;position:relative;z-index:2}
+#about .hero h1 b{color:var(--red)}
+#about .hero .sub{position:absolute;bottom:18px;z-index:2;font-size:15px;letter-spacing:.2em;text-transform:uppercase}
+#about .wrap{max-width:1180px;margin:0 auto;padding:40px 24px 80px;display:grid;grid-template-columns:1fr 1fr;gap:48px}
+#about h2{font-size:15px;letter-spacing:.14em;text-transform:uppercase;margin:0 0 12px}
+#about p{font-size:17px;line-height:1.6;margin:0 0 14px}
+#about table{width:100%;border-collapse:collapse;font-size:14px}
+#about td{border-top:1px solid #444;padding:8px 6px;vertical-align:top}
+#about a{color:var(--bone)}
+#about .redlist{background:var(--red);color:#000;padding:22px 24px;grid-column:1/-1}
+#about .redlist h2{color:#000}
+
+@media (max-width:760px){
+  header{height:56px;padding:0 8px} #stage,#about{top:56px}
+  .section{display:none} .brand{font-size:20px}
+  .nav button{width:38px}
+  #panel{display:none;width:calc(100% - 32px)} body.panel #panel{display:block}
+  #panelToggle{display:grid!important}
+  #stats{inset-inline:16px auto;bottom:12px} .stat .n{font-size:20px} .stat{padding:8px 10px}
+  #about .wrap{grid-template-columns:1fr}
+  #yearL{left:8px} #yearR{right:60px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="nav">
+    <button data-view="about" title="About"><svg viewBox="0 0 24 24"><path d="M6 2h9l4 4v16H6z"/><path d="M9 10h7M9 13h7M9 16h7M9 19h5"/></svg></button>
+    <button data-view="map" class="on" title="Map"><svg viewBox="0 0 24 24"><path d="M3 5l6-2 6 2 6-2v16l-6 2-6-2-6 2z"/><path d="M9 3v16M15 5v16"/></svg></button>
+    <button data-view="compare" title="Compare"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></button>
+  </div>
+  <div class="section" id="sectionLabel">MAP</div>
+  <div class="brand">OFF<b>—</b>MAP</div>
+  <div class="lang" id="lang"><button id="langBtn">ع</button>
+    <div class="menu"><button data-l="ar">ع</button><button data-l="he">ע</button><button data-l="en">E</button></div>
+  </div>
+</header>
+
+<div id="stage">
+  <div id="map"></div>
+  <div id="map2"></div>
+  <div class="grain"></div>
+  <div id="swipe"><div class="bar"></div><div class="knob">⟷</div></div>
+  <div class="yearTag" id="yearL"><select id="selL"></select></div>
+  <div class="yearTag" id="yearR"><select id="selR"></select></div>
+
+  <aside id="panel"></aside>
+
+  <div id="tools">
+    <button id="panelToggle" title="Layers"><svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg></button>
+    <button id="fsBtn" title="Fullscreen"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+    <button id="homeBtn" title="Negev"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg></button>
+    <button id="grainBtn" class="on" title="Grain">G</button>
+  </div>
+
+  <div id="stats"></div>
+
+  <div id="drawBar">
+    <button id="drawBtn"></button>
+    <button id="undoBtn"></button>
+    <button id="exportBtn"></button>
+  </div>
+</div>
+
+<section id="about">
+  <div class="hero" id="hero"><h1>OFF<b>—</b>MAP</h1><div class="sub" id="heroSub"></div></div>
+  <div class="wrap" id="aboutBody"></div>
+</section>
+
+<script>
+/* ======================================================================
+   OFF—MAP · Naqab/Negev spatial-justice atlas
+   Live sources: Israel Planning Administration ArcGIS (ags.iplan.gov.il),
+   OpenFreeMap vector tiles (OSM), Esri World Imagery + Wayback archive.
+   ====================================================================== */
+const IPLAN = 'https://ags.iplan.gov.il/arcgisiplan/rest/services/PlanningPublic';
+const exportTiles = (svc, layers) =>
+  `${IPLAN}/${svc}/MapServer/export?bbox={bbox-epsg-3857}&bboxSR=3857&imageSR=3857&size=512,512&format=png32&transparent=true&dpi=96${layers?`&layers=show:${layers}`:''}&f=image`;
+// Esri Wayback releases: [year, releaseId] (last release of each year; 2014 = earliest archive, Feb 2014)
+const WAYBACK = [[2014,10],[2015,28163],[2016,18966],[2017,25521],[2018,23448],[2019,4756],[2020,29260],[2021,26120],[2022,45134],[2023,56102],[2024,16453],[2025,13192],[2026,43291]];
+const wbTiles = id => `https://wayback.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/WMTS/1.0.0/default028mm/MapServer/tile/${id}/{z}/{y}/{x}`;
+const NEGEV_VIEW = {center:[34.85,31.05], zoom:8.6};
+
+/* ---------------- i18n ---------------- */
+const T = {
+ ar:{dir:'rtl',map:'الخريطة',compare:'قبل / بعد',about:'عن المشروع',
+  base:'الأساس',basemap:'خريطة الشوارع والمباني',sat:'صورة جوية (أبيض/أسود)',mask:'تعتيم خارج النقب',labels:'أسماء الأماكن',
+  bounds:'الحدود والبلدات',arab:'بلدات عربية معترف بها',jew:'بلدات يهودية',ind:'مناطق صناعية / أمنية',rc:'حدود المجالس الإقليمية',
+  red:'القائمة الحمراء',unrec:'قرى خارج أي حدود معترف بها',demo:'هدم موثّق',
+  plan:'التخطيط الرسمي',xplan:'خطوط زرقاء – مخططات (Xplan)',landuse:'استعمالات الأرض',tmm:'مخطط لوائي 4/14 – الجنوب',vatmal:'مجمعات ות"ל معلنة',
+  unrecNote:'نقاط من OSM بأسماء عربية تقع خارج أي حدود بلدة معترف بها — مرشّحة كقرى غير معترف بها. للتحقق مقابل قائمة المجلس الإقليمي للقرى غير المعترف بها.',
+  liveNote:'طبقات حية من خوادم מנהל התכנון — تُحدَّث تلقائياً.',
+  sArab:'كم² لبلدات عربية',sJew:'كم² لبلدات يهودية',sUn:'قرى خارج الحدود',sRc:'كم² لمجالس عربية',
+  draw:'ارسم مبنى مهدوم',drawing:'انقر النقاط · دبل-كليك للإنهاء',undo:'تراجع',export:'تصدير GeoJSON',
+  locality:'بلدة',council:'مجلس إقليمي',area:'المساحة',source:'المصدر',outside:'خارج الحدود المعترف بها',
+  heroSub:'النقب · أطلس العدالة المكانية'},
+ he:{dir:'rtl',map:'מפה',compare:'לפני / אחרי',about:'אודות',
+  base:'בסיס',basemap:'רחובות ומבנים',sat:'תצלום אוויר (שחור-לבן)',mask:'עמעום מחוץ לנגב',labels:'שמות מקומות',
+  bounds:'גבולות ויישובים',arab:'יישובים ערביים מוכרים',jew:'יישובים יהודיים',ind:'אזורי תעשייה / ביטחון',rc:'גבולות מועצות אזוריות',
+  red:'הרשימה האדומה',unrec:'כפרים מחוץ לכל גבול מוכר',demo:'הריסות מתועדות',
+  plan:'תכנון רשמי',xplan:'קווים כחולים – תכניות (Xplan)',landuse:'ייעודי קרקע',tmm:'תמ"מ 4/14 – מחוז דרום',vatmal:'מתחמי ות"ל מוכרזים',
+  unrecNote:'נקודות OSM בשמות ערביים מחוץ לכל גבול יישוב מוכר — מועמדות ככפרים לא מוכרים. לאימות מול רשימת המועצה האזורית לכפרים הלא מוכרים.',
+  liveNote:'שכבות חיות משרתי מנהל התכנון — מתעדכנות אוטומטית.',
+  sArab:'קמ"ר ליישובים ערביים',sJew:'קמ"ר ליישובים יהודיים',sUn:'כפרים מחוץ לגבול',sRc:'קמ"ר למועצות ערביות',
+  draw:'סמן מבנה שנהרס',drawing:'לחצי נקודות · דאבל-קליק לסיום',undo:'בטל',export:'ייצוא GeoJSON',
+  locality:'יישוב',council:'מועצה אזורית',area:'שטח',source:'מקור',outside:'מחוץ לגבול מוכר',
+  heroSub:'הנגב · אטלס צדק מרחבי'},
+ en:{dir:'ltr',map:'Map',compare:'Before / After',about:'About',
+  base:'Base',basemap:'Streets & buildings',sat:'Aerial (B/W)',mask:'Dim outside the Naqab',labels:'Place names',
+  bounds:'Boundaries & localities',arab:'Recognized Arab localities',jew:'Jewish localities',ind:'Industrial / security zones',rc:'Regional council limits',
+  red:'Red list',unrec:'Villages outside any recognized boundary',demo:'Documented demolitions',
+  plan:'Official planning',xplan:'Blue lines – plans (Xplan)',landuse:'Land-use designations',tmm:'District plan 4/14 – South',vatmal:'Declared VATMAL compounds',
+  unrecNote:'OSM places with Arabic names lying outside every recognized locality boundary — candidate unrecognized villages. Verify against the RCUV list.',
+  liveNote:'Live layers streamed from the Israel Planning Administration servers.',
+  sArab:'km² Arab localities',sJew:'km² Jewish localities',sUn:'villages off the map',sRc:'km² Arab councils',
+  draw:'Mark demolished building',drawing:'Click vertices · double-click to finish',undo:'Undo',export:'Export GeoJSON',
+  locality:'Locality',council:'Regional council',area:'Area',source:'Source',outside:'Outside recognized boundary',
+  heroSub:'Naqab · an atlas of spatial justice'}
+};
+let L = 'ar'; try{ L = localStorage.getItem('offmap-lang') || 'ar'; }catch(e){}
+const t = k => (T[L]||T.en)[k] || T.en[k] || k;
+
+/* ---------------- geometry helpers ---------------- */
+const R2=6378137, rad=d=>d*Math.PI/180;
+function ringArea(c){let a=0;for(let i=0;i<c.length-1;i++){const[p1,q1]=c[i],[p2,q2]=c[i+1];a+=rad(p2-p1)*(2+Math.sin(rad(q1))+Math.sin(rad(q2)));}return Math.abs(a*R2*R2/2);}
+function polyArea(g){const ps=g.type==='Polygon'?[g.coordinates]:g.coordinates;let s=0;ps.forEach(p=>{s+=ringArea(p[0]);p.slice(1).forEach(h=>s-=ringArea(h));});return s;}
+function inRing(pt,r){let x=pt[0],y=pt[1],ins=false;for(let i=0,j=r.length-1;i<r.length;j=i++){const[xi,yi]=r[i],[xj,yj]=r[j];if(((yi>y)!==(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi))ins=!ins;}return ins;}
+function inGeom(pt,g){const ps=g.type==='Polygon'?[g.coordinates]:g.coordinates;return ps.some(p=>inRing(pt,p[0])&&!p.slice(1).some(h=>inRing(pt,h)));}
+const hasArabic = s => /[؀-ۿ]/.test(s||'');
+
+/* ---------------- classification ---------------- */
+const REGIONAL = new Set(['Neve Midbar','al Kasum','Merhavim','Sdot Negev','Ramat Negev','Hevel Eielot',"Ha'arava Hatihona","Bnei Shim'on",'Eshkol','Tamar']);
+const ARAB = new Set(['Tel Sheva','Segev Shalom',"Ar'ara Banegev",'Lakiye','Kseyfe','Hura','Rahat','Neve Midbar','al Kasum']);
+const INDUSTRIAL = new Set(['Neot Hovav']);
+
+async function loadData(){
+  const get = f => fetch('data/'+f).then(r=>r.json());
+  const [nafa, muni, rahat, vaadim, places] = await Promise.all(
+    ['negev_nafa.geojson','muni.geojson','rahat.geojson','vaadim.geojson','osm_places.geojson'].map(get));
+  muni.features.push(...rahat.features);
+  const loc=[], rc=[];
+  muni.features.forEach(f=>{
+    const p=f.properties, en=(p.Muni_Eng||'').trim();
+    if(REGIONAL.has(en)){ rc.push({...f,properties:{grp:ARAB.has(en)?'arab':'jewish',en,he:p.Muni_Heb,kind:'council',km2:+(polyArea(f.geometry)/1e6).toFixed(1)}}); return; }
+    loc.push({...f,properties:{grp:INDUSTRIAL.has(en)?'industrial':ARAB.has(en)?'arab':'jewish',en,he:p.Muni_Heb,kind:'locality',km2:+(polyArea(f.geometry)/1e6).toFixed(2)}});
+  });
+  vaadim.features.forEach(f=>{
+    const p=f.properties, v=(p.Vaad_Eng||'').trim(), m=(p.Muni_Eng||'').trim();
+    if(!v || /^GENERAL/i.test(v)) return;
+    const en=v.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
+    loc.push({...f,properties:{grp:ARAB.has(m)?'arab':'jewish',en,he:p.Vaad_Heb,council:m,kind:'locality',km2:+(polyArea(f.geometry)/1e6).toFixed(2)}});
+  });
+  const negevGeom = nafa.features[0].geometry;
+  // red list: Arabic-named OSM places inside the Naqab but outside every recognized locality
+  const seen=new Set(), unrec=[];
+  places.features.forEach(f=>{
+    const p=f.properties, c=f.geometry.coordinates;
+    if(!hasArabic(p.name) || !c || !c[0]) return;
+    if(!inGeom(c,negevGeom)) return;
+    if(loc.some(l=>inGeom(c,l.geometry))) return;
+    const key=(p.ar||p.name)+Math.round(c[0]*100)+Math.round(c[1]*100); if(seen.has(key)) return; seen.add(key);
+    unrec.push({type:'Feature',geometry:f.geometry,properties:{ar:p.ar||p.name,he:p.he||p.ar||p.name,en:p.en||p.ar||p.name,place:p.place}});
+  });
+  // documented demolitions (seed list, positioned from OSM names; extend via the drawing tool)
+  const DEMO=[
+    {match:/العراقيب/,note:{ar:'هُدمت القرية مراراً منذ تموز 2010 — أكثر من 200 مرة بحسب تقارير منتدى التعايش في النقب.',he:'הכפר נהרס שוב ושוב מאז יולי 2010 — יותר מ-200 פעמים לפי דיווחי פורום דו-קיום בנגב.',en:'Demolished repeatedly since July 2010 — over 200 times per Negev Coexistence Forum reports.'}},
+    {match:/عتير|أم الحيران|ام الحيران/,note:{ar:'أم الحيران/عتير: هدم 2017 وإخلاء لصالح بلدة "حيران" اليهودية.',he:'אום אל-חיראן/עתיר: הריסות 2017 ופינוי לטובת היישוב היהודי "חירן".',en:'Umm al-Hiran/Atir: 2017 demolitions, evicted for the Jewish town of Hiran.'}}
+  ];
+  const demo=[];
+  DEMO.forEach(d=>{const f=places.features.find(f=>d.match.test((f.properties.ar||'')+' '+(f.properties.name||'')) && f.geometry.coordinates[0]); if(f) demo.push({type:'Feature',geometry:f.geometry,properties:{ar:f.properties.ar||f.properties.name,he:f.properties.he||f.properties.name,en:f.properties.en||f.properties.name,note:JSON.stringify(d.note)}});});
+  return {nafa, negevGeom, loc:{type:'FeatureCollection',features:loc}, rc:{type:'FeatureCollection',features:rc},
+          unrec:{type:'FeatureCollection',features:unrec}, demo:{type:'FeatureCollection',features:demo}};
+}
+
+/* ---------------- base style (concrete night) ---------------- */
+function nameExpr(){ return ['coalesce',['get','name:'+L],['get','name'] ]; }
+function baseStyle(){
+  return {version:8,
+   glyphs:'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',
+   sources:{
+     omt:{type:'vector',url:'https://tiles.openfreemap.org/planet'},
+     sat:{type:'raster',tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],tileSize:256,maxzoom:19,attribution:'Esri World Imagery'}
+   },
+   layers:[
+    {id:'bg',type:'background',paint:{'background-color':'#151514'}},
+    {id:'sat',type:'raster',source:'sat',layout:{visibility:'none'},paint:{'raster-saturation':-1,'raster-contrast':.25,'raster-brightness-max':.85}},
+    {id:'landuse',type:'fill',source:'omt','source-layer':'landuse',group:'base',paint:{'fill-color':'#1c1c1b'}},
+    {id:'water',type:'fill',source:'omt','source-layer':'water',group:'base',paint:{'fill-color':'#070707'}},
+    {id:'wadi',type:'line',source:'omt','source-layer':'waterway',group:'base',minzoom:9,paint:{'line-color':'#2a2a28','line-width':['interpolate',['linear'],['zoom'],9,.4,14,1.6]}},
+    {id:'bld',type:'fill',source:'omt','source-layer':'building',group:'base',minzoom:12,paint:{'fill-color':'#3b3b39','fill-outline-color':'#55554f'}},
+    {id:'rd-minor',type:'line',source:'omt','source-layer':'transportation',group:'base',minzoom:11,filter:['in',['get','class'],['literal',['minor','service','track','path']]],
+      paint:{'line-color':'#2e2e2c','line-width':['interpolate',['linear'],['zoom'],11,.3,16,2.2]}},
+    {id:'rd-mid',type:'line',source:'omt','source-layer':'transportation',group:'base',filter:['in',['get','class'],['literal',['secondary','tertiary']]],
+      paint:{'line-color':'#4a4a47','line-width':['interpolate',['linear'],['zoom'],8,.4,16,4]}},
+    {id:'rd-major',type:'line',source:'omt','source-layer':'transportation',group:'base',filter:['in',['get','class'],['literal',['motorway','trunk','primary']]],
+      paint:{'line-color':'#6d6d68','line-width':['interpolate',['linear'],['zoom'],7,.6,16,6]}},
+    {id:'rail',type:'line',source:'omt','source-layer':'transportation',group:'base',filter:['==',['get','class'],'rail'],
+      paint:{'line-color':'#6d6d68','line-width':1,'line-dasharray':[3,2]}}
+   ]};
+}
+
+/* ---------------- map ---------------- */
+maplibregl.setRTLTextPlugin('https://unpkg.com/@mapbox/mapbox-gl-rtl-text@0.2.3/mapbox-gl-rtl-text.min.js', true);
+const map = new maplibregl.Map({container:'map',style:baseStyle(),...NEGEV_VIEW,attributionControl:{compact:true},hash:true,maxPitch:0});
+const map2 = new maplibregl.Map({container:'map2',style:{version:8,sources:{},layers:[{id:'bg',type:'background',paint:{'background-color':'#151514'}}]},...NEGEV_VIEW,interactive:false,attributionControl:false});
+map.on('move',()=>map2.jumpTo({center:map.getCenter(),zoom:map.getZoom(),bearing:map.getBearing()}));
+
+const state = { // layer id -> visible
+  basemap:true, sat:false, mask:true, labels:true,
+  arab:true, jew:true, ind:true, rc:false,
+  unrec:true, demo:true,
+  xplan:false, landuse:false, tmm:false, vatmal:false
+};
+try{ Object.assign(state, JSON.parse(localStorage.getItem('offmap-state')||'{}')); }catch(e){}
+const BASE_IDS=['landuse','water','wadi','bld','rd-minor','rd-mid','rd-major','rail'];
+const LAYERMAP = {
+  basemap:BASE_IDS, sat:['sat'], mask:['mask','negev-edge'], labels:['place-lbl'],
+  arab:['loc-arab-fill','loc-arab-line','loc-arab-lbl'], jew:['loc-jew-line','loc-jew-lbl'], ind:['loc-ind'], rc:['rc-line'],
+  unrec:['un-cluster','un-count','un-pt','un-lbl'], demo:['demo-halo','demo-pt'],
+  xplan:['live-xplan'], landuse:['live-landuse'], tmm:['live-tmm'], vatmal:['live-vatmal']
+};
+
+let DATA;
+map.on('load', async ()=>{
+  DATA = await loadData();
+  // live iplan rasters (inserted under vector overlays)
+  const live = [['xplan','Xplan','1'],['landuse','Xplan','4'],['tmm','compilation_tmm_darom',''],['vatmal','vatmal_mitchamim_muchrazim','']];
+  live.forEach(([k,svc,ly])=>{
+    map.addSource('src-'+k,{type:'raster',tiles:[exportTiles(svc,ly)],tileSize:512,minzoom:7,attribution:'© מנהל התכנון'});
+    map.addLayer({id:'live-'+k,type:'raster',source:'src-'+k,paint:{'raster-opacity':k==='landuse'?.55:.9}});
+  });
+  // dim mask: world minus the Naqab
+  const holes = (DATA.negevGeom.type==='Polygon'?[DATA.negevGeom.coordinates]:DATA.negevGeom.coordinates).map(p=>p[0]);
+  map.addSource('mask',{type:'geojson',data:{type:'Feature',geometry:{type:'Polygon',coordinates:[[[-180,-85],[180,-85],[180,85],[-180,85],[-180,-85]],...holes]}}});
+  map.addLayer({id:'mask',type:'fill',source:'mask',paint:{'fill-color':'#000','fill-opacity':.62}});
+  map.addSource('negev',{type:'geojson',data:DATA.nafa});
+  map.addLayer({id:'negev-edge',type:'line',source:'negev',paint:{'line-color':'#e9e6df','line-width':1.2,'line-opacity':.7}});
+  // regional councils
+  map.addSource('rc',{type:'geojson',data:DATA.rc});
+  map.addLayer({id:'rc-line',type:'line',source:'rc',paint:{'line-color':['case',['==',['get','grp'],'arab'],'#e9e6df','#8a8a86'],'line-width':1,'line-dasharray':[4,3],'line-opacity':.7}});
+  // localities: Arab = solid bone slab, Jewish = hollow concrete outline
+  map.addSource('loc',{type:'geojson',data:DATA.loc});
+  map.addLayer({id:'loc-ind',type:'fill',source:'loc',filter:['==',['get','grp'],'industrial'],paint:{'fill-color':'#5a5a55','fill-opacity':.35}});
+  map.addLayer({id:'loc-arab-fill',type:'fill',source:'loc',filter:['==',['get','grp'],'arab'],paint:{'fill-color':'#e9e6df','fill-opacity':['interpolate',['linear'],['zoom'],8,.55,14,.12]}});
+  map.addLayer({id:'loc-arab-line',type:'line',source:'loc',filter:['==',['get','grp'],'arab'],paint:{'line-color':'#e9e6df','line-width':1.4}});
+  map.addLayer({id:'loc-jew-line',type:'line',source:'loc',filter:['==',['get','grp'],'jewish'],paint:{'line-color':'#8a8a86','line-width':1.2}});
+  // base labels on top of boundaries
+  map.addLayer({id:'place-lbl',type:'symbol',source:'omt','source-layer':'place',filter:['in',['get','class'],['literal',['city','town','village']]],
+    layout:{'text-field':nameExpr(),'text-font':['Noto Sans Bold'],'text-size':['match',['get','class'],'city',15,'town',12,11],'text-transform':'uppercase','text-letter-spacing':.06},
+    paint:{'text-color':'#d8d5ce','text-halo-color':'#000','text-halo-width':1.2}});
+  map.addLayer({id:'loc-arab-lbl',type:'symbol',source:'loc',minzoom:10,filter:['==',['get','grp'],'arab'],layout:{'text-field':['get',L==='en'?'en':'he'],'text-font':['Noto Sans Bold'],'text-size':11},paint:{'text-color':'#fff','text-halo-color':'#000','text-halo-width':1.4}});
+  map.addLayer({id:'loc-jew-lbl',type:'symbol',source:'loc',minzoom:10,filter:['==',['get','grp'],'jewish'],layout:{'text-field':['get',L==='en'?'en':'he'],'text-font':['Noto Sans Regular'],'text-size':10},paint:{'text-color':'#9a9a95','text-halo-color':'#000','text-halo-width':1.2}});
+  // red list — SOS cluster logic: black counters, red pins
+  map.addSource('unrec',{type:'geojson',data:DATA.unrec,cluster:true,clusterRadius:42,clusterMaxZoom:11});
+  map.addLayer({id:'un-cluster',type:'circle',source:'unrec',filter:['has','point_count'],paint:{'circle-color':'#111','circle-stroke-color':'#e8452c','circle-stroke-width':1.5,'circle-radius':['step',['get','point_count'],15,5,20,15,27]}});
+  map.addLayer({id:'un-count',type:'symbol',source:'unrec',filter:['has','point_count'],layout:{'text-field':['get','point_count_abbreviated'],'text-font':['Noto Sans Bold'],'text-size':14,'text-allow-overlap':true},paint:{'text-color':'#fff'}});
+  map.addLayer({id:'un-pt',type:'circle',source:'unrec',filter:['!',['has','point_count']],paint:{'circle-color':'#e8452c','circle-radius':['interpolate',['linear'],['zoom'],9,4,15,8],'circle-stroke-color':'#000','circle-stroke-width':2}});
+  map.addLayer({id:'un-lbl',type:'symbol',source:'unrec',minzoom:11,filter:['!',['has','point_count']],layout:{'text-field':['get',L],'text-font':['Noto Sans Bold'],'text-size':11,'text-offset':[0,1.3]},paint:{'text-color':'#e8452c','text-halo-color':'#000','text-halo-width':1.5}});
+  map.addSource('demo',{type:'geojson',data:DATA.demo});
+  map.addLayer({id:'demo-halo',type:'circle',source:'demo',paint:{'circle-radius':18,'circle-color':'#e8452c','circle-opacity':.18,'circle-stroke-color':'#e8452c','circle-stroke-width':1}});
+  map.addLayer({id:'demo-pt',type:'symbol',source:'demo',layout:{'text-field':'✕','text-font':['Noto Sans Bold'],'text-size':20,'text-allow-overlap':true},paint:{'text-color':'#e8452c','text-halo-color':'#000','text-halo-width':2}});
+  // drawn demolitions
+  map.addSource('drawn',{type:'geojson',data:drawnFC()});
+  map.addLayer({id:'drawn-fill',type:'fill',source:'drawn',paint:{'fill-color':'#e8452c','fill-opacity':.45}});
+  map.addLayer({id:'drawn-line',type:'line',source:'drawn',paint:{'line-color':'#e8452c','line-width':2}});
+
+  applyState(); renderPanel(); renderStats(); bindPopups();
+});
+
+function applyState(){
+  if(!map.getLayer('mask')) return;
+  Object.entries(LAYERMAP).forEach(([k,ids])=>ids.forEach(id=>map.getLayer(id)&&map.setLayoutProperty(id,'visibility',state[k]?'visible':'none')));
+  try{ localStorage.setItem('offmap-state',JSON.stringify(state)); }catch(e){}
+}
+
+/* ---------------- panel ---------------- */
+function renderPanel(){
+  const sw=(c,dash)=>`<span class="sw" style="${dash?`border-top:2px dashed ${c}`:`background:${c}`}"></span>`;
+  const row=(k,label,swatch='',live=false)=>`<label class="row"><input type="checkbox" data-k="${k}" ${state[k]?'checked':''}><span class="box"></span>${label}${live?'<span class="live">LIVE</span>':''}${swatch}</label>`;
+  document.getElementById('panel').innerHTML=
+   `<h3>${t('base')}</h3>${row('basemap',t('basemap'))}${row('sat',t('sat'))}${row('mask',t('mask'))}${row('labels',t('labels'))}
+    <h3>${t('bounds')}</h3>${row('arab',t('arab'),sw('#e9e6df'))}${row('jew',t('jew'),`<span class="sw" style="border:2px solid #8a8a86"></span>`)}${row('ind',t('ind'),sw('#5a5a55'))}${row('rc',t('rc'),sw('#8a8a86',1))}
+    <h3>${t('red')}</h3>${row('unrec',t('unrec'),sw('#e8452c'))}${row('demo',t('demo'),'<span class="sw" style="color:#e8452c;font-weight:800;text-align:center">✕</span>')}
+    <div class="note">${t('unrecNote')}</div>
+    <h3>${t('plan')}</h3>${row('xplan',t('xplan'),'',1)}${row('landuse',t('landuse'),'',1)}${row('tmm',t('tmm'),'',1)}${row('vatmal',t('vatmal'),'',1)}
+    <div class="note">${t('liveNote')}</div>`;
+  document.querySelectorAll('#panel input').forEach(i=>i.onchange=()=>{state[i.dataset.k]=i.checked;applyState();});
+}
+function renderStats(){
+  if(!DATA) return;
+  const sum=(fc,g)=>fc.features.filter(f=>f.properties.grp===g).reduce((s,f)=>s+f.properties.km2,0);
+  const a=sum(DATA.loc,'arab'), j=sum(DATA.loc,'jewish'), rcA=sum(DATA.rc,'arab');
+  document.getElementById('stats').innerHTML=
+   `<div class="stat"><div class="n red">${DATA.unrec.features.length}</div><div class="l">${t('sUn')}</div></div>
+    <div class="stat"><div class="n">${Math.round(a)}</div><div class="l">${t('sArab')}</div></div>
+    <div class="stat"><div class="n">${Math.round(j)}</div><div class="l">${t('sJew')}</div></div>`;
+}
+
+/* ---------------- popups (SOS card) ---------------- */
+function bindPopups(){
+  const card=(cls,hd,body)=>`<div class="card"><div class="hd ${cls}">${hd}</div><div class="bd">${body}</div></div>`;
+  const nm=p=>L==='en'?(p.en||p.he):(p.he||p.en);
+  map.on('click','un-pt',e=>{const p=e.features[0].properties;new maplibregl.Popup({maxWidth:'280px'}).setLngLat(e.lngLat).setHTML(card('',t('outside'),`<b>${p[L]||p.ar}</b>${p.ar}<div class="src">${t('source')}: OpenStreetMap · ${p.place}</div>`)).addTo(map);});
+  map.on('click','un-cluster',e=>{const f=e.features[0];map.getSource('unrec').getClusterExpansionZoom(f.properties.cluster_id).then(z=>map.easeTo({center:f.geometry.coordinates,zoom:z}));});
+  map.on('click','demo-pt',e=>{const p=e.features[0].properties,n=JSON.parse(p.note);new maplibregl.Popup({maxWidth:'300px'}).setLngLat(e.lngLat).setHTML(card('',t('demo'),`<b>${p[L]||p.ar}</b>${n[L]}`)).addTo(map);});
+  ['loc-arab-fill','loc-jew-line'].forEach(id=>map.on('click',id,e=>{if(map.queryRenderedFeatures(e.point,{layers:['un-pt','demo-pt','un-cluster']}).length)return;const p=e.features[0].properties;
+    new maplibregl.Popup({maxWidth:'280px'}).setLngLat(e.lngLat).setHTML(card(p.grp==='arab'?'bone':'grey',t(p.grp==='arab'?'arab':'jew'),`<b>${nm(p)}</b>${t('area')}: ${p.km2} km²${p.council?`<br>${t('council')}: ${p.council}`:''}<div class="src">${t('source')}: מנהל התכנון · גבולות שיפוט / ועדים מקומיים</div>`)).addTo(map);}));
+  ['un-pt','un-cluster','demo-pt','loc-arab-fill','loc-jew-line'].forEach(id=>{map.on('mouseenter',id,()=>map.getCanvas().style.cursor='pointer');map.on('mouseleave',id,()=>map.getCanvas().style.cursor='');});
+}
+
+/* ---------------- compare / wayback swipe ---------------- */
+let split=.5;
+function fillYears(){
+  const opts=WAYBACK.map(([y,id])=>`<option value="${id}">${y}</option>`).join('');
+  selL.innerHTML=opts; selR.innerHTML=opts; selL.selectedIndex=0; selR.selectedIndex=WAYBACK.length-1;
+}
+function setWB(m,id){
+  if(m.getLayer('wb')) m.removeLayer('wb'); if(m.getSource('wb')) m.removeSource('wb');
+  m.addSource('wb',{type:'raster',tiles:[wbTiles(id)],tileSize:256,maxzoom:19,attribution:'Esri Wayback'});
+  const before = m===map ? 'landuse' : undefined;
+  m.addLayer({id:'wb',type:'raster',source:'wb',paint:{'raster-saturation':-.85,'raster-contrast':.15}},before);
+}
+function ensureMap2Overlays(){
+  if(map2.getSource('drawn')) return;
+  map2.addSource('drawn',{type:'geojson',data:drawnFC()});
+  map2.addLayer({id:'drawn-fill',type:'fill',source:'drawn',paint:{'fill-color':'#e8452c','fill-opacity':.45}});
+  map2.addLayer({id:'drawn-line',type:'line',source:'drawn',paint:{'line-color':'#e8452c','line-width':2}});
+  if(DATA){ map2.addSource('unrec',{type:'geojson',data:DATA.unrec});
+    map2.addLayer({id:'un-pt',type:'circle',source:'unrec',paint:{'circle-color':'#e8452c','circle-radius':5,'circle-stroke-color':'#000','circle-stroke-width':2}}); }
+}
+function positionSwipe(){
+  const w=document.getElementById('stage').clientWidth, x=w*split;
+  document.getElementById('swipe').style.left=x+'px';
+  document.getElementById('map2').style.clipPath=`inset(0 0 0 ${x}px)`;
+}
+function enterCompare(on){
+  document.body.classList.toggle('compare',on);
+  if(on){
+    if(!selL.options.length) fillYears();
+    setWB(map,selL.value);
+    const go=()=>{setWB(map2,selR.value);ensureMap2Overlays();map2.resize();map2.jumpTo({center:map.getCenter(),zoom:map.getZoom()});positionSwipe();};
+    map2.loaded()?go():map2.once('load',go);
+    state._b=state.basemap; state.basemap=false; applyState();
+    if(map.getZoom()<12) map.flyTo({center:[34.80,31.33],zoom:14}); // al-Araqib area
+  } else {
+    if(map.getLayer('wb')){map.removeLayer('wb');map.removeSource('wb');}
+    if(state._b!==undefined){state.basemap=state._b;delete state._b;applyState();}
+  }
+}
+selL.onchange=()=>setWB(map,selL.value);
+selR.onchange=()=>setWB(map2,selR.value);
+(function(){const knob=document.querySelector('#swipe .knob');let drag=false;
+  knob.addEventListener('pointerdown',e=>{drag=true;knob.setPointerCapture(e.pointerId);});
+  knob.addEventListener('pointermove',e=>{if(!drag)return;const r=document.getElementById('stage').getBoundingClientRect();split=Math.min(.97,Math.max(.03,(e.clientX-r.left)/r.width));positionSwipe();});
+  knob.addEventListener('pointerup',()=>drag=false);
+  window.addEventListener('resize',positionSwipe);
+})();
+
+/* ---------------- demolition drawing tool ---------------- */
+let drawn=[]; try{drawn=JSON.parse(localStorage.getItem('offmap-drawn')||'[]');}catch(e){}
+let drawing=false, verts=[];
+function drawnFC(){const fs=drawn.map(d=>({type:'Feature',geometry:{type:'Polygon',coordinates:[[...d.c,d.c[0]]]},properties:{before:d.b,after:d.a}}));
+  if(verts.length>1) fs.push({type:'Feature',geometry:{type:'LineString',coordinates:verts},properties:{}});return {type:'FeatureCollection',features:fs};}
+function refreshDrawn(){[map,map2].forEach(m=>m.getSource('drawn')&&m.getSource('drawn').setData(drawnFC()));try{localStorage.setItem('offmap-drawn',JSON.stringify(drawn));}catch(e){}}
+drawBtn.onclick=()=>{drawing=!drawing;verts=[];drawBtn.classList.toggle('on',drawing);drawBtn.textContent=drawing?t('drawing'):t('draw');map.doubleClickZoom[drawing?'disable':'enable']();map.getCanvas().style.cursor=drawing?'crosshair':'';refreshDrawn();};
+map.on('click',e=>{if(!drawing)return;verts.push([+e.lngLat.lng.toFixed(6),+e.lngLat.lat.toFixed(6)]);refreshDrawn();});
+map.on('dblclick',e=>{if(!drawing)return;e.preventDefault();if(verts.length>=3){const yr=id=>(WAYBACK.find(w=>w[1]==id)||[])[0];drawn.push({c:verts.slice(0,-1).length>=3?verts.slice(0,-1):verts,b:yr(selL.value),a:yr(selR.value)});}verts=[];refreshDrawn();});
+undoBtn.onclick=()=>{if(verts.length)verts.pop();else drawn.pop();refreshDrawn();};
+exportBtn.onclick=()=>{const fc=drawnFC();fc.features=fc.features.filter(f=>f.geometry.type==='Polygon');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(fc)],{type:'application/geo+json'}));a.download='demolitions_marked.geojson';a.click();};
+
+/* ---------------- about ---------------- */
+function renderAbout(){
+  document.getElementById('heroSub').textContent=t('heroSub');
+  const A={
+   ar:`<div><h2>OFF—MAP</h2><p>في النقب، عشرات القرى العربية البدوية موجودة على الأرض لكنها غائبة عن الخريطة الرسمية: بلا خط أزرق، بلا مخطط، بلا بنى تحتية — ومعرّضة للهدم.</p><p>هذا الأطلس يضع المخطط الرسمي (מנהל התכנון) فوق الواقع (OSM، صور جوية أرشيفية) ليُظهر الفجوة بينهما: من يُرسم ومن يُمحى.</p></div>`,
+   he:`<div><h2>OFF—MAP</h2><p>בנגב, עשרות כפרים ערביים-בדואים קיימים בשטח אך נעדרים מהמפה הרשמית: בלי קו כחול, בלי תכנית, בלי תשתיות — ותחת איום הריסה.</p><p>האטלס מניח את התכנון הרשמי (מנהל התכנון) מעל המציאות (OSM, תצלומי אוויר ארכיוניים) כדי לחשוף את הפער: מי משורטט ומי נמחק.</p></div>`,
+   en:`<div><h2>OFF—MAP</h2><p>In the Naqab/Negev, dozens of Bedouin Arab villages exist on the ground yet are absent from the official map: no blue line, no plan, no infrastructure — and under threat of demolition.</p><p>This atlas lays official planning (Israel Planning Administration) over the ground truth (OSM, archival aerials) to expose the gap: who is drawn, and who is erased.</p></div>`};
+  document.getElementById('aboutBody').innerHTML = A[L] +
+   `<div><h2>${t('source')}</h2><table>
+    <tr><td>Planning Administration (iplan) — gvulot_retzef</td><td>Subdistricts, municipal limits, local committees</td></tr>
+    <tr><td>iplan — Xplan / TMM South / VATMAL</td><td>Live blue lines, land use, district plan</td></tr>
+    <tr><td>OpenStreetMap · OpenFreeMap</td><td>Streets, buildings, village points</td></tr>
+    <tr><td>Esri World Imagery · Wayback</td><td>Aerial archive 2014→today</td></tr>
+    <tr><td>Sikkuy-Aufoq · RCUV · NCF (Dukium)</td><td>Partners / verification sources (to integrate)</td></tr></table></div>
+    <div class="redlist"><h2>${t('red')}</h2><p style="margin:0">${t('unrecNote')}</p></div>`;
+}
+
+/* ---------------- chrome: views, language, tools ---------------- */
+function setView(v){
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('on',b.dataset.view===v));
+  document.body.classList.toggle('about',v==='about');
+  enterCompare(v==='compare');
+  document.getElementById('sectionLabel').textContent=t(v);
+  if(v==='about') renderAbout();
+}
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>setView(b.dataset.view));
+function setLang(l){
+  L=l; try{localStorage.setItem('offmap-lang',l);}catch(e){}
+  document.documentElement.lang=l; document.documentElement.dir=T[l].dir;
+  langBtn.textContent={ar:'ع',he:'ע',en:'E'}[l];
+  document.querySelectorAll('#lang .menu button').forEach(b=>b.classList.toggle('on',b.dataset.l===l));
+  drawBtn.textContent=t('draw'); undoBtn.textContent=t('undo'); exportBtn.textContent=t('export');
+  const cur=document.querySelector('.nav button.on'); document.getElementById('sectionLabel').textContent=t(cur?cur.dataset.view:'map');
+  if(map.getLayer('place-lbl')){ map.setLayoutProperty('place-lbl','text-field',nameExpr());
+    ['loc-arab-lbl','loc-jew-lbl'].forEach(id=>map.setLayoutProperty(id,'text-field',['get',l==='en'?'en':'he']));
+    map.setLayoutProperty('un-lbl','text-field',['get',l]); }
+  renderPanel(); renderStats(); if(document.body.classList.contains('about')) renderAbout();
+}
+langBtn.onclick=()=>document.getElementById('lang').classList.toggle('open');
+document.querySelectorAll('#lang .menu button').forEach(b=>b.onclick=()=>{setLang(b.dataset.l);document.getElementById('lang').classList.remove('open');});
+fsBtn.onclick=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();
+homeBtn.onclick=()=>map.flyTo(NEGEV_VIEW);
+grainBtn.onclick=()=>{document.body.classList.toggle('nograin');grainBtn.classList.toggle('on');};
+panelToggle.onclick=()=>document.body.classList.toggle('panel');
+setLang(L);
+</script>
+</body>
+</html>

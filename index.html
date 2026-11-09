@@ -198,7 +198,9 @@ const T = {
   sArab:'كم² لبلدات عربية',sJew:'كم² لبلدات يهودية',sUn:'قرى خارج الحدود',sRc:'كم² لمجالس عربية',
   draw:'ارسم مبنى مهدوم',drawing:'انقر النقاط · دبل-كليك للإنهاء',undo:'تراجع',export:'تصدير GeoJSON',
   locality:'بلدة',council:'مجلس إقليمي',area:'المساحة',source:'المصدر',outside:'خارج الحدود المعترف بها',
-  heroSub:'النقب · أطلس العدالة المكانية'},
+  heroSub:'النقب · أطلس العدالة المكانية',
+  econ:'الاقتصاد والتشغيل',indJ:'مناطق صناعية – بلدات يهودية',indA:'مناطق صناعية – بلدات عربية',arab7:'البلدات العربية السبع (طبقة الفريق)',
+  sIndA:'كم² صناعة عربية',sIndJ:'كم² صناعة يهودية',gross:'مساحة إجمالية',net:'مساحة صناعية صافية',planNo:'رقم المخطط',owner:'الملكية',auth:'السلطة',zones:'مناطق',dunam:'دونم',teamSrc:'طبقة الفريق (ArcGIS) · مناطق صناعية 2022'},
  he:{dir:'rtl',map:'מפה',compare:'לפני / אחרי',about:'אודות',
   base:'בסיס',basemap:'רחובות ומבנים',sat:'תצלום אוויר (שחור-לבן)',mask:'עמעום מחוץ לנגב',labels:'שמות מקומות',
   bounds:'גבולות ויישובים',arab:'יישובים ערביים מוכרים',jew:'יישובים יהודיים',ind:'אזורי תעשייה / ביטחון',rc:'גבולות מועצות אזוריות',
@@ -209,7 +211,9 @@ const T = {
   sArab:'קמ"ר ליישובים ערביים',sJew:'קמ"ר ליישובים יהודיים',sUn:'כפרים מחוץ לגבול',sRc:'קמ"ר למועצות ערביות',
   draw:'סמן מבנה שנהרס',drawing:'לחצי נקודות · דאבל-קליק לסיום',undo:'בטל',export:'ייצוא GeoJSON',
   locality:'יישוב',council:'מועצה אזורית',area:'שטח',source:'מקור',outside:'מחוץ לגבול מוכר',
-  heroSub:'הנגב · אטלס צדק מרחבי'},
+  heroSub:'הנגב · אטלס צדק מרחבי',
+  econ:'כלכלה ותעסוקה',indJ:'אזורי תעשייה – יישובים יהודיים',indA:'אזורי תעשייה – יישובים ערביים',arab7:'שבעת היישובים הערביים (שכבת הצוות)',
+  sIndA:'קמ"ר תעשייה ערבית',sIndJ:'קמ"ר תעשייה יהודית',gross:'שטח ברוטו',net:'שטח תעשייה נטו',planNo:'מס\' תכנית',owner:'בעלות',auth:'רשות',zones:'אזורים',dunam:'דונם',teamSrc:'שכבת הצוות (ArcGIS) · אזורי תעשייה 2022'},
  en:{dir:'ltr',map:'Map',compare:'Before / After',about:'About',
   base:'Base',basemap:'Streets & buildings',sat:'Aerial (B/W)',mask:'Dim outside the Naqab',labels:'Place names',
   bounds:'Boundaries & localities',arab:'Recognized Arab localities',jew:'Jewish localities',ind:'Industrial / security zones',rc:'Regional council limits',
@@ -220,7 +224,9 @@ const T = {
   sArab:'km² Arab localities',sJew:'km² Jewish localities',sUn:'villages off the map',sRc:'km² Arab councils',
   draw:'Mark demolished building',drawing:'Click vertices · double-click to finish',undo:'Undo',export:'Export GeoJSON',
   locality:'Locality',council:'Regional council',area:'Area',source:'Source',outside:'Outside recognized boundary',
-  heroSub:'Naqab · an atlas of spatial justice'}
+  heroSub:'Naqab · an atlas of spatial justice',
+  econ:'Economy & employment',indJ:'Industrial zones – Jewish localities',indA:'Industrial zones – Arab localities',arab7:'The seven Arab towns (team layer)',
+  sIndA:'km² Arab industry',sIndJ:'km² Jewish industry',gross:'Gross area',net:'Net industrial area',planNo:'Plan no.',owner:'Ownership',auth:'Authority',zones:'zones',dunam:'dunam',teamSrc:'Team layer (ArcGIS) · industrial zones 2022'}
 };
 let L = 'ar'; try{ L = localStorage.getItem('offmap-lang') || 'ar'; }catch(e){}
 const t = k => (T[L]||T.en)[k] || T.en[k] || k;
@@ -273,7 +279,11 @@ async function loadData(){
   ];
   const demo=[];
   DEMO.forEach(d=>{const f=places.features.find(f=>d.match.test((f.properties.ar||'')+' '+(f.properties.name||'')) && f.geometry.coordinates[0]); if(f) demo.push({type:'Feature',geometry:f.geometry,properties:{ar:f.properties.ar||f.properties.name,he:f.properties.he||f.properties.name,en:f.properties.en||f.properties.name,note:JSON.stringify(d.note)}});});
-  return {nafa, negevGeom, loc:{type:'FeatureCollection',features:loc}, rc:{type:'FeatureCollection',features:rc},
+  const opt = f => get(f).catch(()=>({type:'FeatureCollection',features:[]}));
+  const [indJ, indA, arab7] = await Promise.all(['jewish_industrial.geojson','arab_industrial.geojson','arab_negev_7.geojson'].map(opt));
+  indJ.features.forEach(f=>f.properties.grp='jewish'); indA.features.forEach(f=>f.properties.grp='arab');
+  const ind = {type:'FeatureCollection',features:[...indJ.features,...indA.features]};
+  return {ind, arab7, nafa, negevGeom, loc:{type:'FeatureCollection',features:loc}, rc:{type:'FeatureCollection',features:rc},
           unrec:{type:'FeatureCollection',features:unrec}, demo:{type:'FeatureCollection',features:demo}};
 }
 
@@ -314,6 +324,7 @@ const state = { // layer id -> visible
   basemap:true, sat:false, mask:true, labels:true,
   arab:true, jew:true, ind:true, rc:false,
   unrec:true, demo:true,
+  indJ:true, indA:true, arab7:false,
   xplan:false, landuse:false, tmm:false, vatmal:false
 };
 try{ Object.assign(state, JSON.parse(localStorage.getItem('offmap-state')||'{}')); }catch(e){}
@@ -322,11 +333,12 @@ const LAYERMAP = {
   basemap:BASE_IDS, sat:['sat'], mask:['mask','negev-edge'], labels:['place-lbl'],
   arab:['loc-arab-fill','loc-arab-line','loc-arab-lbl'], jew:['loc-jew-line','loc-jew-lbl'], ind:['loc-ind'], rc:['rc-line'],
   unrec:['un-cluster','un-count','un-pt','un-lbl'], demo:['demo-halo','demo-pt'],
+  indJ:['ind-j-fill','ind-j-line'], indA:['ind-a-fill','ind-a-line'], arab7:['arab7-line'],
   xplan:['live-xplan'], landuse:['live-landuse'], tmm:['live-tmm'], vatmal:['live-vatmal']
 };
 
 let DATA;
-map.on('load', async ()=>{
+map.once('style.load', async ()=>{
   DATA = await loadData();
   // live iplan rasters (inserted under vector overlays)
   const live = [['xplan','Xplan','1'],['landuse','Xplan','4'],['tmm','compilation_tmm_darom',''],['vatmal','vatmal_mitchamim_muchrazim','']];
@@ -349,6 +361,14 @@ map.on('load', async ()=>{
   map.addLayer({id:'loc-arab-fill',type:'fill',source:'loc',filter:['==',['get','grp'],'arab'],paint:{'fill-color':'#e9e6df','fill-opacity':['interpolate',['linear'],['zoom'],8,.55,14,.12]}});
   map.addLayer({id:'loc-arab-line',type:'line',source:'loc',filter:['==',['get','grp'],'arab'],paint:{'line-color':'#e9e6df','line-width':1.4}});
   map.addLayer({id:'loc-jew-line',type:'line',source:'loc',filter:['==',['get','grp'],'jewish'],paint:{'line-color':'#8a8a86','line-width':1.2}});
+  // team layers: industrial zones (signal yellow = economy) + the seven Arab towns
+  map.addSource('arab7',{type:'geojson',data:DATA.arab7});
+  map.addLayer({id:'arab7-line',type:'line',source:'arab7',paint:{'line-color':'#e9e6df','line-width':2.5,'line-dasharray':[1,1.5]}});
+  map.addSource('ind',{type:'geojson',data:DATA.ind});
+  map.addLayer({id:'ind-j-fill',type:'fill',source:'ind',filter:['==',['get','grp'],'jewish'],paint:{'fill-color':'#f2c230','fill-opacity':.55}});
+  map.addLayer({id:'ind-j-line',type:'line',source:'ind',filter:['==',['get','grp'],'jewish'],paint:{'line-color':'#f2c230','line-width':1.2}});
+  map.addLayer({id:'ind-a-fill',type:'fill',source:'ind',filter:['==',['get','grp'],'arab'],paint:{'fill-color':'#f2c230','fill-opacity':.95}});
+  map.addLayer({id:'ind-a-line',type:'line',source:'ind',filter:['==',['get','grp'],'arab'],paint:{'line-color':'#000','line-width':2}});
   // base labels on top of boundaries
   map.addLayer({id:'place-lbl',type:'symbol',source:'omt','source-layer':'place',filter:['in',['get','class'],['literal',['city','town','village']]],
     layout:{'text-field':nameExpr(),'text-font':['Noto Sans Bold'],'text-size':['match',['get','class'],'city',15,'town',12,11],'text-transform':'uppercase','text-letter-spacing':.06},
@@ -387,6 +407,7 @@ function renderPanel(){
     <h3>${t('bounds')}</h3>${row('arab',t('arab'),sw('#e9e6df'))}${row('jew',t('jew'),`<span class="sw" style="border:2px solid #8a8a86"></span>`)}${row('ind',t('ind'),sw('#5a5a55'))}${row('rc',t('rc'),sw('#8a8a86',1))}
     <h3>${t('red')}</h3>${row('unrec',t('unrec'),sw('#e8452c'))}${row('demo',t('demo'),'<span class="sw" style="color:#e8452c;font-weight:800;text-align:center">✕</span>')}
     <div class="note">${t('unrecNote')}</div>
+    <h3>${t('econ')}</h3>${row('indA',t('indA'),'<span class="sw" style="background:#f2c230;outline:2px solid #000;outline-offset:-3px"></span>')}${row('indJ',t('indJ'),'<span class="sw" style="background:#f2c230;opacity:.55"></span>')}${row('arab7',t('arab7'),sw('#e9e6df',1))}
     <h3>${t('plan')}</h3>${row('xplan',t('xplan'),'',1)}${row('landuse',t('landuse'),'',1)}${row('tmm',t('tmm'),'',1)}${row('vatmal',t('vatmal'),'',1)}
     <div class="note">${t('liveNote')}</div>`;
   document.querySelectorAll('#panel input').forEach(i=>i.onchange=()=>{state[i.dataset.k]=i.checked;applyState();});
@@ -398,7 +419,10 @@ function renderStats(){
   document.getElementById('stats').innerHTML=
    `<div class="stat"><div class="n red">${DATA.unrec.features.length}</div><div class="l">${t('sUn')}</div></div>
     <div class="stat"><div class="n">${Math.round(a)}</div><div class="l">${t('sArab')}</div></div>
-    <div class="stat"><div class="n">${Math.round(j)}</div><div class="l">${t('sJew')}</div></div>`;
+    <div class="stat"><div class="n">${Math.round(j)}</div><div class="l">${t('sJew')}</div></div>`+
+   (DATA.ind.features.length?(()=>{const g=grp=>DATA.ind.features.filter(f=>f.properties.grp===grp);const km=fs=>fs.reduce((s,f)=>s+(+f.properties.BRUTOAREA||0),0)/1e6;
+     const A=g('arab'),J=g('jewish');return `<div class="stat"><div class="n" style="color:#f2c230">${km(A).toFixed(1)}</div><div class="l">${t('sIndA')} · ${A.length} ${t('zones')}</div></div>
+     <div class="stat"><div class="n" style="color:#f2c230">${km(J).toFixed(1)}</div><div class="l">${t('sIndJ')} · ${J.length} ${t('zones')}</div></div>`;})():'');
 }
 
 /* ---------------- popups (SOS card) ---------------- */
@@ -408,9 +432,11 @@ function bindPopups(){
   map.on('click','un-pt',e=>{const p=e.features[0].properties;new maplibregl.Popup({maxWidth:'280px'}).setLngLat(e.lngLat).setHTML(card('',t('outside'),`<b>${p[L]||p.ar}</b>${p.ar}<div class="src">${t('source')}: OpenStreetMap · ${p.place}</div>`)).addTo(map);});
   map.on('click','un-cluster',e=>{const f=e.features[0];map.getSource('unrec').getClusterExpansionZoom(f.properties.cluster_id).then(z=>map.easeTo({center:f.geometry.coordinates,zoom:z}));});
   map.on('click','demo-pt',e=>{const p=e.features[0].properties,n=JSON.parse(p.note);new maplibregl.Popup({maxWidth:'300px'}).setLngLat(e.lngLat).setHTML(card('',t('demo'),`<b>${p[L]||p.ar}</b>${n[L]}`)).addTo(map);});
-  ['loc-arab-fill','loc-jew-line'].forEach(id=>map.on('click',id,e=>{if(map.queryRenderedFeatures(e.point,{layers:['un-pt','demo-pt','un-cluster']}).length)return;const p=e.features[0].properties;
+  ['loc-arab-fill','loc-jew-line'].forEach(id=>map.on('click',id,e=>{if(map.queryRenderedFeatures(e.point,{layers:['un-pt','demo-pt','un-cluster','ind-a-fill','ind-j-fill'].filter(id=>map.getLayer(id))}).length)return;const p=e.features[0].properties;
     new maplibregl.Popup({maxWidth:'280px'}).setLngLat(e.lngLat).setHTML(card(p.grp==='arab'?'bone':'grey',t(p.grp==='arab'?'arab':'jew'),`<b>${nm(p)}</b>${t('area')}: ${p.km2} km²${p.council?`<br>${t('council')}: ${p.council}`:''}<div class="src">${t('source')}: מנהל התכנון · גבולות שיפוט / ועדים מקומיים</div>`)).addTo(map);}));
-  ['un-pt','un-cluster','demo-pt','loc-arab-fill','loc-jew-line'].forEach(id=>{map.on('mouseenter',id,()=>map.getCanvas().style.cursor='pointer');map.on('mouseleave',id,()=>map.getCanvas().style.cursor='');});
+  ['ind-a-fill','ind-j-fill'].forEach(id=>map.on('click',id,e=>{const p=e.features[0].properties,du=v=>v?Math.round(+v/1000).toLocaleString()+' '+t('dunam'):'—';
+    new maplibregl.Popup({maxWidth:'300px'}).setLngLat(e.lngLat).setHTML(`<div class="card"><div class="hd" style="background:#f2c230">${t(p.grp==='arab'?'indA':'indJ')}</div><div class="bd"><b>${p.NAME||p.NAME_1||p.City_Name||''}</b>${t('auth')}: ${p.AUTHORITY||p.City_Name||'—'}<br>${t('gross')}: ${du(p.BRUTOAREA)}<br>${t('net')}: ${du(p.INDNETAREA)}<br>${t('planNo')}: ${p.TABA_NUM||'—'}${p.OWNER&&p.OWNER.trim()?`<br>${t('owner')}: ${p.OWNER}`:''}<div class="src">${t('source')}: ${t('teamSrc')}</div></div></div>`).addTo(map);e.preventDefault&&e.preventDefault();}));
+  ['un-pt','un-cluster','demo-pt','loc-arab-fill','loc-jew-line','ind-a-fill','ind-j-fill'].forEach(id=>{map.on('mouseenter',id,()=>map.getCanvas().style.cursor='pointer');map.on('mouseleave',id,()=>map.getCanvas().style.cursor='');});
 }
 
 /* ---------------- compare / wayback swipe ---------------- */

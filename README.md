@@ -32,4 +32,4 @@ Compare view → "Mark demolished building" → click vertices, double-click to 
 | 04 | Mobility | MoT GTFS (`transit_direct.json`) | Direct trips on one weekday; only stops inside locality limits |
 | 05 | Violence | — (being collected with Sikkuy-Aufoq / Abraham Initiatives) | Planned: victims by locality, distance to police, AI street-image audit |
 
-Processing scripts live outside the repo (ArcGIS Pro Python): `lpkx_to_geojson.py`, `localities.py`, `buildings.py`, `gtfs_direct.py`.
+Processing scripts are in `scripts/` (run with ArcGIS Pro Python): `lpkx_to_geojson.py`, `localities.py`, `buildings.py`, `gtfs_direct.py`.

@@ -345,13 +345,14 @@ async function loadData(){
   const opt = f => get(f).catch(()=>({type:'FeatureCollection',features:[]}));
   const [indJ, indA, arab7, jew11, bldA, bldJ] = await Promise.all(['jewishh_industrial.geojson','arabb_industrial.geojson','arabb_negev_7.geojson','jewishh_negev_11.geojson','arab_buildings_in_industrial_zones.geojson','jewish_buildings_in_industrial_zones.geojson'].map(opt));
   const istats = await get('industry_stats.json').catch(()=>null);
+  const tprof = await get('town_profile.json').catch(()=>null);
   indJ.features.forEach(f=>f.properties.grp='jewish'); indA.features.forEach(f=>f.properties.grp='arab');
   bldJ.features.forEach(f=>f.properties.grp='jewish'); bldA.features.forEach(f=>f.properties.grp='arab');
   const ind = {type:'FeatureCollection',features:[...indJ.features,...indA.features]};
   const indBld = {type:'FeatureCollection',features:[...bldJ.features,...bldA.features]};
   const [cbs, grid, bsum, transit] = await Promise.all([opt('cbs_localities.geojson'), opt('bld_offmap_grid.geojson'),
     get('buildings_summary.json').catch(()=>null), get('transit_direct.json').catch(()=>null)]);
-  return {cbs, grid, bsum, transit, ind, indBld, istats, jew11, arab7, nafa, negevGeom, loc:{type:'FeatureCollection',features:loc}, rc:{type:'FeatureCollection',features:rc},
+  return {cbs, grid, bsum, transit, ind, indBld, istats, tprof, jew11, arab7, nafa, negevGeom, loc:{type:'FeatureCollection',features:loc}, rc:{type:'FeatureCollection',features:rc},
           unrec:{type:'FeatureCollection',features:unrec}, demo:{type:'FeatureCollection',features:demo}};
 }
 
@@ -550,6 +551,21 @@ function chapterCard(key){
   const big=(a)=>`<div class="big">${a.map(([v,l,r])=>`<div><b class="${r?'r':''}">${v}</b><span>${l}</span></div>`).join('')}</div>`;
   const T3={ar:{},he:{},en:{}}; // per-language prose
   const tr3=o=>o[L]||o.en;
+  // municipal fiscal capacity (MoI audited reports 2024) — what the missing industry costs
+  const fiscal=()=>{ const P=(DATA.tprof&&DATA.tprof.rows)||[]; if(!P.length) return '';
+    const w=(g,k)=>{const R=P.filter(r=>r.grp===g&&r[k]!=null&&r.pop_cbs_2024);const pp=R.reduce((s,r)=>s+r.pop_cbs_2024,0);return pp?R.reduce((s,r)=>s+r[k]*r.pop_cbs_2024,0)/pp:0;};
+    const nm=r=>r[L]||r.en, srt=k=>[...P].filter(r=>r[k]!=null).sort((a,b)=>b[k]-a[k]);
+    const S1=srt('own_rev_pc'), S2=srt('biz_arnona_pc'), S3=srt('own_share');
+    return `<h4>${tr3({ar:'ماذا يعني ذلك لميزانية البلدية؟',he:'מה זה אומר לתקציב הרשות?',en:'What does this mean for the municipal budget?'})}</h4>`+
+     big([[Math.round(w('arab','own_rev_pc')).toLocaleString()+' ₪',tr3({ar:'دخل ذاتي لكل ساكن — عربية',he:'הכנסה עצמית לתושב — ערבי',en:'own revenue / resident — Arab'}),1],[Math.round(w('jewish','own_rev_pc')).toLocaleString()+' ₪',tr3({ar:'— يهودية',he:'— יהודי',en:'— Jewish'}),0]])+
+     big([[Math.round(w('arab','own_share')*100)+'%',tr3({ar:'من الميزانية دخل ذاتي — عربية (الباقي من الحكومة)',he:'מהתקציב הכנסה עצמית — ערבי (השאר מהמדינה)',en:'of budget is own revenue — Arab (rest from the state)'}),1],[Math.round(w('jewish','own_share')*100)+'%',tr3({ar:'— يهودية',he:'— יהודי',en:'— Jewish'}),0]])+
+     `<h4>${tr3({ar:'أرنونا غير سكنية (مصالح وصناعة) لكل ساكن، ₪',he:'ארנונה שאינה למגורים (עסקים ותעשייה) לתושב, ₪',en:'Non-residential (business) arnona per resident, ₪'})}</h4>`+
+     bars(S2.map(r=>({label:nm(r),v:r.biz_arnona_pc,grp:r.grp})),S2[0].biz_arnona_pc)+
+     `<h4>${tr3({ar:'الدخل الذاتي للبلدية لكل ساكن، ₪',he:'הכנסה עצמית של הרשות לתושב, ₪',en:'Municipal own revenue per resident, ₪'})}</h4>`+
+     bars(S1.map(r=>({label:nm(r),v:r.own_rev_pc,grp:r.grp})),S1[0].own_rev_pc)+
+     `<h4>${tr3({ar:'سكان 2024 (الدائرة المركزية للإحصاء)',he:'אוכלוסייה 2024 (הלמ"ס)',en:'Population 2024 (CBS)'})}</h4>`+
+     bars([...P].sort((a,b)=>b.pop_cbs_2024-a.pop_cbs_2024).map(r=>({label:nm(r),v:r.pop_cbs_2024,grp:r.grp})),Math.max(...P.map(r=>r.pop_cbs_2024)))+
+     `<div class="src">${tr3({ar:'وزارة الداخلية — التقارير المالية المدققة 2024 (data.gov.il) · الدائرة المركزية للإحصاء، ملف البلدات 2024. المتوسطات موزونة بعدد السكان.',he:'משרד הפנים — דוחות כספיים מבוקרים 2024 (data.gov.il) · הלמ"ס, קובץ יישובים 2024. ממוצעים משוקללים באוכלוסייה.',en:'Ministry of Interior — audited financial reports 2024 (data.gov.il) · CBS localities file 2024. Averages are population-weighted.'})}</div>`; };
   // proportional squares: side ∝ √area, so square AREA ∝ dunam; inner yellow square = industrial dunam on the same scale
   const tiles=R=>{ const mx=Math.max(...R.map(r=>r.total_dunam),1), px=a=>Math.sqrt(a/mx)*92;
     const row=g=>`<div class="tl-row"><div class="tl-h">${tr3(g==='arab'?{ar:'البلدات العربية السبع',he:'7 היישובים הערביים',en:'7 Arab towns'}:{ar:'11 بلدة يهودية',he:'11 יישובים יהודיים',en:'11 Jewish towns'})}</div><div class="tl-wrap">${
@@ -599,6 +615,7 @@ function chapterCard(key){
      `<p class="note2">${tr3({ar:'لاحظي: بالنسبة المئوية الفرق أصغر — رهط 8.7% قريبة من بئر السبع 8.3%. لكن البلدات العربية صغيرة ومكتظة: نفس النسبة تتوزّع على عدد سكان أكبر بكثير، لذلك المقياس لكل 1000 ساكن (تحت) هو الأعدل.',he:'שימי לב: באחוזים הפער קטן יותר — רהט 8.7% קרובה לבאר שבע 8.3%. אבל היישובים הערביים קטנים וצפופים: אותו אחוז מתחלק על הרבה יותר תושבים, ולכן המדד ל-1000 תושבים (למטה) הוא ההוגן יותר.',en:'Note: in percentages the gap looks smaller — Rahat 8.7% is close to Be\'er Sheva 8.3%. But Arab towns are small and crowded: the same share is split among far more residents, so the per-1,000-residents measure (below) is the fairer one.'})}</p>`+
      `<h4>${tr3({ar:'دونم صناعة لكل 1000 ساكن، حسب البلدة',he:'דונם תעשייה ל-1000 תושבים, לפי יישוב',en:'Industrial dunam per 1,000 residents, by town'})}</h4>`+
      bars(sorted.map(r=>({label:r[L]||r.en,v:r.ind_per1000,grp:r.grp})),sorted[0]?sorted[0].ind_per1000:1)+
+     fiscal()+
      `<div class="src">${t('teamSrc')} · ${tr3({ar:'المباني: OSM داخل المناطق الصناعية. السكان 2026.',he:'מבנים: OSM בתוך אזורי התעשייה. אוכלוסייה 2026.',en:'Buildings: OSM inside industrial zones. Population 2026.'})}</div>`;
   }
   if(key==='transit'){
@@ -764,6 +781,7 @@ function renderAbout(){
     <tr><td>Microsoft Global ML Building Footprints (2026)</td><td>258,871 Naqab buildings classified by recognition status (ch. 01, 02)</td></tr>
     <tr><td>Ministry of Transport — GTFS</td><td>Direct no-transfer trips to Be'er Sheva / Tel Aviv / Jerusalem (ch. 04)</td></tr>
     <tr><td>Team ArcGIS layers</td><td>Arab / Jewish industrial zones 2022 (ch. 03)</td></tr>
+    <tr><td>Ministry of Interior — audited municipal financial reports 2024</td><td>Own revenue, business arnona, budget self-reliance per town (ch. 03)</td></tr>
     <tr><td>Sikkuy-Aufoq · RCUV · NCF (Dukium)</td><td>Partners / verification sources (to integrate)</td></tr></table></div>
     <div class="redlist"><h2>${t('red')}</h2><p style="margin:0">${t('unrecNote')}</p></div>`;
 }

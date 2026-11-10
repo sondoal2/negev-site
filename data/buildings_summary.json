@@ -1,0 +1,927 @@
+{
+ "source": "Microsoft Global ML Building Footprints (release 2026-02-03), centroid-in-polygon vs iplan locality limits",
+ "total_in_negev_subdistrict": 258871,
+ "outside_recognized": 39376,
+ "by_group": {
+  "arab": {
+   "buildings": 70809,
+   "roof_m2": 11284646
+  },
+  "jewish": {
+   "buildings": 114669,
+   "roof_m2": 34214815
+  },
+  "industrial": {
+   "buildings": 2215,
+   "roof_m2": 552659
+  }
+ },
+ "localities": [
+  {
+   "name": "Be'er Sheva",
+   "grp": "jewish",
+   "buildings": 29170
+  },
+  {
+   "name": "Rahat",
+   "grp": "arab",
+   "buildings": 17776
+  },
+  {
+   "name": "Arad",
+   "grp": "jewish",
+   "buildings": 10141
+  },
+  {
+   "name": "Ofakim",
+   "grp": "jewish",
+   "buildings": 7971
+  },
+  {
+   "name": "Tel Sheva",
+   "grp": "arab",
+   "buildings": 7507
+  },
+  {
+   "name": "Dimona",
+   "grp": "jewish",
+   "buildings": 7459
+  },
+  {
+   "name": "Hura",
+   "grp": "arab",
+   "buildings": 6808
+  },
+  {
+   "name": "Netivot",
+   "grp": "jewish",
+   "buildings": 5807
+  },
+  {
+   "name": "Segev Shalom",
+   "grp": "arab",
+   "buildings": 5654
+  },
+  {
+   "name": "Kseyfe",
+   "grp": "arab",
+   "buildings": 5143
+  },
+  {
+   "name": "Ar'ara Banegev",
+   "grp": "arab",
+   "buildings": 4537
+  },
+  {
+   "name": "Omer",
+   "grp": "jewish",
+   "buildings": 4015
+  },
+  {
+   "name": "Lakiye",
+   "grp": "arab",
+   "buildings": 3910
+  },
+  {
+   "name": "Meitar",
+   "grp": "jewish",
+   "buildings": 3810
+  },
+  {
+   "name": "Yeroham",
+   "grp": "jewish",
+   "buildings": 3775
+  },
+  {
+   "name": "Sawa",
+   "grp": "arab",
+   "buildings": 3242
+  },
+  {
+   "name": "Um Batin",
+   "grp": "arab",
+   "buildings": 3188
+  },
+  {
+   "name": "Abu Tlul",
+   "grp": "arab",
+   "buildings": 3064
+  },
+  {
+   "name": "Bir Hadaj",
+   "grp": "arab",
+   "buildings": 2703
+  },
+  {
+   "name": "Lehavim",
+   "grp": "jewish",
+   "buildings": 2613
+  },
+  {
+   "name": "Hatseva",
+   "grp": "jewish",
+   "buildings": 2421
+  },
+  {
+   "name": "Al Sayid",
+   "grp": "arab",
+   "buildings": 2081
+  },
+  {
+   "name": "Kasr A-Sir",
+   "grp": "arab",
+   "buildings": 1819
+  },
+  {
+   "name": "Revivim",
+   "grp": "jewish",
+   "buildings": 1799
+  },
+  {
+   "name": "Gilat",
+   "grp": "jewish",
+   "buildings": 1346
+  },
+  {
+   "name": "Neot Hovav",
+   "grp": "industrial",
+   "buildings": 1316
+  },
+  {
+   "name": "Abu Kureinat",
+   "grp": "arab",
+   "buildings": 1268
+  },
+  {
+   "name": "Tifrah",
+   "grp": "jewish",
+   "buildings": 1178
+  },
+  {
+   "name": "Mash'Abei Sade",
+   "grp": "jewish",
+   "buildings": 1146
+  },
+  {
+   "name": "Tarabin A-Sana",
+   "grp": "arab",
+   "buildings": 1007
+  },
+  {
+   "name": "Midreshet Ben Gurion",
+   "grp": "jewish",
+   "buildings": 931
+  },
+  {
+   "name": "Ranen",
+   "grp": "jewish",
+   "buildings": 908
+  },
+  {
+   "name": "Idan",
+   "grp": "jewish",
+   "buildings": 902
+  },
+  {
+   "name": "Beit Hagadi",
+   "grp": "jewish",
+   "buildings": 901
+  },
+  {
+   "name": "Patish",
+   "grp": "jewish",
+   "buildings": 897
+  },
+  {
+   "name": "Nevatim",
+   "grp": "jewish",
+   "buildings": 843
+  },
+  {
+   "name": "Mishmar Hanegev",
+   "grp": "jewish",
+   "buildings": 785
+  },
+  {
+   "name": "Maslul",
+   "grp": "jewish",
+   "buildings": 723
+  },
+  {
+   "name": "Bitha",
+   "grp": "jewish",
+   "buildings": 710
+  },
+  {
+   "name": "Mahul",
+   "grp": "arab",
+   "buildings": 684
+  },
+  {
+   "name": "Pa'Amei Tashaz",
+   "grp": "jewish",
+   "buildings": 683
+  },
+  {
+   "name": "Ma'Agalim",
+   "grp": "jewish",
+   "buildings": 672
+  },
+  {
+   "name": "Shuva",
+   "grp": "jewish",
+   "buildings": 666
+  },
+  {
+   "name": "Ashalim",
+   "grp": "jewish",
+   "buildings": 652
+  },
+  {
+   "name": "Mabu'Im",
+   "grp": "jewish",
+   "buildings": 629
+  },
+  {
+   "name": "Idan",
+   "grp": "jewish",
+   "buildings": 622
+  },
+  {
+   "name": "Melilot",
+   "grp": "jewish",
+   "buildings": 621
+  },
+  {
+   "name": "Ne'Ot Hakikar",
+   "grp": "jewish",
+   "buildings": 602
+  },
+  {
+   "name": "Talmei Bilu",
+   "grp": "jewish",
+   "buildings": 601
+  },
+  {
+   "name": "Sede Tsevi",
+   "grp": "jewish",
+   "buildings": 599
+  },
+  {
+   "name": "Neot Hovav",
+   "grp": "industrial",
+   "buildings": 593
+  },
+  {
+   "name": "Tekuma",
+   "grp": "jewish",
+   "buildings": 569
+  },
+  {
+   "name": "Peduyim",
+   "grp": "jewish",
+   "buildings": 568
+  },
+  {
+   "name": "Eshbol",
+   "grp": "jewish",
+   "buildings": 561
+  },
+  {
+   "name": "Sa'Ad",
+   "grp": "jewish",
+   "buildings": 554
+  },
+  {
+   "name": "Shibolim",
+   "grp": "jewish",
+   "buildings": 552
+  },
+  {
+   "name": "Kelahim",
+   "grp": "jewish",
+   "buildings": 535
+  },
+  {
+   "name": "Nir Moshe",
+   "grp": "jewish",
+   "buildings": 533
+  },
+  {
+   "name": "Devira",
+   "grp": "jewish",
+   "buildings": 528
+  },
+  {
+   "name": "Giv'Olim",
+   "grp": "jewish",
+   "buildings": 527
+  },
+  {
+   "name": "Yoshivya",
+   "grp": "jewish",
+   "buildings": 516
+  },
+  {
+   "name": "Hatserim",
+   "grp": "jewish",
+   "buildings": 512
+  },
+  {
+   "name": "Nir Akiva",
+   "grp": "jewish",
+   "buildings": 508
+  },
+  {
+   "name": "Zimrat",
+   "grp": "jewish",
+   "buildings": 501
+  },
+  {
+   "name": "Kefar Maymon",
+   "grp": "jewish",
+   "buildings": 492
+  },
+  {
+   "name": "Shoval",
+   "grp": "jewish",
+   "buildings": 486
+  },
+  {
+   "name": "Tidhar",
+   "grp": "jewish",
+   "buildings": 476
+  },
+  {
+   "name": "Sharsheret",
+   "grp": "jewish",
+   "buildings": 472
+  },
+  {
+   "name": "Shokeda",
+   "grp": "jewish",
+   "buildings": 466
+  },
+  {
+   "name": "Zeru'A",
+   "grp": "jewish",
+   "buildings": 460
+  },
+  {
+   "name": "Berosh",
+   "grp": "jewish",
+   "buildings": 457
+  },
+  {
+   "name": "Sede Boker",
+   "grp": "jewish",
+   "buildings": 455
+  },
+  {
+   "name": "Beit Kama",
+   "grp": "jewish",
+   "buildings": 455
+  },
+  {
+   "name": "Be'Eri",
+   "grp": "jewish",
+   "buildings": 449
+  },
+  {
+   "name": "Te'Ashur",
+   "grp": "jewish",
+   "buildings": 430
+  },
+  {
+   "name": "Keramim",
+   "grp": "jewish",
+   "buildings": 425
+  },
+  {
+   "name": "Ein Hatseva",
+   "grp": "jewish",
+   "buildings": 418
+  },
+  {
+   "name": "Geva'Ot Bar",
+   "grp": "jewish",
+   "buildings": 413
+  },
+  {
+   "name": "Lahav",
+   "grp": "jewish",
+   "buildings": 380
+  },
+  {
+   "name": "Shomeria",
+   "grp": "jewish",
+   "buildings": 359
+  },
+  {
+   "name": "Tse'Elim",
+   "grp": "jewish",
+   "buildings": 324
+  },
+  {
+   "name": "Yeroham",
+   "grp": "jewish",
+   "buildings": 309
+  },
+  {
+   "name": "Urim",
+   "grp": "jewish",
+   "buildings": 293
+  },
+  {
+   "name": "Retamim",
+   "grp": "jewish",
+   "buildings": 289
+  },
+  {
+   "name": "Re'Im",
+   "grp": "jewish",
+   "buildings": 283
+  },
+  {
+   "name": "Gevulot",
+   "grp": "jewish",
+   "buildings": 278
+  },
+  {
+   "name": "Alumim",
+   "grp": "jewish",
+   "buildings": 275
+  },
+  {
+   "name": "Ein Gedi",
+   "grp": "jewish",
+   "buildings": 261
+  },
+  {
+   "name": "Telalim",
+   "grp": "jewish",
+   "buildings": 241
+  },
+  {
+   "name": "Tushiya",
+   "grp": "jewish",
+   "buildings": 240
+  },
+  {
+   "name": "Derijat",
+   "grp": "arab",
+   "buildings": 232
+  },
+  {
+   "name": "Ein Habesor",
+   "grp": "jewish",
+   "buildings": 226
+  },
+  {
+   "name": "Merhav Am",
+   "grp": "jewish",
+   "buildings": 212
+  },
+  {
+   "name": "Shvey Darom",
+   "grp": "jewish",
+   "buildings": 207
+  },
+  {
+   "name": "Kohle",
+   "grp": "arab",
+   "buildings": 186
+  },
+  {
+   "name": "Neot Hovav",
+   "grp": "industrial",
+   "buildings": 182
+  },
+  {
+   "name": "Har Amasa",
+   "grp": "jewish",
+   "buildings": 130
+  },
+  {
+   "name": "Neot Hovav",
+   "grp": "industrial",
+   "buildings": 124
+  },
+  {
+   "name": "Netivot",
+   "grp": "jewish",
+   "buildings": 99
+  },
+  {
+   "name": "Dimona",
+   "grp": "jewish",
+   "buildings": 97
+  },
+  {
+   "name": "Neve Zohar",
+   "grp": "jewish",
+   "buildings": 88
+  },
+  {
+   "name": "Ohad",
+   "grp": "jewish",
+   "buildings": 46
+  },
+  {
+   "name": "Shizaf",
+   "grp": "jewish",
+   "buildings": 44
+  },
+  {
+   "name": "Revivim",
+   "grp": "jewish",
+   "buildings": 38
+  },
+  {
+   "name": "Dimona",
+   "grp": "jewish",
+   "buildings": 11
+  },
+  {
+   "name": "Talmei Eliyahu",
+   "grp": "jewish",
+   "buildings": 11
+  },
+  {
+   "name": "Dimona",
+   "grp": "jewish",
+   "buildings": 6
+  },
+  {
+   "name": "Keramim",
+   "grp": "jewish",
+   "buildings": 5
+  },
+  {
+   "name": "Nirim",
+   "grp": "jewish",
+   "buildings": 1
+  }
+ ],
+ "villages": [
+  {
+   "ar": "الدنفيري",
+   "en": "Al Danfiri",
+   "lon": 34.8164,
+   "lat": 31.13154,
+   "buildings": 2065
+  },
+  {
+   "ar": "خشم زنة",
+   "en": "Khashim Zannih",
+   "lon": 34.88307,
+   "lat": 31.20264,
+   "buildings": 2008
+  },
+  {
+   "ar": "الزرنوق",
+   "en": "Al Zarnug",
+   "lon": 34.92521,
+   "lat": 31.20401,
+   "buildings": 2001
+  },
+  {
+   "ar": "خربة الوطن",
+   "en": "Khirbat Al Wattan",
+   "lon": 34.92378,
+   "lat": 31.25536,
+   "buildings": 1820
+  },
+  {
+   "ar": "العزازمة",
+   "en": "Azazme",
+   "lon": 34.81838,
+   "lat": 31.16275,
+   "buildings": 1715
+  },
+  {
+   "ar": "الغراء",
+   "en": "Al Gharrah",
+   "lon": 34.96504,
+   "lat": 31.23702,
+   "buildings": 1332
+  },
+  {
+   "ar": "بئر المشاش",
+   "en": "Bir Al Mshash",
+   "lon": 34.95438,
+   "lat": 31.1947,
+   "buildings": 1316
+  },
+  {
+   "ar": "السر",
+   "en": "Al Sir",
+   "lon": 34.80671,
+   "lat": 31.1969,
+   "buildings": 1184
+  },
+  {
+   "ar": "أم متنان",
+   "en": "Umm Mitnan",
+   "lon": 34.96926,
+   "lat": 31.12624,
+   "buildings": 1069
+  },
+  {
+   "ar": "بير الحمام",
+   "en": "Bir Al Hamam",
+   "lon": 34.9004,
+   "lat": 31.23147,
+   "buildings": 1060
+  },
+  {
+   "ar": "أبو عفش",
+   "en": "Abu Afash",
+   "lon": 34.8074,
+   "lat": 31.16055,
+   "buildings": 964
+  },
+  {
+   "ar": "البحيرة",
+   "en": "Al Bhirah",
+   "lon": 35.08954,
+   "lat": 31.21761,
+   "buildings": 949
+  },
+  {
+   "ar": "وادي الدخل",
+   "en": "Wadi al Dahl",
+   "lon": 35.39472,
+   "lat": 30.93111,
+   "buildings": 898
+  },
+  {
+   "ar": "ابو قرينات",
+   "en": "Abu Kuraynat",
+   "lon": 34.953,
+   "lat": 31.10204,
+   "buildings": 884
+  },
+  {
+   "ar": "قشكار نباري",
+   "en": "Kishkar Nabari",
+   "lon": 35.12071,
+   "lat": 31.29862,
+   "buildings": 856
+  },
+  {
+   "ar": "العظيم",
+   "en": "Aazem",
+   "lon": 34.90108,
+   "lat": 31.29454,
+   "buildings": 848
+  },
+  {
+   "ar": "صواوين",
+   "en": "Swawin",
+   "lon": 34.88055,
+   "lat": 31.18451,
+   "buildings": 809
+  },
+  {
+   "ar": "الوليدي",
+   "en": "Al Walidi",
+   "lon": 34.81534,
+   "lat": 31.17785,
+   "buildings": 766
+  },
+  {
+   "ar": "سعوة",
+   "en": "Sa'wah",
+   "lon": 34.96133,
+   "lat": 31.27023,
+   "buildings": 702
+  },
+  {
+   "ar": "السيد‎",
+   "en": "Sayyid",
+   "lon": 34.93176,
+   "lat": 31.28119,
+   "buildings": 654
+  },
+  {
+   "ar": "أبو رشد",
+   "en": "Abu Rashd",
+   "lon": 34.99076,
+   "lat": 31.10348,
+   "buildings": 649
+  },
+  {
+   "ar": "أبو عمار",
+   "en": "Abu Amar",
+   "lon": 34.96518,
+   "lat": 31.18575,
+   "buildings": 593
+  },
+  {
+   "ar": "الباط",
+   "en": "Al Bat",
+   "lon": 35.03322,
+   "lat": 31.27048,
+   "buildings": 590
+  },
+  {
+   "ar": "السرة",
+   "en": "Al Sirah",
+   "lon": 35.02274,
+   "lat": 31.23697,
+   "buildings": 549
+  },
+  {
+   "ar": "عبدة",
+   "en": "Avdat",
+   "lon": 34.75609,
+   "lat": 30.8096,
+   "buildings": 539
+  },
+  {
+   "ar": "العراقيب",
+   "en": "Al Arakib",
+   "lon": 34.74917,
+   "lat": 31.32237,
+   "buildings": 522
+  },
+  {
+   "ar": "غيندل",
+   "en": "Gindal",
+   "lon": 35.0122,
+   "lat": 31.13281,
+   "buildings": 498
+  },
+  {
+   "ar": "كحلة",
+   "en": "Kuhlih",
+   "lon": 35.05747,
+   "lat": 31.28537,
+   "buildings": 430
+  },
+  {
+   "ar": "تل الملح",
+   "en": "Tal Al Malah",
+   "lon": 35.00378,
+   "lat": 31.23194,
+   "buildings": 421
+  },
+  {
+   "ar": "عتير",
+   "en": "Atir",
+   "lon": 35.02732,
+   "lat": 31.32446,
+   "buildings": 415
+  },
+  {
+   "ar": "العمراني‎",
+   "en": "Al Amrani",
+   "lon": 34.96851,
+   "lat": 31.16788,
+   "buildings": 413
+  },
+  {
+   "ar": "ام رتام",
+   "en": "Um Rattam",
+   "lon": 35.02141,
+   "lat": 31.11644,
+   "buildings": 403
+  },
+  {
+   "ar": "النصاصرة",
+   "en": "Nasasra",
+   "lon": 35.03022,
+   "lat": 31.24297,
+   "buildings": 391
+  },
+  {
+   "ar": "الغول",
+   "en": "Al Ghul",
+   "lon": 34.99649,
+   "lat": 31.12426,
+   "buildings": 382
+  },
+  {
+   "ar": "الجنابب",
+   "en": "Janabib",
+   "lon": 35.10821,
+   "lat": 31.2874,
+   "buildings": 375
+  },
+  {
+   "ar": "الصدير",
+   "en": "Al Sdir",
+   "lon": 34.98954,
+   "lat": 31.16977,
+   "buildings": 337
+  },
+  {
+   "ar": "وادي المشاش",
+   "en": "Havat MaShash",
+   "lon": 34.84778,
+   "lat": 31.08103,
+   "buildings": 336
+  },
+  {
+   "ar": "البقار",
+   "en": "Al Bgar",
+   "lon": 34.73629,
+   "lat": 30.84896,
+   "buildings": 328
+  },
+  {
+   "ar": "أبو جويد",
+   "en": "Abu Juwayid",
+   "lon": 35.07235,
+   "lat": 31.18043,
+   "buildings": 324
+  },
+  {
+   "ar": "باط الصرايعة",
+   "en": "Bat Al Saraya'ah",
+   "lon": 35.02513,
+   "lat": 31.25932,
+   "buildings": 310
+  },
+  {
+   "ar": "المهدي",
+   "en": "El Mahdi",
+   "lon": 35.02172,
+   "lat": 31.10577,
+   "buildings": 300
+  },
+  {
+   "ar": "القطامات",
+   "en": "Al Gatamat",
+   "lon": 35.09496,
+   "lat": 31.17309,
+   "buildings": 277
+  },
+  {
+   "ar": "تل عراد",
+   "en": "Tel A'rad",
+   "lon": 35.14529,
+   "lat": 31.2919,
+   "buildings": 274
+  },
+  {
+   "ar": "بيت بلت",
+   "en": "Bait Pelet",
+   "lon": 34.91962,
+   "lat": 31.19288,
+   "buildings": 262
+  },
+  {
+   "ar": "عوقبي",
+   "en": "Ukbi",
+   "lon": 34.92996,
+   "lat": 31.28442,
+   "buildings": 258
+  },
+  {
+   "ar": "كركور",
+   "en": "Karkour",
+   "lon": 34.76732,
+   "lat": 31.34647,
+   "buildings": 255
+  },
+  {
+   "ar": "ابو جامدة",
+   "en": "Abu Jamada",
+   "lon": 34.98037,
+   "lat": 31.1655,
+   "buildings": 220
+  },
+  {
+   "ar": "زبرجا",
+   "en": "Zabarigha",
+   "lon": 35.02696,
+   "lat": 31.23778,
+   "buildings": 204
+  },
+  {
+   "ar": "عبدة",
+   "en": "Abdih",
+   "lon": 34.77647,
+   "lat": 30.7522,
+   "buildings": 71
+  },
+  {
+   "ar": "قرية العراقيب",
+   "en": "al-Araqeeb",
+   "lon": 34.7797,
+   "lat": 31.34617,
+   "buildings": 68
+  },
+  {
+   "ar": "وادي أريحا",
+   "en": "Wadi Ariha",
+   "lon": 34.78278,
+   "lat": 30.68689,
+   "buildings": 0
+  }
+ ],
+ "outside_recognized_all": 71178,
+ "offmap_rule": "buildings outside every recognized locality limit AND (within 2.5 km of a candidate village point OR inside the Neve Midbar / al-Kasum regional councils)"
+}

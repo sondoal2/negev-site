@@ -22,3 +22,14 @@ Arab/Jewish classification is by council (see `ARAB` set in `index.html`).
 
 ## Demolition tool
 Compare view → "Mark demolished building" → click vertices, double-click to close → Export GeoJSON. Drawings are saved in the browser until exported.
+
+## Five chapters (v2)
+| # | Chapter | Data | Method |
+|---|---|---|---|
+| 01 | Land & recognition | Microsoft ML building footprints 2026, iplan limits, OSM | Buildings outside every recognized limit, ≤2.5 km from a candidate village or inside Neve Midbar / al-Kasum → 250 m grid (`bld_offmap_grid.geojson`, `buildings_summary.json`) |
+| 02 | Housing & settlement | CBS localities file 2024 (`cbs_localities.geojson`) | Timeline of localities by founding year; Arab localities without a CBS year treated as pre-1948; township years from historical sources, Abu Basma villages ≈2004 |
+| 03 | Economy | Team ArcGIS layers | Gross industrial area by sector |
+| 04 | Mobility | MoT GTFS (`transit_direct.json`) | Direct trips on one weekday; only stops inside locality limits |
+| 05 | Violence | — (being collected with Sikkuy-Aufoq / Abraham Initiatives) | Planned: victims by locality, distance to police, AI street-image audit |
+
+Processing scripts live outside the repo (ArcGIS Pro Python): `lpkx_to_geojson.py`, `localities.py`, `buildings.py`, `gtfs_direct.py`.

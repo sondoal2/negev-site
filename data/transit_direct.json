@@ -1,0 +1,2665 @@
+{
+ "date": "20261117",
+ "source": "Israel MoT GTFS (gtfs.mot.gov.il), direct trips without transfer",
+ "rows": [
+  {
+   "id": "Netivot",
+   "he": "נתיבות",
+   "grp": "jewish",
+   "departures": 1196,
+   "bs_trips": 129,
+   "bs_min": 20,
+   "bs_lines": [
+    "322",
+    "323",
+    "325",
+    "342",
+    "343",
+    "353",
+    "359",
+    "361",
+    "363",
+    "364"
+   ],
+   "ta_trips": 47,
+   "ta_min": 57,
+   "ta_lines": [
+    "353",
+    "378"
+   ],
+   "jm_trips": 15,
+   "jm_min": 91,
+   "jm_lines": [
+    "492",
+    "496"
+   ]
+  },
+  {
+   "id": "Yeroham",
+   "he": "ירוחם",
+   "grp": "jewish",
+   "departures": 471,
+   "bs_trips": 161,
+   "bs_min": 13,
+   "bs_lines": [
+    "140",
+    "142",
+    "150",
+    "152",
+    "170",
+    "359",
+    "392",
+    "44",
+    "45",
+    "60",
+    "63",
+    "64"
+   ],
+   "ta_trips": 1,
+   "ta_min": 102,
+   "ta_lines": [
+    "660"
+   ],
+   "jm_trips": 6,
+   "jm_min": 109,
+   "jm_lines": [
+    "458"
+   ]
+  },
+  {
+   "id": "Dimona",
+   "he": "דימונה",
+   "grp": "jewish",
+   "departures": 936,
+   "bs_trips": 122,
+   "bs_min": 24,
+   "bs_lines": [
+    "359",
+    "391",
+    "393",
+    "397",
+    "48",
+    "49",
+    "56",
+    "581",
+    "59",
+    "794"
+   ],
+   "ta_trips": 10,
+   "ta_min": 110,
+   "ta_lines": [
+    "390",
+    "393",
+    "794"
+   ],
+   "jm_trips": 6,
+   "jm_min": 130,
+   "jm_lines": [
+    "458"
+   ]
+  },
+  {
+   "id": "Eilat",
+   "he": "אילת",
+   "grp": "jewish",
+   "departures": 689,
+   "bs_trips": 20,
+   "bs_min": 192,
+   "bs_lines": [
+    "391",
+    "392",
+    "393",
+    "397",
+    "794"
+   ],
+   "ta_trips": 10,
+   "ta_min": 264,
+   "ta_lines": [
+    "390",
+    "393",
+    "794"
+   ],
+   "jm_trips": 4,
+   "jm_min": 245,
+   "jm_lines": [
+    "444"
+   ]
+  },
+  {
+   "id": "Tel Sheva",
+   "he": "תל שבע",
+   "grp": "arab",
+   "departures": 96,
+   "bs_trips": 38,
+   "bs_min": 5,
+   "bs_lines": [
+    "10",
+    "461",
+    "687"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Segev Shalom",
+   "he": "שגב שלום",
+   "grp": "arab",
+   "departures": 87,
+   "bs_trips": 54,
+   "bs_min": 5,
+   "bs_lines": [
+    "427",
+    "461",
+    "687",
+    "70"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Ar'ara Banegev",
+   "he": "ערערה בנגב",
+   "grp": "arab",
+   "departures": 230,
+   "bs_trips": 51,
+   "bs_min": 18,
+   "bs_lines": [
+    "117",
+    "427",
+    "461",
+    "50"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Arad",
+   "he": "ערד",
+   "grp": "jewish",
+   "departures": 784,
+   "bs_trips": 76,
+   "bs_min": 34,
+   "bs_lines": [
+    "384",
+    "386",
+    "387",
+    "388"
+   ],
+   "ta_trips": 4,
+   "ta_min": 99,
+   "ta_lines": [
+    "389",
+    "421"
+   ],
+   "jm_trips": 12,
+   "jm_min": 108,
+   "jm_lines": [
+    "554",
+    "555"
+   ]
+  },
+  {
+   "id": "Omer",
+   "he": "עומר",
+   "grp": "jewish",
+   "departures": 663,
+   "bs_trips": 345,
+   "bs_min": 1,
+   "bs_lines": [
+    "10",
+    "120",
+    "121",
+    "126",
+    "137",
+    "152",
+    "164",
+    "20",
+    "250",
+    "252",
+    "253",
+    "254"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 2,
+   "jm_min": 92,
+   "jm_lines": [
+    "440"
+   ]
+  },
+  {
+   "id": "Mitspe Ramon",
+   "he": "מצפה רמון",
+   "grp": "jewish",
+   "departures": 102,
+   "bs_trips": 46,
+   "bs_min": 70,
+   "bs_lines": [
+    "392",
+    "60",
+    "64",
+    "65"
+   ],
+   "ta_trips": 1,
+   "ta_min": 155,
+   "ta_lines": [
+    "660"
+   ],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Meitar",
+   "he": "מיתר",
+   "grp": "jewish",
+   "departures": 131,
+   "bs_trips": 66,
+   "bs_min": 12,
+   "bs_lines": [
+    "250",
+    "252",
+    "253",
+    "254",
+    "26",
+    "28",
+    "440"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 2,
+   "jm_min": 83,
+   "jm_lines": [
+    "440"
+   ]
+  },
+  {
+   "id": "Lakiye",
+   "he": "לקיה",
+   "grp": "arab",
+   "departures": 129,
+   "bs_trips": 30,
+   "bs_min": 18,
+   "bs_lines": [
+    "30"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Lehavim",
+   "he": "להבים",
+   "grp": "jewish",
+   "departures": 299,
+   "bs_trips": 46,
+   "bs_min": 10,
+   "bs_lines": [
+    "47",
+    "57"
+   ],
+   "ta_trips": 58,
+   "ta_min": 66,
+   "ta_lines": [
+    "369",
+    "469"
+   ],
+   "jm_trips": 6,
+   "jm_min": 66,
+   "jm_lines": [
+    "458"
+   ]
+  },
+  {
+   "id": "Kseyfe",
+   "he": "כסייפה",
+   "grp": "arab",
+   "departures": 277,
+   "bs_trips": 43,
+   "bs_min": 31,
+   "bs_lines": [
+    "117",
+    "120",
+    "20"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Hura",
+   "he": "חורה",
+   "grp": "arab",
+   "departures": 281,
+   "bs_trips": 99,
+   "bs_min": 12,
+   "bs_lines": [
+    "121",
+    "126",
+    "262",
+    "388",
+    "62"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Be'er Sheva",
+   "he": "באר שבע",
+   "grp": "jewish",
+   "departures": 5612,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 144,
+   "ta_min": 69,
+   "ta_lines": [
+    "353",
+    "369",
+    "370",
+    "393",
+    "469",
+    "794"
+   ],
+   "jm_trips": 45,
+   "jm_min": 90,
+   "jm_lines": [
+    "440",
+    "470"
+   ]
+  },
+  {
+   "id": "Ofakim",
+   "he": "אופקים",
+   "grp": "jewish",
+   "departures": 1126,
+   "bs_trips": 136,
+   "bs_min": 14,
+   "bs_lines": [
+    "130",
+    "134",
+    "135",
+    "330",
+    "332",
+    "333",
+    "35",
+    "359"
+   ],
+   "ta_trips": 34,
+   "ta_min": 67,
+   "ta_lines": [
+    "378"
+   ],
+   "jm_trips": 18,
+   "jm_min": 92,
+   "jm_lines": [
+    "494",
+    "499"
+   ]
+  },
+  {
+   "id": "Rahat",
+   "he": "רהט",
+   "grp": "arab",
+   "departures": 958,
+   "bs_trips": 196,
+   "bs_min": 18,
+   "bs_lines": [
+    "258",
+    "367",
+    "368",
+    "369",
+    "377",
+    "427",
+    "450",
+    "451",
+    "452",
+    "454",
+    "455",
+    "461"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Shvey Darom",
+   "he": "שבי דרום",
+   "grp": "jewish",
+   "departures": 0,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Giv'Olim",
+   "he": "גבעולים",
+   "grp": "jewish",
+   "departures": 12,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Revivim",
+   "he": "רביבים",
+   "grp": "jewish",
+   "departures": 14,
+   "bs_trips": 7,
+   "bs_min": 32,
+   "bs_lines": [
+    "45"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Idan",
+   "he": "עידן",
+   "grp": "jewish",
+   "departures": 0,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Keramim",
+   "he": "כרמים",
+   "grp": "jewish",
+   "departures": 150,
+   "bs_trips": 36,
+   "bs_min": 10,
+   "bs_lines": [
+    "26",
+    "30"
+   ],
+   "ta_trips": 4,
+   "ta_min": 74,
+   "ta_lines": [
+    "389",
+    "421"
+   ],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Ein Tamar",
+   "he": "עין תמר",
+   "grp": "jewish",
+   "departures": 0,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Ein Hatseva",
+   "he": "עין חצבה",
+   "grp": "jewish",
+   "departures": 0,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Ein Gedi",
+   "he": "עין גדי",
+   "grp": "jewish",
+   "departures": 44,
+   "bs_trips": 5,
+   "bs_min": 103,
+   "bs_lines": [
+    "384"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 17,
+   "jm_min": 57,
+   "jm_lines": [
+    "444",
+    "486",
+    "487"
+   ]
+  },
+  {
+   "id": "Neve Zohar",
+   "he": "נוה זוהר",
+   "grp": "jewish",
+   "departures": 64,
+   "bs_trips": 5,
+   "bs_min": 56,
+   "bs_lines": [
+    "384"
+   ],
+   "ta_trips": 2,
+   "ta_min": 122,
+   "ta_lines": [
+    "421"
+   ],
+   "jm_trips": 12,
+   "jm_min": 105,
+   "jm_lines": [
+    "486"
+   ]
+  },
+  {
+   "id": "Ne'Ot Hakikar",
+   "he": "נאות הכיכר",
+   "grp": "jewish",
+   "departures": 4,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Har Amasa",
+   "he": "הר עמשא",
+   "grp": "jewish",
+   "departures": 20,
+   "bs_trips": 6,
+   "bs_min": 47,
+   "bs_lines": [
+    "252"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Tekuma",
+   "he": "תקומה",
+   "grp": "jewish",
+   "departures": 22,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Tushiya",
+   "he": "תושיה",
+   "grp": "jewish",
+   "departures": 22,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Sharsheret",
+   "he": "שרשרת",
+   "grp": "jewish",
+   "departures": 12,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Shokeda",
+   "he": "שוקדה",
+   "grp": "jewish",
+   "departures": 22,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Shuva",
+   "he": "שובה",
+   "grp": "jewish",
+   "departures": 22,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Shibolim",
+   "he": "שבלים",
+   "grp": "jewish",
+   "departures": 99,
+   "bs_trips": 69,
+   "bs_min": 17,
+   "bs_lines": [
+    "322",
+    "323",
+    "325",
+    "342",
+    "343",
+    "353",
+    "361",
+    "363"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Alumim",
+   "he": "עלומים",
+   "grp": "jewish",
+   "departures": 22,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Sa'Ad",
+   "he": "סעד",
+   "grp": "jewish",
+   "departures": 0,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Ma'Agalim",
+   "he": "מעגלים",
+   "grp": "jewish",
+   "departures": 12,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Melilot",
+   "he": "מלילות",
+   "grp": "jewish",
+   "departures": 12,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Kefar Maymon",
+   "he": "כפר מימון",
+   "grp": "jewish",
+   "departures": 11,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Yoshivya",
+   "he": "יושיביה",
+   "grp": "jewish",
+   "departures": 60,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Zeru'A",
+   "he": "זרועה",
+   "grp": "jewish",
+   "departures": 12,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Zimrat",
+   "he": "זמרת",
+   "grp": "jewish",
+   "departures": 44,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Beit Hagadi",
+   "he": "בית הגדי",
+   "grp": "jewish",
+   "departures": 408,
+   "bs_trips": 82,
+   "bs_min": 20,
+   "bs_lines": [
+    "325",
+    "342",
+    "343",
+    "353",
+    "361",
+    "363",
+    "364"
+   ],
+   "ta_trips": 17,
+   "ta_min": 63,
+   "ta_lines": [
+    "353",
+    "378"
+   ],
+   "jm_trips": 2,
+   "jm_min": 93,
+   "jm_lines": [
+    "492"
+   ]
+  },
+  {
+   "id": "Sede Boker",
+   "he": "שדה בוקר",
+   "grp": "jewish",
+   "departures": 107,
+   "bs_trips": 48,
+   "bs_min": 32,
+   "bs_lines": [
+    "392",
+    "60",
+    "63",
+    "64",
+    "65"
+   ],
+   "ta_trips": 1,
+   "ta_min": 117,
+   "ta_lines": [
+    "660"
+   ],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Retamim",
+   "he": "רתמים",
+   "grp": "jewish",
+   "departures": 14,
+   "bs_trips": 7,
+   "bs_min": 37,
+   "bs_lines": [
+    "45"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Nitsanei Sinay",
+   "he": "ניצני סיני",
+   "grp": "jewish",
+   "departures": 17,
+   "bs_trips": 9,
+   "bs_min": 58,
+   "bs_lines": [
+    "140",
+    "44"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Mash'Abei Sade",
+   "he": "משאבי שדה",
+   "grp": "jewish",
+   "departures": 155,
+   "bs_trips": 79,
+   "bs_min": 19,
+   "bs_lines": [
+    "140",
+    "142",
+    "36",
+    "392",
+    "44",
+    "45",
+    "60",
+    "63",
+    "64",
+    "65"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Merhav Am",
+   "he": "מרחב עם",
+   "grp": "jewish",
+   "departures": 19,
+   "bs_trips": 2,
+   "bs_min": 42,
+   "bs_lines": [
+    "63"
+   ],
+   "ta_trips": 1,
+   "ta_min": 114,
+   "ta_lines": [
+    "660"
+   ],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Midreshet Ben Gurion",
+   "he": "מדרשת בן גוריון",
+   "grp": "jewish",
+   "departures": 102,
+   "bs_trips": 46,
+   "bs_min": 34,
+   "bs_lines": [
+    "392",
+    "60",
+    "64",
+    "65"
+   ],
+   "ta_trips": 1,
+   "ta_min": 119,
+   "ta_lines": [
+    "660"
+   ],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Kemehin",
+   "he": "כמהין",
+   "grp": "jewish",
+   "departures": 17,
+   "bs_trips": 9,
+   "bs_min": 58,
+   "bs_lines": [
+    "140",
+    "44"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Telalim",
+   "he": "טללים",
+   "grp": "jewish",
+   "departures": 19,
+   "bs_trips": 10,
+   "bs_min": 24,
+   "bs_lines": [
+    "60",
+    "63",
+    "64"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Be'Er Milka",
+   "he": "באר מילכה",
+   "grp": "jewish",
+   "departures": 12,
+   "bs_trips": 4,
+   "bs_min": 61,
+   "bs_lines": [
+    "140"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Ashalim",
+   "he": "אשלים",
+   "grp": "jewish",
+   "departures": 34,
+   "bs_trips": 17,
+   "bs_min": 27,
+   "bs_lines": [
+    "140",
+    "142",
+    "44"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Kasr A-Sir",
+   "he": "קצר א-סר",
+   "grp": "arab",
+   "departures": 265,
+   "bs_trips": 99,
+   "bs_min": 18,
+   "bs_lines": [
+    "48",
+    "49",
+    "56",
+    "581",
+    "67"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Bir Hadaj",
+   "he": "ביר הדאג'",
+   "grp": "arab",
+   "departures": 28,
+   "bs_trips": 14,
+   "bs_min": 28,
+   "bs_lines": [
+    "36",
+    "45"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Abu Tlul",
+   "he": "אבו תלול",
+   "grp": "arab",
+   "departures": 149,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Abu Kureinat",
+   "he": "אבו קורינאת",
+   "grp": "arab",
+   "departures": 34,
+   "bs_trips": 7,
+   "bs_min": 34,
+   "bs_lines": [
+    "67"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Tifrah",
+   "he": "תפרח",
+   "grp": "jewish",
+   "departures": 107,
+   "bs_trips": 6,
+   "bs_min": 12,
+   "bs_lines": [
+    "359"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 10,
+   "jm_min": 81,
+   "jm_lines": [
+    "499"
+   ]
+  },
+  {
+   "id": "Talmei Bilu",
+   "he": "תלמי ביל\"ו",
+   "grp": "jewish",
+   "departures": 78,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 13,
+   "jm_min": 69,
+   "jm_lines": [
+    "496"
+   ]
+  },
+  {
+   "id": "Sede Tsevi",
+   "he": "שדה צבי",
+   "grp": "jewish",
+   "departures": 10,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Ranen",
+   "he": "רנן",
+   "grp": "jewish",
+   "departures": 8,
+   "bs_trips": 1,
+   "bs_min": 33,
+   "bs_lines": [
+    "134"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Kelahim",
+   "he": "קלחים",
+   "grp": "jewish",
+   "departures": 31,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Pa'Amei Tashaz",
+   "he": "פעמי תש\"ז",
+   "grp": "jewish",
+   "departures": 52,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Patish",
+   "he": "פטיש",
+   "grp": "jewish",
+   "departures": 8,
+   "bs_trips": 1,
+   "bs_min": 46,
+   "bs_lines": [
+    "134"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Peduyim",
+   "he": "פדויים",
+   "grp": "jewish",
+   "departures": 8,
+   "bs_trips": 1,
+   "bs_min": 28,
+   "bs_lines": [
+    "134"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Nir Akiva",
+   "he": "ניר עקיבא",
+   "grp": "jewish",
+   "departures": 10,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Nir Moshe",
+   "he": "ניר משה",
+   "grp": "jewish",
+   "departures": 10,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Maslul",
+   "he": "מסלול",
+   "grp": "jewish",
+   "departures": 8,
+   "bs_trips": 1,
+   "bs_min": 38,
+   "bs_lines": [
+    "134"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Mabu'Im",
+   "he": "מבועים",
+   "grp": "jewish",
+   "departures": 10,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Gilat",
+   "he": "גילת",
+   "grp": "jewish",
+   "departures": 6,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Bitha",
+   "he": "בטחה",
+   "grp": "jewish",
+   "departures": 6,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Eshbol",
+   "he": "אשבול",
+   "grp": "jewish",
+   "departures": 52,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Ne'Ot Smadar",
+   "he": "שיזפון",
+   "grp": "jewish",
+   "departures": 0,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Shaharut",
+   "he": "שחרות",
+   "grp": "jewish",
+   "departures": 15,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Ketura",
+   "he": "קטורה",
+   "grp": "jewish",
+   "departures": 87,
+   "bs_trips": 13,
+   "bs_min": 157,
+   "bs_lines": [
+    "391",
+    "393",
+    "397",
+    "794"
+   ],
+   "ta_trips": 10,
+   "ta_min": 229,
+   "ta_lines": [
+    "390",
+    "393",
+    "794"
+   ],
+   "jm_trips": 4,
+   "jm_min": 210,
+   "jm_lines": [
+    "444"
+   ]
+  },
+  {
+   "id": "Samar",
+   "he": "סמר",
+   "grp": "jewish",
+   "departures": 89,
+   "bs_trips": 13,
+   "bs_min": 168,
+   "bs_lines": [
+    "391",
+    "393",
+    "397",
+    "794"
+   ],
+   "ta_trips": 10,
+   "ta_min": 240,
+   "ta_lines": [
+    "390",
+    "393",
+    "794"
+   ],
+   "jm_trips": 4,
+   "jm_min": 221,
+   "jm_lines": [
+    "444"
+   ]
+  },
+  {
+   "id": "Neve Harif",
+   "he": "נווה חריף",
+   "grp": "jewish",
+   "departures": 15,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Lotan",
+   "he": "לוטן",
+   "grp": "jewish",
+   "departures": 32,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Yotvata",
+   "he": "יטבתה",
+   "grp": "jewish",
+   "departures": 45,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Yahel",
+   "he": "יהל",
+   "grp": "jewish",
+   "departures": 72,
+   "bs_trips": 13,
+   "bs_min": 147,
+   "bs_lines": [
+    "391",
+    "393",
+    "397",
+    "794"
+   ],
+   "ta_trips": 10,
+   "ta_min": 219,
+   "ta_lines": [
+    "390",
+    "393",
+    "794"
+   ],
+   "jm_trips": 4,
+   "jm_min": 200,
+   "jm_lines": [
+    "444"
+   ]
+  },
+  {
+   "id": "Gerofit",
+   "he": "גרופית",
+   "grp": "jewish",
+   "departures": 32,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Be'Er Ora",
+   "he": "באר אורה",
+   "grp": "jewish",
+   "departures": 17,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Elifaz",
+   "he": "אליפז",
+   "grp": "jewish",
+   "departures": 89,
+   "bs_trips": 13,
+   "bs_min": 172,
+   "bs_lines": [
+    "391",
+    "393",
+    "397",
+    "794"
+   ],
+   "ta_trips": 10,
+   "ta_min": 244,
+   "ta_lines": [
+    "390",
+    "393",
+    "794"
+   ],
+   "jm_trips": 4,
+   "jm_min": 225,
+   "jm_lines": [
+    "444"
+   ]
+  },
+  {
+   "id": "Eilot",
+   "he": "אילות",
+   "grp": "jewish",
+   "departures": 17,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Tsukim",
+   "he": "צוקים",
+   "grp": "jewish",
+   "departures": 55,
+   "bs_trips": 13,
+   "bs_min": 110,
+   "bs_lines": [
+    "391",
+    "393",
+    "397",
+    "794"
+   ],
+   "ta_trips": 10,
+   "ta_min": 182,
+   "ta_lines": [
+    "390",
+    "393",
+    "794"
+   ],
+   "jm_trips": 4,
+   "jm_min": 163,
+   "jm_lines": [
+    "444"
+   ]
+  },
+  {
+   "id": "Tsofar",
+   "he": "צופר",
+   "grp": "jewish",
+   "departures": 55,
+   "bs_trips": 13,
+   "bs_min": 104,
+   "bs_lines": [
+    "391",
+    "393",
+    "397",
+    "794"
+   ],
+   "ta_trips": 10,
+   "ta_min": 176,
+   "ta_lines": [
+    "390",
+    "393",
+    "794"
+   ],
+   "jm_trips": 4,
+   "jm_min": 157,
+   "jm_lines": [
+    "444"
+   ]
+  },
+  {
+   "id": "Paran",
+   "he": "פארן",
+   "grp": "jewish",
+   "departures": 55,
+   "bs_trips": 13,
+   "bs_min": 121,
+   "bs_lines": [
+    "391",
+    "393",
+    "397",
+    "794"
+   ],
+   "ta_trips": 10,
+   "ta_min": 193,
+   "ta_lines": [
+    "390",
+    "393",
+    "794"
+   ],
+   "jm_trips": 4,
+   "jm_min": 174,
+   "jm_lines": [
+    "444"
+   ]
+  },
+  {
+   "id": "Ein Yahav",
+   "he": "עין יהב",
+   "grp": "jewish",
+   "departures": 0,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Sapir",
+   "he": "ספיר",
+   "grp": "jewish",
+   "departures": 56,
+   "bs_trips": 13,
+   "bs_min": 100,
+   "bs_lines": [
+    "391",
+    "393",
+    "397",
+    "794"
+   ],
+   "ta_trips": 10,
+   "ta_min": 172,
+   "ta_lines": [
+    "390",
+    "393",
+    "794"
+   ],
+   "jm_trips": 4,
+   "jm_min": 153,
+   "jm_lines": [
+    "444"
+   ]
+  },
+  {
+   "id": "Hatseva",
+   "he": "חצבה",
+   "grp": "jewish",
+   "departures": 0,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Tidhar",
+   "he": "תדהר",
+   "grp": "jewish",
+   "departures": 207,
+   "bs_trips": 69,
+   "bs_min": 15,
+   "bs_lines": [
+    "322",
+    "323",
+    "325",
+    "342",
+    "343",
+    "353",
+    "361",
+    "363"
+   ],
+   "ta_trips": 13,
+   "ta_min": 108,
+   "ta_lines": [
+    "353"
+   ],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Te'Ashur",
+   "he": "תאשור",
+   "grp": "jewish",
+   "departures": 12,
+   "bs_trips": 6,
+   "bs_min": 16,
+   "bs_lines": [
+    "325"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Shomeria",
+   "he": "שומריה",
+   "grp": "jewish",
+   "departures": 31,
+   "bs_trips": 10,
+   "bs_min": 18,
+   "bs_lines": [
+    "164",
+    "57"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Shoval",
+   "he": "שובל",
+   "grp": "jewish",
+   "departures": 69,
+   "bs_trips": 8,
+   "bs_min": 19,
+   "bs_lines": [
+    "371"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Nevatim",
+   "he": "נבטים",
+   "grp": "jewish",
+   "departures": 154,
+   "bs_trips": 154,
+   "bs_min": 2,
+   "bs_lines": [
+    "117",
+    "427",
+    "461",
+    "48",
+    "49",
+    "50",
+    "54",
+    "56",
+    "581",
+    "67"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Mishmar Hanegev",
+   "he": "משמר הנגב",
+   "grp": "jewish",
+   "departures": 24,
+   "bs_trips": 8,
+   "bs_min": 17,
+   "bs_lines": [
+    "371"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Lahav",
+   "he": "להב",
+   "grp": "jewish",
+   "departures": 31,
+   "bs_trips": 16,
+   "bs_min": 15,
+   "bs_lines": [
+    "164",
+    "26",
+    "57"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Hatserim",
+   "he": "חצרים",
+   "grp": "jewish",
+   "departures": 31,
+   "bs_trips": 14,
+   "bs_min": 6,
+   "bs_lines": [
+    "40",
+    "41"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Devira",
+   "he": "דבירה",
+   "grp": "jewish",
+   "departures": 12,
+   "bs_trips": 6,
+   "bs_min": 32,
+   "bs_lines": [
+    "57"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Geva'Ot Bar",
+   "he": "גבעות בר",
+   "grp": "jewish",
+   "departures": 14,
+   "bs_trips": 7,
+   "bs_min": 14,
+   "bs_lines": [
+    "454"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Berosh",
+   "he": "ברוש",
+   "grp": "jewish",
+   "departures": 185,
+   "bs_trips": 63,
+   "bs_min": 14,
+   "bs_lines": [
+    "323",
+    "325",
+    "342",
+    "343",
+    "353",
+    "361",
+    "363"
+   ],
+   "ta_trips": 13,
+   "ta_min": 110,
+   "ta_lines": [
+    "353"
+   ],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Beit Kama",
+   "he": "בית-קמה",
+   "grp": "jewish",
+   "departures": 94,
+   "bs_trips": 2,
+   "bs_min": 25,
+   "bs_lines": [
+    "393",
+    "794"
+   ],
+   "ta_trips": 12,
+   "ta_min": 59,
+   "ta_lines": [
+    "390",
+    "393",
+    "421",
+    "794"
+   ],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Talmei Yosef",
+   "he": "תלמי יוסף",
+   "grp": "jewish",
+   "departures": 18,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Talmei Eliyahu",
+   "he": "תלמי אליהו",
+   "grp": "jewish",
+   "departures": 19,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Shelomit",
+   "he": "שלומית",
+   "grp": "jewish",
+   "departures": 16,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Sedei Avraham",
+   "he": "שדי אברהם",
+   "grp": "jewish",
+   "departures": 29,
+   "bs_trips": 1,
+   "bs_min": 51,
+   "bs_lines": [
+    "135"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 1,
+   "jm_min": 119,
+   "jm_lines": [
+    "495"
+   ]
+  },
+  {
+   "id": "Sede Nitsan",
+   "he": "שדה ניצן",
+   "grp": "jewish",
+   "departures": 19,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Re'Im",
+   "he": "רעים",
+   "grp": "jewish",
+   "departures": 30,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 6,
+   "ta_min": 71,
+   "ta_lines": [
+    "379"
+   ],
+   "jm_trips": 1,
+   "jm_min": 97,
+   "jm_lines": [
+    "495"
+   ]
+  },
+  {
+   "id": "Tsohar",
+   "he": "צוחר",
+   "grp": "jewish",
+   "departures": 0,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Tse'Elim",
+   "he": "צאלים",
+   "grp": "jewish",
+   "departures": 49,
+   "bs_trips": 9,
+   "bs_min": 51,
+   "bs_lines": [
+    "130"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Peri Gan",
+   "he": "פרי גן",
+   "grp": "jewish",
+   "departures": 18,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Ami'Oz",
+   "he": "עמיעוז",
+   "grp": "jewish",
+   "departures": 46,
+   "bs_trips": 1,
+   "bs_min": 44,
+   "bs_lines": [
+    "135"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 1,
+   "jm_min": 112,
+   "jm_lines": [
+    "495"
+   ]
+  },
+  {
+   "id": "Ein Hashelosha",
+   "he": "עין השלושה",
+   "grp": "jewish",
+   "departures": 19,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Ein Habesor",
+   "he": "עין הבשור",
+   "grp": "jewish",
+   "departures": 55,
+   "bs_trips": 1,
+   "bs_min": 41,
+   "bs_lines": [
+    "135"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 1,
+   "jm_min": 108,
+   "jm_lines": [
+    "495"
+   ]
+  },
+  {
+   "id": "Sufa",
+   "he": "סופה",
+   "grp": "jewish",
+   "departures": 17,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Nirim",
+   "he": "נירים",
+   "grp": "jewish",
+   "departures": 47,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 6,
+   "ta_min": 76,
+   "ta_lines": [
+    "379"
+   ],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Nir Oz",
+   "he": "ניר עוז",
+   "grp": "jewish",
+   "departures": 19,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Nir Yitshak",
+   "he": "ניר יצחק",
+   "grp": "jewish",
+   "departures": 57,
+   "bs_trips": 1,
+   "bs_min": 48,
+   "bs_lines": [
+    "135"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 1,
+   "jm_min": 116,
+   "jm_lines": [
+    "495"
+   ]
+  },
+  {
+   "id": "Neve",
+   "he": "נווה",
+   "grp": "jewish",
+   "departures": 20,
+   "bs_trips": 1,
+   "bs_min": 55,
+   "bs_lines": [
+    "135"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 1,
+   "jm_min": 123,
+   "jm_lines": [
+    "495"
+   ]
+  },
+  {
+   "id": "Magen",
+   "he": "מגן",
+   "grp": "jewish",
+   "departures": 160,
+   "bs_trips": 11,
+   "bs_min": 38,
+   "bs_lines": [
+    "135",
+    "35"
+   ],
+   "ta_trips": 6,
+   "ta_min": 82,
+   "ta_lines": [
+    "379"
+   ],
+   "jm_trips": 1,
+   "jm_min": 106,
+   "jm_lines": [
+    "495"
+   ]
+  },
+  {
+   "id": "Mivtahim",
+   "he": "מבטחים",
+   "grp": "jewish",
+   "departures": 19,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Kerem Shalom",
+   "he": "כרם שלום",
+   "grp": "jewish",
+   "departures": 17,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Kisufim",
+   "he": "כיסופים",
+   "grp": "jewish",
+   "departures": 19,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Yated",
+   "he": "יתד",
+   "grp": "jewish",
+   "departures": 29,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Yesha",
+   "he": "ישע",
+   "grp": "jewish",
+   "departures": 49,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Yevul",
+   "he": "יבול",
+   "grp": "jewish",
+   "departures": 18,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Holit",
+   "he": "חולית",
+   "grp": "jewish",
+   "departures": 17,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Dekel",
+   "he": "דקל",
+   "grp": "jewish",
+   "departures": 16,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Gevulot",
+   "he": "גבולות",
+   "grp": "jewish",
+   "departures": 18,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Benei Netsarim",
+   "he": "בני נצרים",
+   "grp": "jewish",
+   "departures": 22,
+   "bs_trips": 1,
+   "bs_min": 59,
+   "bs_lines": [
+    "135"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 1,
+   "jm_min": 127,
+   "jm_lines": [
+    "495"
+   ]
+  },
+  {
+   "id": "Be'Eri",
+   "he": "בארי",
+   "grp": "jewish",
+   "departures": 30,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 6,
+   "ta_min": 63,
+   "ta_lines": [
+    "379"
+   ],
+   "jm_trips": 1,
+   "jm_min": 92,
+   "jm_lines": [
+    "495"
+   ]
+  },
+  {
+   "id": "Urim",
+   "he": "אורים",
+   "grp": "jewish",
+   "departures": 54,
+   "bs_trips": 20,
+   "bs_min": 29,
+   "bs_lines": [
+    "130",
+    "135",
+    "35"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Ohad",
+   "he": "אוהד",
+   "grp": "jewish",
+   "departures": 0,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Avshalom",
+   "he": "אבשלום",
+   "grp": "jewish",
+   "departures": 16,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Tarabin A-Sana",
+   "he": "תראבין א-צאנע",
+   "grp": "arab",
+   "departures": 14,
+   "bs_trips": 7,
+   "bs_min": 10,
+   "bs_lines": [
+    "454"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Sawa",
+   "he": "סעוה",
+   "grp": "arab",
+   "departures": 162,
+   "bs_trips": 63,
+   "bs_min": 14,
+   "bs_lines": [
+    "121",
+    "126",
+    "388"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Mahul",
+   "he": "מכחול",
+   "grp": "arab",
+   "departures": 76,
+   "bs_trips": 8,
+   "bs_min": 41,
+   "bs_lines": [
+    "121"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Kohle",
+   "he": "כחלה",
+   "grp": "arab",
+   "departures": 0,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Derijat",
+   "he": "דריג'את",
+   "grp": "arab",
+   "departures": 76,
+   "bs_trips": 8,
+   "bs_min": 43,
+   "bs_lines": [
+    "121"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Al Sayid",
+   "he": "אל סייד",
+   "grp": "arab",
+   "departures": 138,
+   "bs_trips": 9,
+   "bs_min": 42,
+   "bs_lines": [
+    "126"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Um Batin",
+   "he": "אום בטין",
+   "grp": "arab",
+   "departures": 417,
+   "bs_trips": 203,
+   "bs_min": 5,
+   "bs_lines": [
+    "120",
+    "121",
+    "126",
+    "164",
+    "20",
+    "26",
+    "262",
+    "28",
+    "30",
+    "388",
+    "461",
+    "62"
+   ],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  },
+  {
+   "id": "Shizaf",
+   "he": "שיזף",
+   "grp": "jewish",
+   "departures": 0,
+   "bs_trips": 0,
+   "bs_min": null,
+   "bs_lines": [],
+   "ta_trips": 0,
+   "ta_min": null,
+   "ta_lines": [],
+   "jm_trips": 0,
+   "jm_min": null,
+   "jm_lines": []
+  }
+ ]
+}

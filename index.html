@@ -161,6 +161,17 @@ body.chap #stats{display:none}
 .b0{position:absolute;inset-inline-start:4px;top:-2px;color:var(--red-deep);font-weight:800}
 .bv{font-family:"Jost";font-weight:700;text-align:end}
 .bu{font-size:11px;color:#444}
+.tl-row{margin-bottom:8px}
+.tl-h{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px}
+.tl-wrap{display:flex;flex-wrap:wrap;align-items:flex-end;gap:8px 10px}
+.tl{display:flex;flex-direction:column;align-items:center;font-size:10px;line-height:1.2;min-width:30px}
+.tl-box{position:relative;min-width:3px;min-height:3px}
+.tl-box.arab{background:#fff;outline:2px solid #000;outline-offset:-2px}
+.tl-box.jewish{background:#c9c7c1;outline:1px solid #8a8a86;outline-offset:-1px}
+.tl-ind{position:absolute;inset-block-end:0;inset-inline-start:0;background:#f2c230;outline:1px solid #000;min-width:2px;min-height:2px}
+.tl-n{margin-top:3px;max-width:70px;text-align:center}
+.tl-p{font-family:"Jost";font-weight:800;font-size:12px}
+.note2{font-size:12px;background:#f2c23033;padding:6px 8px;margin:6px 0}
 
 @media (max-width:760px){
   #card{inset-inline:8px;width:auto;max-height:45%}
@@ -539,6 +550,11 @@ function chapterCard(key){
   const big=(a)=>`<div class="big">${a.map(([v,l,r])=>`<div><b class="${r?'r':''}">${v}</b><span>${l}</span></div>`).join('')}</div>`;
   const T3={ar:{},he:{},en:{}}; // per-language prose
   const tr3=o=>o[L]||o.en;
+  // proportional squares: side ∝ √area, so square AREA ∝ dunam; inner yellow square = industrial dunam on the same scale
+  const tiles=R=>{ const mx=Math.max(...R.map(r=>r.total_dunam),1), px=a=>Math.sqrt(a/mx)*92;
+    const row=g=>`<div class="tl-row"><div class="tl-h">${tr3(g==='arab'?{ar:'البلدات العربية السبع',he:'7 היישובים הערביים',en:'7 Arab towns'}:{ar:'11 بلدة يهودية',he:'11 יישובים יהודיים',en:'11 Jewish towns'})}</div><div class="tl-wrap">${
+      R.filter(r=>r.grp===g).sort((a,b)=>b.ind_pct-a.ind_pct).map(r=>`<div class="tl" title="${(r[L]||r.en)}: ${Math.round(r.total_dunam).toLocaleString()} / ${Math.round(r.ind_dunam).toLocaleString()} ${t('dunam')}"><div class="tl-box ${g}" style="width:${px(r.total_dunam)}px;height:${px(r.total_dunam)}px"><div class="tl-ind" style="width:${px(r.ind_dunam)}px;height:${px(r.ind_dunam)}px"></div></div><div class="tl-n">${r[L]||r.en}</div><div class="tl-p">${r.ind_pct.toFixed(1)}%</div></div>`).join('')}</div></div>`;
+    return row('arab')+row('jewish'); };
   // legend: [[swatchCSS, label], ...]
   const leg=items=>`<div class="leg">${items.map(([css,l])=>`<span><i style="${css}"></i>${tr3(l)}</span>`).join('')}</div>`;
   // horizontal bar chart: rows [{label, v, grp, note}]
@@ -579,6 +595,8 @@ function chapterCard(key){
     return leg([['background:#f2c230;outline:2px solid #000;outline-offset:-3px',{ar:'منطقة صناعية – بلدة عربية',he:'אזור תעשייה – יישוב ערבי',en:'industrial zone – Arab town'}],['background:#f2c230;opacity:.55',{ar:'منطقة صناعية – بلدة يهودية',he:'אזור תעשייה – יישוב יהודי',en:'industrial zone – Jewish town'}],['background:#111;border:1px solid #f2c230',{ar:'مبنى قائم داخل المنطقة (قرّبي)',he:'מבנה קיים באזור (זום פנימה)',en:'existing building in zone (zoom in)'}],['border-top:2px dashed #e9e6df',{ar:'البلدات العربية السبع',he:'7 היישובים הערביים',en:'the 7 Arab towns'}],['border-top:2px dashed #8a8a86',{ar:'11 بلدة يهودية للمقارنة',he:'11 יישובים יהודיים להשוואה',en:'11 Jewish comparison towns'}]])+
      big([[pa.toFixed(1),tr3({ar:'دونم صناعة لكل 1000 ساكن — عربية',he:'דונם תעשייה ל-1000 תושבים — ערבי',en:'industrial dunam / 1,000 residents — Arab'}),1],[pj.toFixed(1),tr3({ar:'دونم لكل 1000 — يهودية',he:'דונם ל-1000 — יהודי',en:'dunam / 1,000 — Jewish'}),0]])+
      big([[nb('arab'),tr3({ar:'مبنى قائم في مناطق صناعية عربية',he:'מבנים באזורי תעשייה ערביים',en:'buildings in Arab industrial zones'}),1],[nb('jewish').toLocaleString(),tr3({ar:'مبنى في مناطق صناعية يهودية',he:'מבנים באזורי תעשייה יהודיים',en:'buildings in Jewish industrial zones'}),0]])+T3[L]+
+     `<h4>${tr3({ar:'نسبة وتناسب: المربع = مساحة البلدة، الأصفر = المساحة الصناعية منها',he:'יחס: הריבוע = שטח היישוב, הצהוב = השטח התעשייתי בתוכו',en:'Proportion: square = town area, yellow = its industrial area'})}</h4>`+tiles(R)+
+     `<p class="note2">${tr3({ar:'لاحظي: بالنسبة المئوية الفرق أصغر — رهط 8.7% قريبة من بئر السبع 8.3%. لكن البلدات العربية صغيرة ومكتظة: نفس النسبة تتوزّع على عدد سكان أكبر بكثير، لذلك المقياس لكل 1000 ساكن (تحت) هو الأعدل.',he:'שימי לב: באחוזים הפער קטן יותר — רהט 8.7% קרובה לבאר שבע 8.3%. אבל היישובים הערביים קטנים וצפופים: אותו אחוז מתחלק על הרבה יותר תושבים, ולכן המדד ל-1000 תושבים (למטה) הוא ההוגן יותר.',en:'Note: in percentages the gap looks smaller — Rahat 8.7% is close to Be\'er Sheva 8.3%. But Arab towns are small and crowded: the same share is split among far more residents, so the per-1,000-residents measure (below) is the fairer one.'})}</p>`+
      `<h4>${tr3({ar:'دونم صناعة لكل 1000 ساكن، حسب البلدة',he:'דונם תעשייה ל-1000 תושבים, לפי יישוב',en:'Industrial dunam per 1,000 residents, by town'})}</h4>`+
      bars(sorted.map(r=>({label:r[L]||r.en,v:r.ind_per1000,grp:r.grp})),sorted[0]?sorted[0].ind_per1000:1)+
      `<div class="src">${t('teamSrc')} · ${tr3({ar:'المباني: OSM داخل المناطق الصناعية. السكان 2026.',he:'מבנים: OSM בתוך אזורי התעשייה. אוכלוסייה 2026.',en:'Buildings: OSM inside industrial zones. Population 2026.'})}</div>`;

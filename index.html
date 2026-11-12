@@ -265,7 +265,7 @@ const NEGEV_VIEW = {center:[34.85,31.05], zoom:8.6};
 /* ---------------- i18n ---------------- */
 const T = {
  ar:{dir:'rtl',map:'الخريطة',compare:'قبل / بعد',about:'عن المشروع',
-  base:'الأساس',basemap:'خريطة الشوارع والمباني',sat:'صورة جوية (أبيض/أسود)',mask:'تعتيم خارج النقب',labels:'أسماء الأماكن',
+  base:'الأساس',basemap:'خريطة الشوارع والمباني',sat:'صورة جوية (أبيض/أسود)',mask:'تعتيم خارج النقب',mask2:'تعتيم خارج الدولة',labels:'أسماء الأماكن',
   bounds:'الحدود والبلدات',arab:'بلدات عربية معترف بها',jew:'بلدات يهودية',ind:'مناطق صناعية / أمنية',rc:'حدود المجالس الإقليمية',
   red:'القائمة الحمراء',unrec:'قرى خارج أي حدود معترف بها',demo:'هدم موثّق',
   plan:'التخطيط الرسمي',xplan:'خطوط زرقاء – مخططات (Xplan)',landuse:'استعمالات الأرض',tmm:'مخطط لوائي 4/14 – الجنوب',vatmal:'مجمعات ות"ל معلنة',
@@ -278,7 +278,7 @@ const T = {
   econ:'الاقتصاد والتشغيل',indJ:'مناطق صناعية – بلدات يهودية',indA:'مناطق صناعية – بلدات عربية',arab7:'البلدات العربية السبع (طبقة الفريق)',
   sIndA:'كم² صناعة عربية',sIndJ:'كم² صناعة يهودية',gross:'مساحة إجمالية',net:'مساحة صناعية صافية',planNo:'رقم المخطط',owner:'الملكية',auth:'السلطة',zones:'مناطق',dunam:'دونم',teamSrc:'طبقة الفريق (ArcGIS) · مناطق صناعية 2022'},
  he:{dir:'rtl',map:'מפה',compare:'לפני / אחרי',about:'אודות',
-  base:'בסיס',basemap:'רחובות ומבנים',sat:'תצלום אוויר (שחור-לבן)',mask:'עמעום מחוץ לנגב',labels:'שמות מקומות',
+  base:'בסיס',basemap:'רחובות ומבנים',sat:'תצלום אוויר (שחור-לבן)',mask:'עמעום מחוץ לנגב',mask2:'עמעום מחוץ למדינה',labels:'שמות מקומות',
   bounds:'גבולות ויישובים',arab:'יישובים ערביים מוכרים',jew:'יישובים יהודיים',ind:'אזורי תעשייה / ביטחון',rc:'גבולות מועצות אזוריות',
   red:'הרשימה האדומה',unrec:'כפרים מחוץ לכל גבול מוכר',demo:'הריסות מתועדות',
   plan:'תכנון רשמי',xplan:'קווים כחולים – תכניות (Xplan)',landuse:'ייעודי קרקע',tmm:'תמ"מ 4/14 – מחוז דרום',vatmal:'מתחמי ות"ל מוכרזים',
@@ -291,7 +291,7 @@ const T = {
   econ:'כלכלה ותעסוקה',indJ:'אזורי תעשייה – יישובים יהודיים',indA:'אזורי תעשייה – יישובים ערביים',arab7:'שבעת היישובים הערביים (שכבת הצוות)',
   sIndA:'קמ"ר תעשייה ערבית',sIndJ:'קמ"ר תעשייה יהודית',gross:'שטח ברוטו',net:'שטח תעשייה נטו',planNo:'מס\' תכנית',owner:'בעלות',auth:'רשות',zones:'אזורים',dunam:'דונם',teamSrc:'שכבת הצוות (ArcGIS) · אזורי תעשייה 2022'},
  en:{dir:'ltr',map:'Map',compare:'Before / After',about:'About',
-  base:'Base',basemap:'Streets & buildings',sat:'Aerial (B/W)',mask:'Dim outside the Naqab',labels:'Place names',
+  base:'Base',basemap:'Streets & buildings',sat:'Aerial (B/W)',mask:'Dim outside the Naqab',mask2:'Dim outside the state',labels:'Place names',
   bounds:'Boundaries & localities',arab:'Recognized Arab localities',jew:'Jewish localities',ind:'Industrial / security zones',rc:'Regional council limits',
   red:'Red list',unrec:'Villages outside any recognized boundary',demo:'Documented demolitions',
   plan:'Official planning',xplan:'Blue lines – plans (Xplan)',landuse:'Land-use designations',tmm:'District plan 4/14 – South',vatmal:'Declared VATMAL compounds',
@@ -365,12 +365,11 @@ async function loadData(){
   const indBld = {type:'FeatureCollection',features:[...bldJ.features,...bldA.features]};
   const [cbs, grid, bsum, transit] = await Promise.all([opt('cbs_localities.geojson'), opt('bld_offmap_grid.geojson'),
     get('buildings_summary.json').catch(()=>null), get('transit_direct.json').catch(()=>null)]);
-  const [frames, housesArr] = await Promise.all([opt('cluster_frames.geojson'), get('offmap_houses.json').catch(()=>[])]);
+  const [frames, israel] = await Promise.all([opt('cluster_frames.geojson'), get('israel_outline.geojson').catch(()=>null)]);
   frames.features.forEach((f,i)=>f.properties.i=i);
   [...frames.features].sort((a,b)=>b.properties.n-a.properties.n).forEach((f,r)=>f.properties.rank=r);
   const [nat, routes] = await Promise.all([opt('national_localities.geojson'), opt('transit_routes.geojson')]);
-  const houses = {type:'FeatureCollection',features:housesArr.map(([x,y,a])=>({type:'Feature',geometry:{type:'Point',coordinates:[x,y]},properties:{a}}))};
-  return {nat, routes, frames, houses, cbs, grid, bsum, transit, ind, indBld, istats, tprof, jew11, arab7, nafa, negevGeom, loc:{type:'FeatureCollection',features:loc}, rc:{type:'FeatureCollection',features:rc},
+  return {nat, routes, frames, israel, cbs, grid, bsum, transit, ind, indBld, istats, tprof, jew11, arab7, nafa, negevGeom, loc:{type:'FeatureCollection',features:loc}, rc:{type:'FeatureCollection',features:rc},
           unrec:{type:'FeatureCollection',features:unrec}, demo:{type:'FeatureCollection',features:demo}};
 }
 
@@ -411,7 +410,7 @@ const state = { // layer id -> visible
   basemap:true, sat:false, mask:true, labels:true,
   arab:true, jew:true, ind:true, rc:false,
   unrec:true, demo:true,
-  indJ:true, indA:true, arab7:false, grid:false, frames:false, nat:false, routes:false, cbs:false, transit:false, jew11:false, indBld:false,
+  indJ:true, indA:true, arab7:false, grid:false, frames:false, nat:false, routes:false, mask2:false, cbs:false, transit:false, jew11:false, indBld:false,
   xplan:false, landuse:false, tmm:false, vatmal:false
 };
 try{ Object.assign(state, JSON.parse(localStorage.getItem('offmap-state')||'{}')); }catch(e){}
@@ -421,7 +420,7 @@ const LAYERMAP = {
   arab:['loc-arab-fill','loc-arab-line','loc-arab-lbl'], jew:['loc-jew-line','loc-jew-lbl'], ind:['loc-ind'], rc:['rc-line'],
   unrec:['un-cluster','un-count','un-pt','un-lbl'], demo:['demo-halo','demo-pt'],
   indJ:['ind-j-fill','ind-j-line'], indA:['ind-a-fill','ind-a-line'], arab7:['arab7-line'],
-  grid:['grid-fill'], frames:['frames-fill','frames-line','frames-lbl','houses'], nat:['nat-arab','nat-arab-line','nat-jew','nat-new','nat-bt'], routes:['rt-line','rt-miss','rt-miss-lbl'], cbs:['cbs-pt','cbs-new'], transit:['tr-circ','tr-num','tr-name','tr-dest','tr-dest-lbl'],
+  grid:['grid-fill'], frames:['frames-fill','frames-line','frames-line-e','frames-lbl','bld-u','bld-e','bld-e-line'], mask2:['mask2'], nat:['nat-arab','nat-arab-line','nat-jew','nat-new','nat-bt'], routes:['rt-line','rt-miss','rt-miss-lbl'], cbs:['cbs-pt','cbs-new'], transit:['tr-circ','tr-num','tr-name','tr-dest','tr-dest-lbl'],
   jew11:['jew11-line'], indBld:['indbld-fill'],
   xplan:['live-xplan'], landuse:['live-landuse'], tmm:['live-tmm'], vatmal:['live-vatmal']
 };
@@ -486,9 +485,16 @@ map.once('style.load', async ()=>{
   map.addSource('grid',{type:'geojson',data:DATA.grid});
   map.addLayer({id:'grid-fill',type:'fill',source:'grid',maxzoom:10.5,paint:{'fill-color':'#e8452c','fill-opacity':['interpolate',['linear'],['get','n'],1,.25,20,.6,80,.95]}},'loc-ind');
   // closer in: every Bedouin cluster framed, every house red
-  map.addSource('houses',{type:'geojson',data:DATA.houses});
-  map.addLayer({id:'houses',type:'circle',source:'houses',minzoom:11,paint:{'circle-color':'#e8452c','circle-opacity':.9,
-    'circle-radius':['interpolate',['exponential',2],['zoom'],11,['max',.6,['*',.04,['sqrt',['get','a']]]],18,['max',5,['*',5,['sqrt',['get','a']]]]]}});
+  map.addSource('bld',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
+  map.addLayer({id:'bld-u',type:'fill',source:'bld',minzoom:11.5,filter:['==',['get','c'],'u'],paint:{'fill-color':'#e8452c','fill-opacity':.9}});
+  map.addLayer({id:'bld-e',type:'fill',source:'bld',minzoom:11.5,filter:['==',['get','c'],'e'],paint:{'fill-color':'#e8452c','fill-opacity':.25}});
+  map.addLayer({id:'bld-e-line',type:'line',source:'bld',minzoom:11.5,filter:['==',['get','c'],'e'],paint:{'line-color':'#e8452c','line-width':1.4}});
+  fetch('data/offmap_buildings.json').then(r=>r.json()).then(arr=>{ map.getSource('bld').setData({type:'FeatureCollection',features:arr.map(a=>{
+      let x=a[2],y=a[3]; const ring=[[x/1e5,y/1e5]]; for(let i=4;i<a.length;i+=2){x+=a[i];y+=a[i+1];ring.push([x/1e5,y/1e5]);} ring.push(ring[0]);
+      return {type:'Feature',geometry:{type:'Polygon',coordinates:[ring]},properties:{c:a[0],s:a[1]}};})}); }).catch(()=>{});
+  if(DATA.israel){ const hole=DATA.israel.geometry.coordinates.map(p=>p[0]);
+    map.addSource('mask2',{type:'geojson',data:{type:'Feature',geometry:{type:'Polygon',coordinates:[[[-180,-85],[180,-85],[180,85],[-180,85],[-180,-85]],...hole]}}});
+    map.addLayer({id:'mask2',type:'fill',source:'mask2',layout:{visibility:'none'},paint:{'fill-color':'#000','fill-opacity':.62}},'mask'); }
   // concrete hatch (no new colour): bone diagonal lines on transparent — the visual mark for Arab localities
   { const c=document.createElement('canvas'); c.width=c.height=8; const x=c.getContext('2d'); x.strokeStyle='#e9e6df'; x.lineWidth=1.6;
     x.beginPath(); x.moveTo(-2,10); x.lineTo(10,-2); x.moveTo(-2,2); x.lineTo(2,-2); x.moveTo(6,10); x.lineTo(10,6); x.stroke();
@@ -509,14 +515,15 @@ map.once('style.load', async ()=>{
   map.addLayer({id:'rt-miss-lbl',type:'symbol',source:'rtmiss',layout:{'symbol-placement':'line-center','text-field':'0','text-font':['Noto Sans Bold'],'text-size':16,'text-allow-overlap':true},paint:{'text-color':'#e8452c','text-halo-color':'#000','text-halo-width':3}});
   map.addSource('frames',{type:'geojson',data:DATA.frames});
   map.addLayer({id:'frames-fill',type:'fill',source:'frames',minzoom:8,paint:{'fill-color':'#e8452c','fill-opacity':.18}});
-  map.addLayer({id:'frames-line',type:'line',source:'frames',minzoom:8,filter:['>=',['get','n'],20],paint:{'line-color':'#e8452c','line-width':['interpolate',['linear'],['zoom'],10,1,14,2.5]}});
+  map.addLayer({id:'frames-line',type:'line',source:'frames',minzoom:8,filter:['all',['>=',['get','n'],20],['==',['get','c'],'u']],paint:{'line-color':'#e8452c','line-width':['interpolate',['linear'],['zoom'],10,1,14,2.5]}});
+  map.addLayer({id:'frames-line-e',type:'line',source:'frames',minzoom:8,filter:['all',['>=',['get','n'],20],['==',['get','c'],'e']],paint:{'line-dasharray':[2,1.5],'line-color':'#e8452c','line-width':['interpolate',['linear'],['zoom'],10,1,14,2.5]}});
   map.addLayer({id:'frames-lbl',type:'symbol',source:'frames',minzoom:10.5,filter:['>=',['get','n'],60],
-    layout:{'text-field':['concat',['get',L==='ar'?'ar':'en'],'  ',['to-string',['get','n']]],'text-font':['Noto Sans Bold'],'text-size':11,'symbol-placement':'point','text-anchor':'bottom','text-offset':[0,-.2]},
+    layout:{'text-field':['case',['==',['get','en'],'unnamed'],['to-string',['get','n']],['concat',['get',L==='ar'?'ar':'en'],'  ',['to-string',['get','n']]]],'text-font':['Noto Sans Bold'],'text-size':11,'symbol-placement':'point','text-anchor':'bottom','text-offset':[0,-.2]},
     paint:{'text-color':'#000','text-halo-color':'#e8452c','text-halo-width':3}});
   map.addSource('hi',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
   map.addLayer({id:'hi-fill',type:'fill',source:'hi',paint:{'fill-color':'#fff','fill-opacity':.08}});
   map.addLayer({id:'hi-line',type:'line',source:'hi',paint:{'line-color':'#fff','line-width':3}});
-  map.on('click','frames-line',e=>{const p=e.features[0].properties;new maplibregl.Popup().setLngLat(e.lngLat).setHTML(`<div class="card"><div class="hd">${CHT('offmapCell')}</div><div class="bd"><b>${L==='ar'?p.ar:p.en}</b>${p.n} · ${p.du} ${t('dunam')}<div class="src">Microsoft footprints 2026 · OSM</div></div></div>`).addTo(map);});
+  map.on('click','frames-fill',e=>{const p=e.features[0].properties;new maplibregl.Popup().setLngLat(e.lngLat).setHTML(`<div class="card"><div class="hd">${CHT('offmapCell')}</div><div class="bd"><b>${L==='ar'?p.ar:p.en}</b>${p.n} · ${p.du} ${t('dunam')}<div class="src">Microsoft footprints 2026 · OSM</div></div></div>`).addTo(map);});
   // 02 — localities by founding year (CBS)
   map.addSource('cbs',{type:'geojson',data:DATA.cbs});
   const cbsColor=['match',['get','grp'],'jewish','#8a8a86','bedouin_town','#e8452c','tribe','#e8452c','#e9e6df'];
@@ -592,7 +599,7 @@ function trPopup(e){const p=e.features[0].properties;const v=n=>+n?`<b style="di
 /* chapter definitions: layer preset + view + card */
 const CHAPTERS=[
  {no:'01',key:'land',view:{center:[34.86,31.2],zoom:9.7},layers:{mask:true,arab:true,jew:true,rc:false,unrec:false,demo:true,grid:false,frames:true,indJ:false,indA:false,cbs:false,transit:false,xplan:false,landuse:false}},
- {no:'02',key:'housing',view:{center:[35.0,31.55],zoom:7.2},layers:{mask:false,arab:false,jew:false,unrec:false,demo:false,grid:false,indJ:false,indA:false,cbs:false,nat:true,transit:false},timeline:true},
+ {no:'02',key:'housing',view:{center:[35.0,31.55],zoom:7.2},layers:{mask:false,mask2:true,arab:false,jew:false,unrec:false,demo:false,grid:false,indJ:false,indA:false,cbs:false,nat:true,transit:false},timeline:true},
  {no:'03',key:'economy',view:{center:[34.85,31.25],zoom:10},layers:{mask:true,arab:false,jew:false,unrec:false,demo:false,grid:false,indJ:true,indA:true,arab7:true,jew11:true,indBld:true,cbs:false,transit:false}},
  {no:'04',key:'transit',view:{center:[35.0,31.6],zoom:7.9},layers:{mask:false,routes:true,arab:false,jew:false,unrec:false,demo:false,grid:false,indJ:false,indA:false,arab7:false,jew11:false,indBld:false,cbs:false,transit:true}},
  {no:'05',key:'violence',view:{center:[34.85,31.25],zoom:9.6},layers:{mask:true,arab:true,jew:true,unrec:true,demo:false,grid:true,indJ:false,indA:false,cbs:false,transit:false}}
@@ -635,7 +642,7 @@ function chapterCard(key){
     T3.he=`<p>כל ריבוע אדום = מבנים קיימים בשטח <b>מחוץ לכל גבול יישוב מוכר</b>. בתים בלי קו כחול, בלי היתר, בלי מים וחשמל רשמיים — ותחת איום הריסה.</p>`;
     T3.en=`<p>Each red square = buildings standing on the ground <b>outside every recognized locality limit</b>: homes with no blue line, no permit, no official water or power — and exposed to demolition.</p>`;
     const top=(S&&S.villages||[]).slice(0,8);
-    return leg([['background:#e8452c',{ar:'مبانٍ خارج الحدود (مربع 250م، منظر بعيد)',he:'מבנים מחוץ לגבולות (ריבוע 250 מ\', מבט רחוק)',en:'off-map buildings (250 m cell, far view)'}],['border:2px solid #e8452c',{ar:'إطار تجمّع بدوي (قرّبي)',he:'מסגרת ריכוז בדואי (זום פנימה)',en:'Bedouin cluster frame (zoom in)'}],['background:#e8452c;border-radius:50%;width:8px;height:8px',{ar:'بيت (قرّبي أكثر)',he:'בית (זום פנימה עוד)',en:'house (zoom in further)'}],['background:#e8452c;border-radius:50%',{ar:'قرية مرشّحة',he:'כפר מועמד',en:'candidate village'}],['background:#e9e6df',{ar:'بلدة عربية معترف بها',he:'יישוב ערבי מוכר',en:'recognized Arab locality'}],['border:2px solid #8a8a86',{ar:'بلدة يهودية',he:'יישוב יהודי',en:'Jewish locality'}]])+
+    return leg([['background:#e8452c',{ar:'مبانٍ خارج الحدود (مربع 250م، منظر بعيد)',he:'מבנים מחוץ לגבולות (ריבוע 250 מ\', מבט רחוק)',en:'off-map buildings (250 m cell, far view)'}],['border:2px solid #e8452c',{ar:'إطار تجمّع بدوي (قرّبي)',he:'מסגרת ריכוז בדואי (זום פנימה)',en:'Bedouin cluster frame (zoom in)'}],['background:#e8452c',{ar:'بيت في قرية غير معترف بها (قرّبي)',he:'בית בכפר לא מוכר (זום)',en:'house in unrecognized village (zoom in)'}],['background:#e8452c40;border:2px solid #e8452c',{ar:'بيت توسّع خارج الخط الأزرق',he:'בית בהרחבה מחוץ לקו הכחול',en:'house built beyond a blue line'}],['background:#e8452c;border-radius:50%',{ar:'قرية مرشّحة',he:'כפר מועמד',en:'candidate village'}],['background:#e9e6df',{ar:'بلدة عربية معترف بها',he:'יישוב ערבי מוכר',en:'recognized Arab locality'}],['border:2px solid #8a8a86',{ar:'بلدة يهودية',he:'יישוב יהודי',en:'Jewish locality'}]])+
      big([[f(off),{ar:'مبنى خارج الحدود',he:'מבנים מחוץ לגבולות',en:'buildings off the map'}[L],1],[nv,{ar:'قرية مرشّحة',he:'כפרים מועמדים',en:'candidate villages'}[L],1]])+T3[L]+
      (top.length?`<h4>${tr3({ar:'أكبر التجمعات خارج الحدود (عدد المباني ضمن 2 كم)',he:'הריכוזים הגדולים מחוץ לגבולות (מבנים ברדיוס 2 ק"מ)',en:'Largest off-map clusters (buildings within 2 km)'})}</h4>`+bars(top.map(v=>({label:L==='ar'?v.ar:v.en,v:v.buildings,grp:'red'})),top[0].buildings):'')+
      `<div class="todo">${{ar:'قيد العمل: مقارنة البصمات مع صور 2014→2026 (أداة الذكاء الاصطناعي) لتحديد المباني المهدومة + مطابقة مع تقارير منتدى التعايش.',he:'בעבודה: השוואת טביעות המבנים לתצלומי 2014→2026 (כלי AI) לזיהוי מבנים שנהרסו + הצלבה עם דוחות פורום דו-קיום.',en:'In progress: matching footprints against 2014→2026 aerials (AI tool) to flag demolished buildings, cross-checked with NCF reports.'}[L]}</div>`+
@@ -705,7 +712,7 @@ function openChapter(key,keepView){
   const c=CHAPTERS.find(c=>c.key===key); document.body.classList.toggle('tl',!!(c&&c.timeline));
   if(!c){ stopPlayer(); resetHi(); document.getElementById('card').style.display='none'; return; }
   stopPlayer(); resetHi();
-  document.getElementById('card').style.display=''; Object.assign(state,{frames:false,nat:false,routes:false},c.layers); applyState(); renderPanel();
+  document.getElementById('card').style.display=''; Object.assign(state,{frames:false,nat:false,routes:false,mask2:false},c.layers); applyState(); renderPanel();
   if(!keepView) map.flyTo({...c.view,duration:1600});
   document.getElementById('card').innerHTML=`<div class="hd"><span class="no">${c.no}</span><h2>${CH_TITLE[L][key]}</h2></div><div class="bd">${chapterCard(key)}</div>`;
   if(c.timeline) setYear(tlRange.value);
@@ -720,14 +727,14 @@ const fly=(opts)=>map.easeTo({...opts,duration:Math.min(900,PL.speed*.7)});
 const fitB=(g,maxZoom)=>{const ps=g.type==='Polygon'?[g.coordinates]:g.coordinates;let x0=180,y0=90,x1=-180,y1=-90;ps.forEach(p=>p[0].forEach(([x,y])=>{x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x);y1=Math.max(y1,y);}));
   map.fitBounds([[x0,y0],[x1,y1]],{padding:{top:120,bottom:80,left:window.innerWidth>900?440:40,right:window.innerWidth>900?340:40},maxZoom,duration:Math.min(900,PL.speed*.7)});};
 const setHi=fs=>map.getSource('hi')&&map.getSource('hi').setData({type:'FeatureCollection',features:fs});
-function resetHi(){ setHi([]); if(map.getLayer('frames-line')){['frames-fill','frames-line'].forEach(id=>map.setFilter(id,null));map.setFilter('rt-line',['==',['get','o'],'__none']);map.getSource('rtmiss').setData({type:'FeatureCollection',features:[]});}
+function resetHi(){ setHi([]); if(map.getLayer('frames-line')){map.setFilter('frames-fill',null);map.setFilter('frames-line',['all',['>=',['get','n'],20],['==',['get','c'],'u']]);map.setFilter('frames-line-e',['all',['>=',['get','n'],20],['==',['get','c'],'e']]);map.setFilter('rt-line',['==',['get','o'],'__none']);map.getSource('rtmiss').setData({type:'FeatureCollection',features:[]});}
   if(map.getLayer('tr-circ')){map.setPaintProperty('tr-circ','circle-opacity',1);map.setPaintProperty('tr-num','text-opacity',1);map.setPaintProperty('tr-name','text-opacity',1);} }
 const FRAMES={
  // 01: camera fixed; Bedouin clusters light up from largest to smallest, counter climbs
  land:()=>{ const F=DATA.frames.features, tot=F.length, steps=[25,60,110,180,260,350,450,540,622];
    return steps.map(k=>{const sub=F.filter(f=>f.properties.rank<k), b=sub.reduce((s,f)=>s+f.properties.n,0);
      return {cap:`<b>${b.toLocaleString()}</b>${T4({ar:'بيت بلا اعتراف',he:'בתים ללא הכרה',en:'unrecognized homes'})} · ${Math.min(k,tot)} ${T4({ar:'تجمّعاً',he:'ריכוזים',en:'clusters'})}`,
-       apply:()=>{['frames-fill','frames-line'].forEach(id=>map.setFilter(id,['<',['get','rank'],k]));}};}); },
+       apply:()=>{map.setFilter('frames-fill',['<',['get','rank'],k]);map.setFilter('frames-line',['all',['<',['get','rank'],k],['==',['get','c'],'u']]);map.setFilter('frames-line-e',['all',['<',['get','rank'],k],['==',['get','c'],'e']]);}};}); },
  // 02: camera fixed on the country; grey polygons accumulate, hatched Arab localities stay frozen
  housing:()=>{ const ys=[]; for(let y=1948;y<=2024;y+=2) ys.push(y); if(ys[ys.length-1]!==2024) ys.push(2024);
    return ys.map(y=>({cap:()=>{const c=tlCounts(y);return `<b>${y}</b><span class="sq g"></span>${c.j} &nbsp; <span class="sq h"></span>${c.a} &nbsp; <span class="sq r"></span>${c.b}`;},apply:()=>setYear(y)})); },
@@ -782,7 +789,7 @@ function renderPanel(){
   const sw=(c,dash)=>`<span class="sw" style="${dash?`border-top:2px dashed ${c}`:`background:${c}`}"></span>`;
   const row=(k,label,swatch='',live=false)=>`<label class="row"><input type="checkbox" data-k="${k}" ${state[k]?'checked':''}><span class="box"></span>${label}${live?'<span class="live">LIVE</span>':''}${swatch}</label>`;
   document.getElementById('panel').innerHTML=
-   `<h3>${t('base')}</h3>${row('basemap',t('basemap'))}${row('sat',t('sat'))}${row('mask',t('mask'))}${row('labels',t('labels'))}
+   `<h3>${t('base')}</h3>${row('basemap',t('basemap'))}${row('sat',t('sat'))}${row('mask',t('mask'))}${row('mask2',t('mask2'))}${row('labels',t('labels'))}
     <h3>${t('bounds')}</h3>${row('arab',t('arab'),sw('#e9e6df'))}${row('jew',t('jew'),`<span class="sw" style="border:2px solid #8a8a86"></span>`)}${row('ind',t('ind'),sw('#5a5a55'))}${row('rc',t('rc'),sw('#8a8a86',1))}
     <h3>${t('red')}</h3>${row('unrec',t('unrec'),sw('#e8452c'))}${row('grid',CHT('offmapCell'),sw('#e8452c'))}${row('cbs',CH_TITLE[L].housing+' · 1870–2024',sw('#8a8a86'))}${row('transit',CH_TITLE[L].transit+' · GTFS',sw('#e8452c',1))}${row('demo',t('demo'),'<span class="sw" style="color:#e8452c;font-weight:800;text-align:center">✕</span>')}
     <div class="note">${t('unrecNote')}</div>
@@ -920,7 +927,7 @@ function setLang(l){
   if(map.getLayer('place-lbl')){ map.setLayoutProperty('place-lbl','text-field',nameExpr());
     ['loc-arab-lbl','loc-jew-lbl'].forEach(id=>map.setLayoutProperty(id,'text-field',['get',l==='en'?'en':'he']));
     map.setLayoutProperty('un-lbl','text-field',['get',l]); }
-  if(DATA){ if(map.getLayer('frames-lbl')) map.setLayoutProperty('frames-lbl','text-field',['concat',['get',l==='ar'?'ar':'en'],'  ',['to-string',['get','n']]]);
+  if(DATA){ if(map.getLayer('frames-lbl')) map.setLayoutProperty('frames-lbl','text-field',['case',['==',['get','en'],'unnamed'],['to-string',['get','n']],['concat',['get',l==='ar'?'ar':'en'],'  ',['to-string',['get','n']]]]);
     renderPanel(); renderStats(); buildChapters(); if(map.getSource('transit')) map.getSource('transit').setData(transitFC());
     if(map.getSource('trdest')) map.getSource('trdest').setData({type:'FeatureCollection',features:Object.entries(DESTS).map(([k,d])=>({type:'Feature',geometry:{type:'Point',coordinates:d.c},properties:{k,name:d[l]||d.en}}))}); }
   if(document.body.classList.contains('about')) renderAbout();

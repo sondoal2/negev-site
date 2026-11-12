@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OFF—MAP · رصد الهدم</title>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;600;800&family=Alexandria:wght@400;600;800&display=swap" rel="stylesheet">
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<style>
+:root{--ink:#0d0d0d;--bone:#e9e6df;--concrete:#8a8a86;--red:#e8452c;--line:#3a3a38;
+  --p1:#6e4a3a;--p2:#9c4a30;--p3:#c4562e;--p4:#ff4d24}
+*{box-sizing:border-box} html,body{margin:0;height:100%;background:var(--ink);color:var(--bone);font-family:"Alexandria","Jost",sans-serif}
+button,select,input,textarea{font:inherit;color:inherit}
+button{background:none;border:0;cursor:pointer}
+header{position:fixed;inset:0 0 auto 0;height:56px;background:#000;display:flex;align-items:center;gap:14px;padding:0 16px;z-index:20;border-bottom:1px solid var(--line)}
+header a{color:var(--bone);text-decoration:none;font-family:"Jost";font-weight:800;font-size:22px;direction:ltr}
+header a b{color:var(--red)} header .t{font-weight:600;letter-spacing:.06em}
+#map{position:fixed;inset:56px 380px 92px 0}
+/* side panel */
+#side{position:fixed;top:56px;bottom:0;left:0;width:380px;background:#111;border-inline-start:1px solid var(--line);overflow:auto;z-index:15}
+html[dir=rtl] #side{left:0;right:auto} html[dir=rtl] #map{inset:56px 0 92px 380px}
+#side h3{margin:0;padding:12px 14px 6px;font-size:12px;letter-spacing:.14em;color:var(--concrete);text-transform:uppercase;border-top:1px solid var(--line)}
+#side h3:first-child{border:0}
+.pad{padding:6px 14px 12px;font-size:13px;line-height:1.5}
+.btn{background:var(--bone);color:#000;font-weight:700;padding:7px 12px;margin:2px}
+.btn.r{background:var(--red)} .btn.o{background:none;color:var(--bone);border:1px solid var(--line)}
+.btn:disabled{opacity:.35;cursor:default}
+.prog{height:8px;background:#222;margin:6px 0} .prog i{display:block;height:100%;background:var(--red)}
+.phase{display:flex;gap:8px;align-items:flex-start;margin:6px 0;font-size:12px}
+.phase i{flex:none;width:16px;height:16px;margin-top:2px}
+.phase small{color:var(--concrete)}
+.ev{border-top:1px solid #222;padding:6px 0;font-size:12px}
+.ev a{color:var(--bone)} .ev b{color:var(--red)}
+label.f{display:block;font-size:11px;color:var(--concrete);margin-top:8px}
+select,input[type=text],input[type=url],textarea{width:100%;background:#000;border:1px solid var(--line);padding:6px;margin-top:2px}
+textarea{height:54px}
+.warn{background:#3a1410;border-inline-start:3px solid var(--red);padding:6px 8px;margin:6px 0;font-size:12px}
+.ok{background:#14301a;border-inline-start:3px solid #4caf50;padding:6px 8px;margin:6px 0;font-size:12px}
+.site{display:flex;gap:8px;align-items:center;padding:5px 0;border-top:1px solid #222;font-size:12px;cursor:pointer}
+.site i{width:12px;height:12px;flex:none}
+/* year bar */
+#years{position:fixed;bottom:0;height:92px;inset-inline-start:380px;inset-inline-end:0;background:#000;border-top:1px solid var(--line);display:flex;align-items:center;gap:10px;padding:0 14px;z-index:15;direction:ltr}
+#years .yr{display:flex;flex-direction:column;align-items:center;gap:3px}
+#years .yr button{font-family:"Jost";font-weight:800;font-size:15px;padding:6px 8px;border:1px solid var(--line);min-width:52px}
+#years .yr button.on{background:var(--bone);color:#000}
+#years .yr .ab{font-size:10px;color:var(--concrete);height:12px}
+#years .yr.A .ab::after{content:'قبل';color:var(--bone)} #years .yr.B .ab::after{content:'بعد';color:var(--red)}
+#years .lab{font-size:12px;color:var(--concrete);direction:rtl;min-width:150px}
+#mode{position:fixed;top:68px;z-index:16;inset-inline-end:16px;display:flex;flex-direction:column;gap:6px}
+#mode button{background:#000;border:1px solid var(--line);padding:8px 10px;font-size:13px;font-weight:600;text-align:start}
+#mode button.on{background:var(--red);color:#000}
+#status{position:fixed;top:68px;inset-inline-start:396px;z-index:16;background:#000;border:1px solid var(--line);padding:6px 10px;font-size:13px;max-width:460px}
+html[dir=rtl] #status{inset-inline-start:auto;inset-inline-end:auto;right:16px} html[dir=rtl] #mode{left:396px;right:auto}
+.maplibregl-ctrl-attrib{font-size:10px}
+@media (max-width:900px){#side{width:100%;top:auto;height:45%;bottom:92px} html[dir=rtl] #map,#map{inset:56px 0 calc(45% + 92px) 0} #years{inset-inline-start:0} html[dir=rtl] #mode{left:8px}}
+</style>
+</head>
+<body>
+<header><a href="index.html">OFF<b>—</b>MAP</a><span class="t">رصد الهدم · النقب</span><span style="margin-inline-start:auto;font-size:12px;color:var(--concrete)">الآلة تقترح · العين تقرّر · الـ AI يرسم الحدّ</span></header>
+<div id="map"></div>
+<div id="status">جارٍ التحميل…</div>
+<div id="mode">
+  <button id="mSam" title="SAM: اضغطي داخل مجموعة البيوت، Shift+ضغطة للاستبعاد">✦ رسم بالذكاء (SAM)</button>
+  <button id="mPoly" title="ضغطات لرسم الحدود، دبل-كليك للإغلاق">✎ رسم يدوي</button>
+  <button id="mHints">◎ تلميحات آلية للمربع</button>
+  <button id="mAB" title="مفتاح المسافة يقلب بين قبل وبعد">⇄ قبل / بعد (Space)</button>
+</div>
+<aside id="side">
+  <h3>01 · التغطية</h3>
+  <div class="pad"><div id="covTxt"></div><div class="prog"><i id="covBar"></i></div>
+    <button class="btn o" id="prevCell">→ السابق</button><button class="btn" id="nextCell">التالي ←</button><button class="btn r" id="doneCell">✓ تمّت مراجعة المربع</button></div>
+  <h3>02 · الموقع المرسوم</h3>
+  <div class="pad" id="draft"><span style="color:var(--concrete)">اختاري أداة رسم، ثم اضغطي على البيوت في صورة «قبل».</span></div>
+  <h3>03 · المواقع المحفوظة</h3>
+  <div class="pad"><div id="sites"></div>
+    <button class="btn o" id="exp">⬇ تصدير GeoJSON</button><label class="btn o" style="display:inline-block">⬆ استيراد<input type="file" id="imp" accept=".json,.geojson" hidden></label></div>
+  <h3>04 · المراحل (من المصادر)</h3>
+  <div class="pad" id="phases"></div>
+  <h3>05 · أحداث موثّقة (للتلميحات)</h3>
+  <div class="pad" id="events"></div>
+  <h3>06 · حدود المنهج</h3>
+  <div class="pad" style="color:var(--concrete)">الصور تُظهر ما انمحى، لا لماذا ولا من — هذا يأتي من المصادر. تواريخ Wayback هي تواريخ نشر، والالتقاط قد يسبقها بأشهر. الهدم قبل 2014 لا يظهر هنا. «الهدم الذاتي» (88% من الهدم في 2018 بحسب منتدى التعايش) يبدو في الصور مثل أي هدم — النوع يُحدَّد من المصادر. المرشّح الآلي لا يُعرض للجمهور.</div>
+</aside>
+<div id="years"></div>
+
+<script type="module">
+/* ============================================================
+   Demolition monitor (human + AI) — Naqab adaptation of the Casablanca method.
+   Machine proposes (grid, change hints, documented events) · eye decides · SAM draws the edge.
+   ============================================================ */
+const WAYBACK=[[2014,10],[2015,28163],[2016,18966],[2017,25521],[2018,23448],[2019,4756],[2020,29260],[2021,26120],[2022,45134],[2023,56102],[2024,16453],[2025,13192],[2026,43291]];
+const wbUrl=id=>`https://wayback.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/WMTS/1.0.0/default028mm/MapServer/tile/${id}/{z}/{y}/{x}`;
+// Phases built from sourced events (Negev Coexistence Forum structure-demolition counts; dated evictions)
+const PHASES=[
+ {to:2016,c:'var(--p1)',hex:'#6e4a3a',t:'بعد تجميد برافر',y:'2014–2016',d:'≈1,000 مبنى/سنة (1,073 · 982 · 1,158)',src:[['منتدى التعايش 2023','https://www.dukium.org/wp-content/uploads/2024/06/Infogram-ENG-2023_4Drive.pdf'],['تجميد برافر 12/2013','https://www.aljazeera.com/news/2013/12/12/israel-scraps-plan-to-uproot-bedouin']]},
+ {to:2020,c:'var(--p2)',hex:'#9c4a30',t:'التضاعف',y:'2017–2020',d:'2,220 · 2,326 · 2,241 · 2,568 — 88% منها هدم ذاتي (2018)',src:[['منتدى التعايش 2018','https://www.dukium.org/wp-content/uploads/2019/07/Demolition-Report-Heb2018.pdf']]},
+ {to:2023,c:'var(--p3)',hex:'#c4562e',t:'≈3,000 سنوياً',y:'2021–2023',d:'3,004 · 2,850 · 3,283 (رقم قياسي 2023)',src:[['منتدى التعايش 2023','https://www.dukium.org/wp-content/uploads/2024/06/Infogram-ENG-2023_4Drive.pdf']]},
+ {to:2026,c:'var(--p4)',hex:'#ff4d24',t:'محو قرى كاملة',y:'2024–2026',d:'2,007 مبنى في النصف الأول 2024 فقط؛ وادي الخليل وأم الحيران',src:[['منتدى التعايش — تقرير 2023–2024','https://www.dukium.org/wp-content/uploads/2024/12/NCF_Neglected-Voices_-Human-Rights-Violations-in-the-Bedouin-Community-of-the-Negev_Naqab-Israel-2023%E2%80%932024.pdf']]},
+];
+const phaseOf=y=>PHASES.find(p=>y<=p.to)||PHASES[PHASES.length-1];
+const EVENTS=[
+ {k:'araqib',names:['العراقيب','قرية العراقيب'],t:'العراقيب',d:'هُدمت منذ 27/07/2010 — الهدم رقم 244 حتى 12/2025',from:2014,to:2026,conf:'documented',src:'https://english.wafa.ps/Pages/Details/165634'},
+ {k:'khalil',names:['وادي الخليل'],t:'وادي الخليل',d:'هُدمت القرية كلها 08/05/2024 (47 بيتاً، أكثر من 300 ساكن) — توسيع شارع 6',from:2023,to:2024,conf:'documented',src:'https://www.amnesty.org/en/latest/news/2024/05/israel-opt-over-300-palestinian-bedouin-face-forced-evictions-following-mass-home-demolitions-in-negev-naqab/'},
+ {k:'hiran',names:['أم الحيران','ام الحيران','عتير'],t:'أم الحيران',d:'هُدمت 14/11/2024 لإقامة بلدة «درور» — وهدم سابق 01/2017',from:2023,to:2024,conf:'documented',src:'https://www.timesofisrael.com/liveblog_entry/police-complete-demolition-of-unrecognized-bedouin-village-umm-al-hiran/'},
+ {k:'jrabah',names:['راس جرابا','رأس جرابة','راس جرابه'],t:'رأس جرابة',d:'مهددة: المحكمة صادقت 03/06/2024 على التهجير لتوسيع ديمونا',from:null,to:null,conf:'threatened',src:'https://www.adalah.org/en/content/view/11127'},
+];
+const CONF={documented:'موثّق',observed:'مرصود بالعين',candidate:'مرشّح آلي (داخلي فقط)',threatened:'مهدَّد'};
+const TYPES={village:'محو قرية/حيّ كامل',homes:'هدم بيوت',self:'هدم ذاتي (من المصادر)',tents:'خيام/صفيح/حظائر',rebuild:'هدم وإعادة بناء'};
+
+const $=id=>document.getElementById(id), status=t=>$('status').innerHTML=t;
+const LS={get:(k,d)=>{try{return JSON.parse(localStorage.getItem('demo-'+k))??d}catch(e){return d}},set:(k,v)=>{try{localStorage.setItem('demo-'+k,JSON.stringify(v))}catch(e){}}};
+let A=LS.get('A',0), B=LS.get('B',WAYBACK.length-1), showing='A';
+let sites=LS.get('sites',[]), done=new Set(LS.get('done',[])), eventPos=LS.get('evpos',{});
+
+/* ---------- map ---------- */
+const map=new maplibregl.Map({container:'map',preserveDrawingBuffer:true,maxPitch:0,center:[34.86,31.22],zoom:11,attributionControl:{compact:true},
+  style:{version:8,glyphs:'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',sources:{},layers:[{id:'bg',type:'background',paint:{'background-color':'#151514'}}]}});
+const setImagery=i=>{ if(map.getLayer('img')) map.removeLayer('img'); if(map.getSource('img')) map.removeSource('img');
+  map.addSource('img',{type:'raster',tiles:[wbUrl(WAYBACK[i][1])],tileSize:256,maxzoom:WAYBACK[i][1]===10?16:18,attribution:'Esri World Imagery Wayback'});
+  map.addLayer({id:'img',type:'raster',source:'img',paint:{'raster-saturation':-.6,'raster-fade-duration':0}},map.getLayer('cells-fill')?'cells-fill':undefined); };
+const showYear=w=>{ showing=w; setImagery(w==='A'?A:B); renderYears(); };
+
+window._dm={map};  // handle for debugging in the console
+/* ---------- data: houses (context + cell selection) ---------- */
+const decode=arr=>arr.map(a=>{let x=a[2],y=a[3];const r=[[x/1e5,y/1e5]];for(let i=4;i<a.length;i+=2){x+=a[i];y+=a[i+1];r.push([x/1e5,y/1e5]);}r.push(r[0]);return {type:'Feature',geometry:{type:'Polygon',coordinates:[r]},properties:{c:a[0]}};});
+const DX=1/95.3, DY=1/111;  // 1 km in degrees at 31°N
+let CELLS=[], cur=LS.get('cur',0), houses=[], places=[];
+const cellKey=c=>c.i+'_'+c.j;
+const cellPoly=c=>{const x0=c.i*DX,y0=c.j*DY;return [[x0,y0],[x0+DX,y0],[x0+DX,y0+DY],[x0,y0+DY],[x0,y0]];};
+
+map.on('load',async()=>{
+  setImagery(A);
+  const [arr,pl]=await Promise.all([fetch('data/offmap_buildings.json').then(r=>r.json()),fetch('data/osm_places.geojson').then(r=>r.json())]);
+  houses=decode(arr); places=pl.features;
+  // cells = 1 km squares holding ≥5 off-map houses + cells of documented events
+  const cnt={}; houses.forEach(f=>{const [x,y]=f.geometry.coordinates[0][0];const k=Math.floor(x/DX)+'_'+Math.floor(y/DY);cnt[k]=(cnt[k]||0)+1;});
+  EVENTS.forEach(e=>{const p=eventPos[e.k]||(()=>{const f=places.find(f=>e.names.some(n=>(f.properties.ar||f.properties.name||'').includes(n)));return f&&f.geometry.coordinates;})(); e.pos=p; if(p){const k=Math.floor(p[0]/DX)+'_'+Math.floor(p[1]/DY); cnt[k]=Math.max(cnt[k]||0,5);}});
+  CELLS=Object.entries(cnt).filter(([,n])=>n>=5).map(([k,n])=>{const [i,j]=k.split('_').map(Number);return {i,j,n};}).sort((a,b)=>b.j-a.j||a.i-b.i);
+  map.addSource('cells',{type:'geojson',data:cellsFC()});
+  map.addLayer({id:'cells-fill',type:'fill',source:'cells',paint:{'fill-color':['case',['get','done'],'#4caf50','#000'],'fill-opacity':['case',['get','cur'],0,['get','done'],.12,.0]}});
+  map.addLayer({id:'cells-line',type:'line',source:'cells',paint:{'line-color':['case',['get','cur'],'#fff',['get','done'],'#4caf50','#555'],'line-width':['case',['get','cur'],2.5,.6]}});
+  map.addSource('houses',{type:'geojson',data:{type:'FeatureCollection',features:houses}});
+  map.addLayer({id:'houses',type:'line',source:'houses',minzoom:14,paint:{'line-color':'#e9e6df','line-width':.6,'line-opacity':.35}});
+  map.addSource('sites',{type:'geojson',data:sitesFC()});
+  map.addLayer({id:'sites-fill',type:'fill',source:'sites',paint:{'fill-color':['get','col'],'fill-opacity':.55}});
+  map.addLayer({id:'sites-line',type:'line',source:'sites',paint:{'line-color':['get','col'],'line-width':2,'line-dasharray':[1,0]}});
+  map.addSource('hints',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
+  map.addLayer({id:'hints',type:'circle',source:'hints',paint:{'circle-radius':['interpolate',['linear'],['zoom'],14,6,17,22],'circle-color':'rgba(0,0,0,0)','circle-stroke-color':'#ffd54a','circle-stroke-width':2}});
+  map.addSource('events',{type:'geojson',data:eventsFC()});
+  map.addLayer({id:'events',type:'symbol',source:'events',layout:{'text-field':['concat','◆ ',['get','t']],'text-font':['Noto Sans Bold'],'text-size':13,'text-allow-overlap':true},paint:{'text-color':'#ff4d24','text-halo-color':'#000','text-halo-width':2}});
+  map.addSource('draft',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
+  map.addLayer({id:'draft-fill',type:'fill',source:'draft',filter:['==',['geometry-type'],'Polygon'],paint:{'fill-color':'#fff','fill-opacity':.25}});
+  map.addLayer({id:'draft-line',type:'line',source:'draft',paint:{'line-color':'#fff','line-width':2}});
+  map.addLayer({id:'draft-pts',type:'circle',source:'draft',filter:['==',['geometry-type'],'Point'],paint:{'circle-radius':['case',['==',['get','k'],'v'],5,6],'circle-color':['match',['get','k'],'pos','#4caf50','neg','#e8452c','#fff'],'circle-stroke-color':'#000','circle-stroke-width':1.5}});
+  renderYears(); renderPhases(); renderEvents(); renderSites(); goCell(cur,true);
+  status('اختاري سنة «قبل» وسنة «بعد» من الشريط تحت، وراجعي المربع ✓. مفتاح المسافة يقلب الصورة.');
+});
+
+/* ---------- grid coverage ---------- */
+function cellsFC(){return {type:'FeatureCollection',features:CELLS.map((c,k)=>({type:'Feature',geometry:{type:'Polygon',coordinates:[cellPoly(c)]},properties:{done:done.has(cellKey(c)),cur:k===cur}}))};}
+function goCell(k,instant){ if(!CELLS.length) return; cur=(k+CELLS.length)%CELLS.length; LS.set('cur',cur);
+  const c=CELLS[cur], p=cellPoly(c); map.getSource('cells').setData(cellsFC()); map.getSource('hints').setData({type:'FeatureCollection',features:[]});
+  map.fitBounds([p[0],p[2]],{padding:30,duration:instant?0:700});
+  const n=done.size; $('covTxt').innerHTML=`المربع <b>${cur+1}</b> من ${CELLS.length} · ${c.n} مبنى خارج الحدود · ${done.has(cellKey(c))?'<span style="color:#4caf50">✓ تمت مراجعته</span>':'لم يُراجَع'}<br>أُنجز <b>${n}</b> / ${CELLS.length}`;
+  $('covBar').style.width=(n/CELLS.length*100)+'%'; }
+$('nextCell').onclick=()=>{ let k=cur; for(let s=1;s<=CELLS.length;s++){ if(!done.has(cellKey(CELLS[(cur+s)%CELLS.length]))){k=cur+s;break;} } goCell(k); };
+$('prevCell').onclick=()=>goCell(cur-1);
+$('doneCell').onclick=()=>{ const k=cellKey(CELLS[cur]); done.has(k)?done.delete(k):done.add(k); LS.set('done',[...done]); goCell(cur,true); };
+
+/* ---------- which real image is behind each year here? ---------- */
+let REAL={}, realKey=null;
+async function resolveYears(){ const c=map.getCenter(), z=16, x=Math.floor((c.lng+180)/360*2**z), r=c.lat*Math.PI/180, y=Math.floor((1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*2**z), k=x+'/'+y;
+  if(k===realKey) return; realKey=k;
+  const res=await Promise.all(WAYBACK.map(async([yr,id])=>{ try{ const r=await fetch(wbUrl(id).replace('{z}',z).replace('{y}',y).replace('{x}',x),{method:'GET'}); const m=r.url.match(/tile\/(\d+)\//i); return r.ok?(m?+m[1]:id):null; }catch(e){ return null; } }));
+  if(k!==realKey) return; REAL={}; WAYBACK.forEach(([yr],i)=>REAL[yr]=res[i]); renderYears(); }
+let rt=null; map.on('moveend',()=>{ clearTimeout(rt); rt=setTimeout(resolveYears,700); });
+/* ---------- years bar (before / after) ---------- */
+function renderYears(){
+  $('years').innerHTML=`<div class="lab">اضغطي على سنة لعرضها. <b>Alt+ضغطة</b> = اجعليها «قبل»، <b>Shift+ضغطة</b> = «بعد».<br>المقارنة: ${WAYBACK[A][0]} ← ${WAYBACK[B][0]}</div>`+
+   WAYBACK.map(([y],i)=>{ const same=i>0&&REAL[y]&&REAL[y]===REAL[WAYBACK[i-1][0]], none=REAL[y]===null; return `<div class="yr ${i===A?'A':''} ${i===B?'B':''}"><button data-i="${i}" class="${(showing==='A'?A:B)===i?'on':''}" title="${same?'نفس صورة السنة السابقة هنا — ليست صورة جديدة':none?'لا صورة هنا':''}" style="border-bottom:4px solid ${phaseOf(y).hex};${same||none?'opacity:.35;text-decoration:line-through':''}">${y}</button><span class="ab"></span></div>`; }).join('')+`<div class="lab" style="min-width:120px">المشطوب = نفس الصورة السابقة هنا (لا صورة جديدة)</div>`;
+  document.querySelectorAll('#years button').forEach(b=>b.onclick=e=>{ const i=+b.dataset.i;
+    if(e.altKey){A=i;LS.set('A',A);showYear('A');} else if(e.shiftKey){B=i;LS.set('B',B);showYear('B');}
+    else { if(i<=A){A=i;LS.set('A',A);showYear('A');} else {B=i;LS.set('B',B);showYear('B');} } }); }
+document.addEventListener('keydown',e=>{ if(e.code==='Space'&&!/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)){e.preventDefault();showYear(showing==='A'?'B':'A');} if(e.key==='Escape') clearDraft(); });
+$('mAB').onclick=()=>showYear(showing==='A'?'B':'A');
+
+/* ---------- machine hints: pixel change between "before" and "after" inside the current cell ---------- */
+const lon2t=(x,z)=>(x+180)/360*2**z, lat2t=(y,z)=>{const r=y*Math.PI/180;return (1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*2**z;};
+const t2lon=(t,z)=>t/2**z*360-180, t2lat=(t,z)=>{const n=Math.PI-2*Math.PI*t/2**z;return 180/Math.PI*Math.atan(.5*(Math.exp(n)-Math.exp(-n)));};
+const loadImg=u=>new Promise((res,rej)=>{const im=new Image();im.crossOrigin='anonymous';im.onload=()=>res(im);im.onerror=rej;im.src=u;});
+async function mosaic(id,x0,y0,nx,ny,z){ const cv=document.createElement('canvas');cv.width=nx*256;cv.height=ny*256;const g=cv.getContext('2d');
+  await Promise.all([...Array(nx*ny)].map(async(_,k)=>{const x=x0+k%nx,y=y0+Math.floor(k/nx);try{g.drawImage(await loadImg(wbUrl(id).replace('{z}',z).replace('{y}',y).replace('{x}',x)),(x-x0)*256,(y-y0)*256);}catch(e){}}));
+  return g.getImageData(0,0,cv.width,cv.height).data; }
+async function changeScore(bbox,blk=16,z=17){ // returns blocks [{lon,lat,score}] with normalised luminance difference
+  const x0=Math.floor(lon2t(bbox[0],z)),x1=Math.floor(lon2t(bbox[2],z)),y0=Math.floor(lat2t(bbox[3],z)),y1=Math.floor(lat2t(bbox[1],z));
+  const nx=x1-x0+1,ny=y1-y0+1; if(nx*ny>64) return null;
+  const [a,b]=await Promise.all([mosaic(WAYBACK[A][1],x0,y0,nx,ny,z),mosaic(WAYBACK[B][1],x0,y0,nx,ny,z)]);
+  const W=nx*256,H=ny*256, L=(d,i)=>.3*d[i]+.59*d[i+1]+.11*d[i+2];
+  let ma=0,mb=0,n=0; for(let i=0;i<a.length;i+=16){ma+=L(a,i);mb+=L(b,i);n++;} ma/=n; mb/=n;   // brightness normalisation between years
+  const out=[]; for(let by=0;by<H;by+=blk) for(let bx=0;bx<W;bx+=blk){ let s=0,c=0;
+    for(let y=by;y<by+blk;y+=2) for(let x=bx;x<bx+blk;x+=2){const i=(y*W+x)*4; s+=Math.abs((L(a,i)-ma)-(L(b,i)-mb)); c++;}
+    out.push({lon:t2lon(x0+(bx+blk/2)/256,z),lat:t2lat(y0+(by+blk/2)/256,z),score:s/c}); }
+  return out; }
+$('mHints').onclick=async()=>{ const c=CELLS[cur], p=cellPoly(c); status('◎ أقارن صور '+WAYBACK[A][0]+' و'+WAYBACK[B][0]+' داخل المربع…');
+  const bl=await changeScore([p[0][0],p[0][1],p[2][0],p[2][1]],16,17); if(!bl){status('المربع كبير جداً');return;}
+  const sc=bl.map(b=>b.score).sort((a,b)=>a-b), thr=Math.max(28,sc[Math.floor(sc.length*.97)]);
+  // keep only changes near a known building footprint (houses that existed) — reduces noise from fields/roads
+  const near=(lon,lat)=>houses.some(f=>{const q=f.geometry.coordinates[0][0];return Math.abs(q[0]-lon)<.0004&&Math.abs(q[1]-lat)<.0004;});
+  const hits=bl.filter(b=>b.score>=thr&&near(b.lon,b.lat));
+  map.getSource('hints').setData({type:'FeatureCollection',features:hits.map(h=>({type:'Feature',geometry:{type:'Point',coordinates:[h.lon,h.lat]},properties:{s:h.score}}))});
+  status(`◎ ${hits.length} تلميح (دوائر صفراء). التلميحات ليست قائمة: أي مكان ترينه يُضاف حتى بدون دائرة.`); };
+
+/* ---------- drawing: SAM (in-browser) or manual ---------- */
+let mode=null, pts=[], verts=[], poly=null;
+function setMode(m){ mode=mode===m?null:m; $('mSam').classList.toggle('on',mode==='sam'); $('mPoly').classList.toggle('on',mode==='poly');
+  map.getCanvas().style.cursor=mode?'crosshair':''; map.doubleClickZoom[mode==='poly'?'disable':'enable']();
+  if(mode==='sam'){ if(showing!=='A') showYear('A'); status('✦ SAM على صورة «قبل» ('+WAYBACK[A][0]+'): اضغطي داخل مجموعة البيوت. Shift+ضغطة = استبعاد. Esc = مسح.'); loadSam(); }
+  if(mode==='poly') status('✎ اضغطي نقاط الحدود على صورة «قبل»، ودبل-كليك للإغلاق.'); }
+$('mSam').onclick=()=>setMode('sam'); $('mPoly').onclick=()=>setMode('poly');
+function drawDraft(){ const fs=[]; if(poly) fs.push({type:'Feature',geometry:{type:'Polygon',coordinates:[poly]},properties:{}});
+  if(mode==='poly'&&verts.length>1) fs.push({type:'Feature',geometry:{type:'LineString',coordinates:verts},properties:{}});
+  pts.forEach(p=>fs.push({type:'Feature',geometry:{type:'Point',coordinates:p.ll},properties:{k:p.l?'pos':'neg'}}));
+  if(poly) poly.slice(0,-1).forEach((c,i)=>fs.push({type:'Feature',geometry:{type:'Point',coordinates:c},properties:{k:'v',i}}));
+  map.getSource('draft').setData({type:'FeatureCollection',features:fs}); renderDraft(); }
+function clearDraft(){ pts=[]; verts=[]; poly=null; samEmb=null; drawDraft(); }
+
+// --- SAM via transformers.js (SlimSAM, quantised) ---
+let SAM=null, samEmb=null, samView=null;
+async function loadSam(){ if(SAM) return SAM; status('✦ تحميل نموذج SAM (مرة واحدة، ~15MB)…');
+  const T=await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.2');
+  const model=await T.SamModel.from_pretrained('Xenova/slimsam-77-uniform',{dtype:'q8'}), proc=await T.AutoProcessor.from_pretrained('Xenova/slimsam-77-uniform');
+  SAM={T,model,proc}; status('✦ SAM جاهز. اضغطي داخل مجموعة البيوت.'); return SAM; }
+async function samSegment(){
+  const {T,model,proc}=await loadSam(), cv=map.getCanvas(), dpr=cv.width/cv.clientWidth;
+  const viewKey=JSON.stringify([map.getCenter(),map.getZoom(),A]);
+  if(!samEmb||samView!==viewKey){ status('✦ SAM يقرأ الصورة…'); const img=await T.RawImage.fromURL(cv.toDataURL('image/png'));
+    const inp=await proc(img); samEmb={inp,emb:await model.get_image_embeddings(inp)}; samView=viewKey; }
+  const {inp,emb}=samEmb, [rh,rw]=inp.reshaped_input_sizes[0];
+  const P=pts.map(p=>{const s=map.project(p.ll);return [s.x*dpr/cv.width*rw, s.y*dpr/cv.height*rh];});
+  const input_points=new T.Tensor('float32',P.flat(),[1,1,P.length,2]), input_labels=new T.Tensor('int64',pts.map(p=>BigInt(p.l?1:0)),[1,1,P.length]);
+  const out=await model({...emb,input_points,input_labels});
+  const masks=await proc.post_process_masks(out.pred_masks,inp.original_sizes,inp.reshaped_input_sizes);
+  const sc=out.iou_scores.data; let best=0; for(let i=1;i<sc.length;i++) if(sc[i]>sc[best]) best=i;
+  const m=masks[0], [, , H, W]=m.dims, data=m.data, off=best*H*W;
+  const grid=new Uint8Array(W*H); for(let i=0;i<W*H;i++) grid[i]=data[off+i]?1:0;
+  // seed = first positive click, trace the outer boundary of its connected component (fills inner holes)
+  const s0=map.project(pts.find(p=>p.l).ll); const ring=traceOuter(grid,W,H,Math.round(s0.x*dpr),Math.round(s0.y*dpr));
+  if(!ring){ status('SAM ما لقى منطقة عند هذه النقطة — جرّبي نقطة ثانية.'); return; }
+  const simp=dp(ring,1.2*dpr*Math.max(1,2**(17-map.getZoom()))); // ≈1 m at z17
+  poly=simp.map(([x,y])=>{const ll=map.unproject([x/dpr,y/dpr]);return [+ll.lng.toFixed(6),+ll.lat.toFixed(6)];}); poly.push(poly[0]);
+  drawDraft(); status(`✦ حدّ من SAM (ثقة ${(sc[best]*100|0)}%). أضيفي نقاط أو Shift للاستبعاد، أو اسحبي أي نقطة للتصحيح.`); }
+// Moore-neighbour boundary trace of the component containing (sx,sy)
+function traceOuter(g,W,H,sx,sy){ if(sx<0||sy<0||sx>=W||sy>=H) return null;
+  if(!g[sy*W+sx]){ let f=null; for(let r=1;r<8&&!f;r++) for(let dy=-r;dy<=r&&!f;dy++) for(let dx=-r;dx<=r;dx++){const x=sx+dx,y=sy+dy; if(x>=0&&y>=0&&x<W&&y<H&&g[y*W+x]){f=[x,y];break;}} if(!f) return null; [sx,sy]=f; }
+  let x=sx; while(x>0&&g[sy*W+x-1]) x--; const start=[x,sy];
+  const D=[[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1],[0,-1],[1,-1]], at=(x,y)=>x>=0&&y>=0&&x<W&&y<H&&g[y*W+x];
+  const ring=[start]; let cx=start[0],cy=start[1],dir=6;
+  for(let n=0;n<200000;n++){ let found=false;
+    for(let k=0;k<8;k++){ const d=(dir+6+k)%8, nx=cx+D[d][0], ny=cy+D[d][1]; if(at(nx,ny)){ cx=nx;cy=ny;dir=d;found=true;break; } }
+    if(!found||(cx===start[0]&&cy===start[1])) break; ring.push([cx,cy]); }
+  return ring.length>8?ring:null; }
+function dp(P,eps){ if(P.length<3) return P; const a=P[0],b=P[P.length-1]; let i0=0,dm=0;
+  for(let i=1;i<P.length-1;i++){ const [x,y]=P[i], L=Math.hypot(b[0]-a[0],b[1]-a[1])||1, d=Math.abs((b[1]-a[1])*x-(b[0]-a[0])*y+b[0]*a[1]-b[1]*a[0])/L; if(d>dm){dm=d;i0=i;} }
+  return dm>eps?[...dp(P.slice(0,i0+1),eps).slice(0,-1),...dp(P.slice(i0),eps)]:[a,b]; }
+
+map.on('click',async e=>{ if(!mode) return; const ll=[e.lngLat.lng,e.lngLat.lat];
+  if(mode==='sam'){ pts.push({ll,l:!e.originalEvent.shiftKey}); drawDraft(); try{ await samSegment(); }catch(err){ status('خطأ SAM: '+err.message+' — استعملي الرسم اليدوي.'); } }
+  else { verts.push(ll); drawDraft(); } });
+map.on('dblclick',e=>{ if(mode!=='poly'||verts.length<3) return; e.preventDefault(); poly=[...verts,verts[0]]; verts=[]; drawDraft(); });
+// vertex dragging
+let drag=null;
+map.on('mousedown','draft-pts',e=>{ const f=e.features.find(f=>f.properties.k==='v'); if(!f) return; e.preventDefault(); drag=+f.properties.i; map.dragPan.disable(); });
+map.on('mousemove',e=>{ if(drag===null) return; poly[drag]=[e.lngLat.lng,e.lngLat.lat]; if(drag===0) poly[poly.length-1]=poly[0]; drawDraft(); });
+map.on('mouseup',()=>{ if(drag!==null){ drag=null; map.dragPan.enable(); } });
+
+/* ---------- card + automatic checks ---------- */
+const area=r=>{let a=0;for(let i=0;i<r.length-1;i++){const[p1,q1]=r[i],[p2,q2]=r[i+1];a+=(p2-p1)*Math.PI/180*(2+Math.sin(q1*Math.PI/180)+Math.sin(q2*Math.PI/180));}return Math.abs(a*6378137**2/2);};
+const inRing=(pt,r)=>{let x=pt[0],y=pt[1],ins=false;for(let i=0,j=r.length-1;i<r.length;j=i++){const[xi,yi]=r[i],[xj,yj]=r[j];if(((yi>y)!==(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi))ins=!ins;}return ins;};
+function renderDraft(){
+  if(!poly){ $('draft').innerHTML=pts.length?'<span style="color:var(--concrete)">… جارٍ الرسم</span>':'<span style="color:var(--concrete)">اختاري أداة رسم، ثم اضغطي على البيوت في صورة «قبل».</span>'; return; }
+  const a=area(poly), y0=WAYBACK[A][0], y1=WAYBACK[B][0];
+  $('draft').innerHTML=`<b>${Math.round(a).toLocaleString()} م²</b> (${(a/1000).toFixed(1)} دونم)
+   <label class="f">بين سنتين (آخر سنة قائم ← أول سنة اختفى)</label>
+   <div style="display:flex;gap:6px"><select id="fFrom">${WAYBACK.map(([y])=>`<option ${y===y0?'selected':''}>${y}</option>`).join('')}</select><select id="fTo">${WAYBACK.map(([y])=>`<option ${y===y1?'selected':''}>${y}</option>`).join('')}</select></div>
+   <label class="f">النوع</label><select id="fType">${Object.entries(TYPES).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select>
+   <label class="f">الثقة</label><select id="fConf">${Object.entries(CONF).map(([k,v])=>`<option value="${k}" ${k==='observed'?'selected':''}>${v}</option>`).join('')}</select>
+   <label class="f">المصدر (رابط خبر/تقرير إن وُجد)</label><input type="url" id="fSrc" placeholder="https://">
+   <label class="f">ملاحظة</label><textarea id="fNote" placeholder="مثلاً: بقي جزء في الشرق"></textarea>
+   <div id="checks"><span style="color:var(--concrete)">… فحص آلي</span></div>
+   <button class="btn r" id="saveSite">حفظ الموقع</button><button class="btn o" id="cancelSite">مسح</button>`;
+  $('saveSite').onclick=saveSite; $('cancelSite').onclick=clearDraft; runChecks(); }
+async function runChecks(){ const r=poly, out=[], bb=[Math.min(...r.map(p=>p[0])),Math.min(...r.map(p=>p[1])),Math.max(...r.map(p=>p[0])),Math.max(...r.map(p=>p[1]))];
+  const ov=sites.filter(s=>s.geometry.coordinates[0].some(p=>inRing(p,r))||r.some(p=>inRing(p,s.geometry.coordinates[0])));
+  if(ov.length) out.push(`<div class="warn">يتداخل مع ${ov.length} موقع محفوظ — تأكدي إنه مش نفس الهدم.</div>`);
+  const still=houses.filter(f=>inRing(f.geometry.coordinates[0][0],r)).length;
+  if(still) out.push(`<div class="warn">${still} مبنى من طبقة البيوت (2026) ما زال داخل الحد — هل البناء قائم اليوم؟</div>`);
+  if(a2(r)>200000) out.push(`<div class="warn">مساحة كبيرة جداً (${(a2(r)/1000|0)} دونم) — هل الحدّ يشمل حقولاً أو شوارع؟</div>`);
+  try{ const bl=await changeScore(bb,8,18); if(bl){ const ins=bl.filter(b=>inRing([b.lon,b.lat],r)); const s=ins.reduce((t,b)=>t+b.score,0)/(ins.length||1);
+      out.push(s<14?`<div class="warn">تغيّر ضعيف بين ${WAYBACK[A][0]} و${WAYBACK[B][0]} داخل الحد (${s.toFixed(0)}) — تأكدي بعينك.</div>`:`<div class="ok">تغيّر واضح داخل الحد (${s.toFixed(0)}).</div>`); } }catch(e){}
+  if(!out.length) out.push('<div class="ok">لا تنبيهات.</div>');
+  if($('checks')) $('checks').innerHTML=out.join(''); }
+const a2=r=>area(r);
+function saveSite(){ const from=+$('fFrom').value,to=+$('fTo').value;
+  sites.push({type:'Feature',geometry:{type:'Polygon',coordinates:[poly]},properties:{id:Date.now(),from,to,type:$('fType').value,conf:$('fConf').value,src:$('fSrc').value||null,note:$('fNote').value||null,
+    area_m2:Math.round(area(poly)),before_img:WAYBACK.find(w=>w[0]===from)?.[1],after_img:WAYBACK.find(w=>w[0]===to)?.[1],cell:cellKey(CELLS[cur]),saved:new Date().toISOString()}});
+  LS.set('sites',sites); clearDraft(); renderSites(); map.getSource('sites').setData(sitesFC()); status('✓ حُفظ. استمري بالمربع أو علّميه ✓.'); }
+
+/* ---------- saved sites, export/import ---------- */
+function sitesFC(){return {type:'FeatureCollection',features:sites.map(s=>({...s,properties:{...s.properties,col:s.properties.conf==='threatened'?'#ff4d24':phaseOf(s.properties.to).hex}}))};}
+function renderSites(){ const byPh=PHASES.map(p=>({p,ha:sites.filter(s=>s.properties.conf!=='candidate'&&s.properties.conf!=='threatened'&&phaseOf(s.properties.to)===p).reduce((t,s)=>t+s.properties.area_m2,0)/1e4}));
+  const mx=Math.max(1e-9,...byPh.map(b=>b.ha));
+  $('sites').innerHTML=`<div style="margin-bottom:6px">${byPh.map(b=>`<div class="phase"><i style="background:${b.p.hex}"></i><div style="flex:1"><div style="height:10px;background:${b.p.hex};width:${b.ha/mx*100}%"></div></div><span>${b.ha.toFixed(2)} هكتار</span></div>`).join('')}</div>`+
+   (sites.length?sites.map((s,i)=>`<div class="site" data-i="${i}"><i style="background:${phaseOf(s.properties.to).hex}"></i>${s.properties.from}→${s.properties.to} · ${TYPES[s.properties.type]} · ${CONF[s.properties.conf]} · ${(s.properties.area_m2/1000).toFixed(1)} دونم <button data-del="${i}" style="margin-inline-start:auto;color:var(--red)">✕</button></div>`).join(''):'<span style="color:var(--concrete)">لا توجد مواقع بعد.</span>');
+  document.querySelectorAll('#sites .site').forEach(d=>d.onclick=e=>{ if(e.target.dataset.del){ if(confirm('حذف هذا الموقع؟')){sites.splice(+e.target.dataset.del,1);LS.set('sites',sites);renderSites();map.getSource('sites').setData(sitesFC());} return; }
+    const r=sites[+d.dataset.i].geometry.coordinates[0]; map.fitBounds([[Math.min(...r.map(p=>p[0])),Math.min(...r.map(p=>p[1]))],[Math.max(...r.map(p=>p[0])),Math.max(...r.map(p=>p[1]))]],{padding:80,maxZoom:18}); }); }
+$('exp').onclick=()=>{ const blob=new Blob([JSON.stringify({type:'FeatureCollection',meta:{method:'OFF—MAP demolition monitor (human + SAM)',years:WAYBACK,cells_done:[...done],cells_total:CELLS.length,exported:new Date().toISOString()},features:sites},null,1)],{type:'application/geo+json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='naqab_demolitions.geojson'; a.click(); };
+$('imp').onchange=async e=>{ const f=e.target.files[0]; if(!f) return; const j=JSON.parse(await f.text()); const ids=new Set(sites.map(s=>s.properties.id));
+  (j.features||[]).forEach(s=>{ if(!ids.has(s.properties.id)) sites.push(s); }); (j.meta?.cells_done||[]).forEach(k=>done.add(k));
+  LS.set('sites',sites); LS.set('done',[...done]); renderSites(); map.getSource('sites').setData(sitesFC()); goCell(cur,true); status(`⬆ استيراد: ${j.features?.length||0} موقع.`); };
+
+/* ---------- phases + documented events ---------- */
+function renderPhases(){ $('phases').innerHTML=PHASES.map(p=>`<div class="phase"><i style="background:${p.hex}"></i><div><b>${p.y} · ${p.t}</b><br>${p.d}<br><small>${p.src.map(([t,u])=>`<a href="${u}" target="_blank" rel="noopener" style="color:var(--concrete)">${t}</a>`).join(' · ')}</small></div></div>`).join('')+
+  `<div class="phase"><i style="border:2px dashed #ff4d24"></i><div><b>مهدَّد</b><br>رأس جرابة وغيرها — حدّ متقطع</div></div><small style="color:var(--concrete)">الأرقام = مبانٍ (لا بيوت فقط) بحسب منتدى التعايش في النقب.</small>`; }
+function eventsFC(){ return {type:'FeatureCollection',features:EVENTS.filter(e=>e.pos).map(e=>({type:'Feature',geometry:{type:'Point',coordinates:e.pos},properties:{t:e.t}}))}; }
+let placing=null;
+function renderEvents(){ $('events').innerHTML=EVENTS.map(e=>`<div class="ev"><b>◆ ${e.t}</b> — ${e.d}<br><a href="${e.src}" target="_blank" rel="noopener">المصدر</a> · ${e.pos?`<a href="#" data-go="${e.k}">اذهبي إليه</a>`:`<a href="#" data-place="${e.k}" style="color:var(--red)">حدّدي المكان على الخريطة</a>`}</div>`).join('');
+  document.querySelectorAll('#events [data-go]').forEach(a=>a.onclick=ev=>{ev.preventDefault();const e=EVENTS.find(x=>x.k===a.dataset.go);map.flyTo({center:e.pos,zoom:15.5});});
+  document.querySelectorAll('#events [data-place]').forEach(a=>a.onclick=ev=>{ev.preventDefault();placing=a.dataset.place;status('اضغطي على الخريطة مكان «'+EVENTS.find(x=>x.k===placing).t+'»');}); }
+map.on('click',e=>{ if(!placing) return; const ev=EVENTS.find(x=>x.k===placing); ev.pos=[e.lngLat.lng,e.lngLat.lat]; eventPos[ev.k]=ev.pos; LS.set('evpos',eventPos); placing=null; map.getSource('events').setData(eventsFC()); renderEvents(); status('حُفظ مكان «'+ev.t+'».'); });
+</script>
+</body>
+</html>

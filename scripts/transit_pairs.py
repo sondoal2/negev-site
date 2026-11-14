@@ -7,7 +7,9 @@ Inputs: msb_dir (Microsoft footprints, Israel tiles *.csv.gz), data_dir (offmap_
 Output: data/transit_pairs.json
   pairs[k].a / .j = {name{ar,he,en}, kind, pct_lt400, median_m, n, stops, b:[[cls, x0, y0, dx1, dy1, ...], ...], s:[[x, y], ...]}
   coordinates are metres from the window's south-west corner (y up); cls 0..3 = <400 m, 0.4-1 km, 1-3 km, >3 km.
-Run after transit_access.py and clip_to_negev.py.
+  .cs = school-distance class per building (same order as b; <500 m, 0.5-1 km, 1-3 km, >3 km), .sc = elementary schools,
+  .school = {pct_lt1k, median_m, n} (chapter 05 player uses the same windows).
+Run after transit_access.py, clip_to_negev.py and services_access.py.
 """
 import json, sys, os, math, gzip, glob, statistics
 msb_dir, data_dir = sys.argv[1:3]
@@ -29,6 +31,23 @@ def near_m(x, y):
                 best = min(best, math.hypot((a - x) * kx, (b - y) * 110.57))
     return best * 1000
 cls = lambda d: 0 if d < 400 else 1 if d < 1000 else 2 if d < 3000 else 3
+# chapter 05 uses the same windows: distance to the nearest active elementary school (services_access.py)
+schools = [f['geometry']['coordinates'] for f in J('services_points.geojson')['features'] if f['properties']['k'] == 'e']
+sidx = {}
+for x, y in schools: sidx.setdefault((int(x / C), int(y / C)), []).append((x, y))
+def near_school(x, y):
+    kx = 111.32 * math.cos(math.radians(y)); best = 1e9
+    for di in range(-4, 5):
+        for dj in range(-4, 5):
+            for a, b in sidx.get((int(x / C) + di, int(y / C) + dj), ()):
+                best = min(best, math.hypot((a - x) * kx, (b - y) * 110.57))
+    return best * 1000
+scls = lambda d: 0 if d < 500 else 1 if d < 1000 else 2 if d < 3000 else 3
+SVC = {t['key']: t for t in J('services_access.json')['school']['towns']}
+def schools_in(w):
+    m = 1050 / w['ky']
+    return [[round((x - w['x0']) * w['kx']), round((y - w['y0']) * w['ky'])] for x, y in schools
+            if w['x0'] - m <= x <= w['x1'] + m and w['y0'] - m <= y <= w['y1'] + m]
 
 def window(cx, cy):
     kx = 111320 * math.cos(math.radians(cy)); ky = 110570
@@ -90,23 +109,29 @@ for k, ps in polys.items():
     centre[k] = (statistics.median(p[0] for p in pts), statistics.median(p[1] for p in pts))
 
 def town_panel(k):
-    w = window(*centre[k]); t = acc[k]; b = []
+    w = window(*centre[k]); t = acc[k]; b = []; cs = []
     for ring, x, y in MS:
-        if in_w(w, x, y): b.append(enc(cls(near_m(x, y)), local(w, ring)))
+        if in_w(w, x, y): b.append(enc(cls(near_m(x, y)), local(w, ring))); cs.append(scls(near_school(x, y)))
+    sv = SVC[k]
     return {'name': {'ar': t['ar'], 'he': t['he'], 'en': t['en']}, 'kind': 'arab_town' if t['grp'] == 'arab' else 'jewish_town',
-            'pct_lt400': t['pct_lt400'], 'median_m': t['median_m'], 'n': t['n'], 'b': b, 's': stops_in(w)}
+            'pct_lt400': t['pct_lt400'], 'median_m': t['median_m'], 'n': t['n'], 'b': b, 's': stops_in(w),
+            'cs': cs, 'sc': schools_in(w), 'school': {'pct_lt1k': sv['pct_lt1k'], 'median_m': sv['median_m'], 'n': sv['n']}}
 def village_panel(name):
     f = frames[name]; r = f['geometry']['coordinates'][0]
     x0, x1 = min(p[0] for p in r), max(p[0] for p in r); y0, y1 = min(p[1] for p in r), max(p[1] for p in r)
     w = window((x0 + x1) / 2, (y0 + y1) / 2)
     ds = [d for ring, x, y, d in OFF if x0 <= x <= x1 and y0 <= y <= y1]
     b = [enc(cls(d), local(w, ring)) for ring, x, y, d in OFF if in_w(w, x, y)]
+    cs = [scls(near_school(x, y)) for ring, x, y, d in OFF if in_w(w, x, y)]
+    sd = [near_school(x, y) for ring, x, y, d in OFF if x0 <= x <= x1 and y0 <= y <= y1]
     p = f['properties']
     return {'name': {'ar': p['ar'], 'he': p['en'], 'en': p['en']}, 'kind': 'unrec', 'pct_lt400': round(sum(d < 400 for d in ds) / len(ds) * 100, 1),
-            'median_m': round(statistics.median(ds)), 'n': len(ds), 'b': b, 's': stops_in(w)}
+            'median_m': round(statistics.median(ds)), 'n': len(ds), 'b': b, 's': stops_in(w),
+            'cs': cs, 'sc': schools_in(w), 'school': {'pct_lt1k': round(sum(d < 1000 for d in sd) / len(sd) * 100, 1), 'median_m': round(statistics.median(sd)), 'n': len(sd)}}
 out = []
 for pr in PAIRS:
     a = village_panel(pr[0]) if pr[0] else town_panel(pr[1]); j = town_panel(pr[-1])
+    print('  school:', a['school'], len(a['sc']), '|', j['school'], len(j['sc']))
     out.append({'a': a, 'j': j}); print(a['name']['en'], a['pct_lt400'], a['median_m'], len(a['b']), 'bld', len(a['s']), 'stops |',
                                        j['name']['en'], j['pct_lt400'], j['median_m'], len(j['b']), 'bld', len(j['s']), 'stops')
 json.dump({'window_m': W, 'classes_m': [400, 1000, 3000], 'source': 'MoT GTFS (served stops) · Microsoft footprints · OSM · iplan',

@@ -1,7 +1,7 @@
 {
  "source": "Microsoft Global ML Building Footprints (release 2026-02-03), centroid-in-polygon vs iplan locality limits",
  "total_in_negev_subdistrict": 258871,
- "outside_recognized": 48953,
+ "outside_recognized": 45405,
  "by_group": {
   "arab": {
    "buildings": 70809,
@@ -925,12 +925,13 @@
  "outside_recognized_all": 71178,
  "offmap_rule": "buildings outside every recognized locality limit AND (within 2.5 km of a candidate village point OR inside the Neve Midbar / al-Kasum regional councils)",
  "v2": {
-  "houses": 48953,
-  "unrecognized": 41077,
+  "houses": 45405,
+  "unrecognized": 37529,
   "expansion": 7876,
-  "osm": 4452,
-  "ms": 44501,
-  "clusters": 954,
-  "rule": "OSM buildings + MS footprints where OSM is empty; Bedouin belt only; outside all recognized limits; >300 m from Jewish localities; e = <=400 m from recognized Arab locality"
+  "osm": 936,
+  "ms": 44469,
+  "clusters": 895,
+  "rule": "OSM buildings + MS footprints where OSM is empty; Bedouin belt only; outside all recognized limits; >300 m from Jewish localities; e = <=400 m from recognized Arab locality",
+  "clip": "centroid inside the Be'er Sheva subdistrict (West Bank buildings removed 2026-11-14)"
  }
 }

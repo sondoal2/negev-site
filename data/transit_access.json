@@ -6,16 +6,16 @@
  "method": "straight-line distance from each building centroid to the nearest stop with >=1 departure on the weekday",
  "groups": {
   "unrec": {
-   "n": 41077,
-   "lt400": 2844,
-   "m400_1k": 7800,
-   "k1_3": 22394,
-   "gt3k": 8039,
-   "pct_lt400": 6.9,
-   "pct_m400_1k": 19.0,
-   "pct_k1_3": 54.5,
-   "pct_gt3k": 19.6,
-   "median_m": 1760
+   "n": 37529,
+   "lt400": 1435,
+   "m400_1k": 7306,
+   "k1_3": 21339,
+   "gt3k": 7449,
+   "pct_lt400": 3.8,
+   "pct_m400_1k": 19.5,
+   "pct_k1_3": 56.9,
+   "pct_gt3k": 19.8,
+   "median_m": 1805
   },
   "expansion": {
    "n": 7876,

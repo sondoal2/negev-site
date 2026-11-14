@@ -33,6 +33,8 @@ Compare view → "Mark demolished building" → click vertices, double-click to 
 | 04b | Walking access to a bus stop | MoT GTFS (served stops only), Microsoft footprints, iplan limits (`transit_access.json`, `transit_stops.geojson`, `offmap_stopdist.json`, `grid_stopdist.json`) | Straight-line distance from every off-map house and every building in the 18 comparison towns' built-up core to the nearest stop with ≥1 weekday trip (`scripts/transit_access.py`). Netivot and Eilat left out of totals (no Microsoft footprints). Bedouin clusters inside Arad's limit stay counted as Arad — conservative. |
 | 05 | Violence | — (being collected with Sikkuy-Aufoq / Abraham Initiatives) | Planned: victims by locality, distance to police, AI street-image audit |
 
+**Scope:** the atlas covers the Be'er Sheva subdistrict only. Off-map houses are clipped to it (`scripts/clip_to_negev.py`); an earlier version wrongly counted 3,548 West Bank buildings (Masafer Yatta / Susiya) as unrecognized-village houses.
+
 Processing scripts are in `scripts/` (run with ArcGIS Pro Python): `lpkx_to_geojson.py`, `localities.py`, `buildings.py`, `gtfs_direct.py`, `transit_access.py`.
 
 Every chapter ends with a **gap card**: one Arab line vs one Jewish line in the same unit, and the ratio (×N) in red.

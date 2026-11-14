@@ -42,7 +42,7 @@ Every chapter ends with a **gap card**: one Arab line vs one Jewish line in the 
 
 ## GIFs (one story each)
 
-`gifs/ar/*.gif` — nine 1200×675 GIFs, each a single story: the map on the left (camera never moves), and on the right the topic, one question,
+`gifs/ar/`, `gifs/he/`, `gifs/en/` — nine 1200×675 GIFs per language, each a single story: the map on the left (camera never moves), and on the right the topic, one question,
 the two sides in identical units, the gap ×N and the source.
 
 | file | story |

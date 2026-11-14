@@ -471,7 +471,7 @@ const state = { // layer id -> visible
   basemap:true, sat:false, mask:true, labels:true,
   arab:true, jew:true, ind:true, rc:false,
   unrec:true, demo:true,
-  indJ:true, indA:true, arab7:false, grid:false, frames:false, nat:false, routes:false, mask2:false, cbs:false, transit:false, access:false, svc:false, jew11:false, indBld:false,
+  indJ:true, indA:true, arab7:false, grid:false, frames:false, nat:false, routes:false, mask2:false, cbs:false, transit:false, access:false, svc:false, econ:false, jew11:false, indBld:false,
   xplan:false, landuse:false, tmm:false, vatmal:false
 };
 try{ Object.assign(state, JSON.parse(localStorage.getItem('offmap-state')||'{}')); }catch(e){}
@@ -481,7 +481,7 @@ const LAYERMAP = {
   arab:['loc-arab-fill','loc-arab-line','loc-arab-lbl'], jew:['loc-jew-line','loc-jew-lbl'], ind:['loc-ind'], rc:['rc-line'],
   unrec:['un-cluster','un-count','un-pt','un-lbl'], demo:['demo-halo','demo-pt'],
   indJ:['ind-j-fill','ind-j-line'], indA:['ind-a-fill','ind-a-line'], arab7:['arab7-line'],
-  grid:['grid-fill'], frames:['frames-fill','frames-line','frames-line-e','frames-lbl','bld-u','bld-e','bld-e-line'], mask2:['mask2'], nat:['nat-arab','nat-arab-line','nat-jew','nat-new','nat-bt'], routes:['rt-line','rt-miss','rt-miss-lbl'], cbs:['cbs-pt','cbs-new'], transit:['tr-circ','tr-num','tr-name','tr-dest','tr-dest-lbl'], access:['acc-grid','acc-bld','acc-stop'], svc:['svc-grid','svc-school','svc-clinic'],
+  grid:['grid-fill'], frames:['frames-fill','frames-line','frames-line-e','frames-lbl','bld-u','bld-e','bld-e-line'], mask2:['mask2'], nat:['nat-arab','nat-arab-line','nat-jew','nat-new','nat-bt'], routes:['rt-line','rt-miss','rt-miss-lbl'], cbs:['cbs-pt','cbs-new'], transit:['tr-circ','tr-num','tr-name','tr-dest','tr-dest-lbl'], access:['acc-grid','acc-bld','acc-stop'], svc:['svc-grid','svc-school','svc-clinic'], econ:['econ-link','econ-link-lbl','econ-sq','econ-zero','econ-num','econ-name'],
   jew11:['jew11-line'], indBld:['indbld-fill'],
   xplan:['live-xplan'], landuse:['live-landuse'], tmm:['live-tmm'], vatmal:['live-vatmal']
 };
@@ -579,6 +579,20 @@ map.once('style.load', async ()=>{
   { const c=document.createElement('canvas'); c.width=c.height=8; const x=c.getContext('2d'); x.strokeStyle='#e9e6df'; x.lineWidth=1.6;
     x.beginPath(); x.moveTo(-2,10); x.lineTo(10,-2); x.moveTo(-2,2); x.lineTo(2,-2); x.moveTo(6,10); x.lineTo(10,6); x.stroke();
     map.addImage('hatch',{width:8,height:8,data:x.getImageData(0,0,8,8).data}); }
+  // 03 — yellow square per town, AREA = m² of industrial land per resident (icon size ∝ √value)
+  { const c=document.createElement('canvas'); c.width=c.height=64; const x=c.getContext('2d'); x.fillStyle='#000'; x.fillRect(0,0,64,64); x.fillStyle='#f2c230'; x.fillRect(3,3,58,58);
+    map.addImage('sqY',{width:64,height:64,data:x.getImageData(0,0,64,64).data}); }
+  map.addSource('econ',{type:'geojson',data:econFC()});
+  map.addSource('econlink',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
+  map.addLayer({id:'econ-link',type:'line',source:'econlink',layout:{visibility:'none'},paint:{'line-color':'#e9e6df','line-width':2,'line-dasharray':[2,2]}});
+  map.addLayer({id:'econ-link-lbl',type:'symbol',source:'econlink',layout:{visibility:'none','symbol-placement':'line-center','text-field':['concat',['to-string',['get','km']],' km'],'text-font':['Noto Sans Bold'],'text-size':12,'text-offset':[0,-.8]},paint:{'text-color':'#e9e6df','text-halo-color':'#000','text-halo-width':2}});
+  map.addLayer({id:'econ-sq',type:'symbol',source:'econ',filter:['>',['get','v'],0],layout:{visibility:'none','icon-image':'sqY','icon-allow-overlap':true,'icon-ignore-placement':true,
+    'icon-size':['interpolate',['linear'],['sqrt',['get','v']],0,0,13.1,1.25]}});
+  map.addLayer({id:'econ-zero',type:'symbol',source:'econ',filter:['==',['get','v'],0],layout:{visibility:'none','text-field':'0','text-font':['Noto Sans Bold'],'text-size':16,'text-allow-overlap':true},paint:{'text-color':'#e8452c','text-halo-color':'#000','text-halo-width':3}});
+  map.addLayer({id:'econ-num',type:'symbol',source:'econ',filter:['>',['get','v'],0],layout:{visibility:'none','text-field':['concat',['to-string',['get','v']],' m²'],'text-font':['Noto Sans Bold'],'text-size':13,'text-allow-overlap':true},
+    paint:{'text-color':'#000','text-halo-color':'#f2c230','text-halo-width':2.5}});
+  map.addLayer({id:'econ-name',type:'symbol',source:'econ',layout:{visibility:'none','text-field':['get','name'],'text-font':['Noto Sans Bold'],'text-size':12,'text-anchor':'top','text-allow-overlap':true,
+    'text-offset':['case',['>',['get','v'],60],['literal',[0,3.4]],['literal',[0,1.6]]]},paint:{'text-color':['match',['get','grp'],'arab','#fff','#b9b6ae'],'text-halo-color':'#000','text-halo-width':2}});
   // 02 — national locality polygons by founding year
   map.addSource('nat',{type:'geojson',data:DATA.nat});
   map.addLayer({id:'nat-jew',type:'fill',source:'nat',filter:['all',['==',['get','grp'],'jewish'],['<=',['coalesce',['get','y'],9999],2024]],paint:{'fill-color':'#8a8a86','fill-opacity':.85,'fill-outline-color':'#000'}});
@@ -682,7 +696,7 @@ function trPopup(e){const p=e.features[0].properties;const v=n=>+n?`<b style="di
 const CHAPTERS=[
  {no:'01',key:'land',view:{center:[34.86,31.2],zoom:9.7},layers:{mask:true,arab:true,jew:true,rc:false,unrec:false,demo:true,grid:false,frames:true,indJ:false,indA:false,cbs:false,transit:false,xplan:false,landuse:false}},
  {no:'02',key:'housing',view:{center:[35.0,31.55],zoom:7.2},layers:{mask:false,mask2:true,arab:false,jew:false,unrec:false,demo:false,grid:false,indJ:false,indA:false,cbs:false,nat:true,transit:false},timeline:true},
- {no:'03',key:'economy',view:{center:[34.85,31.25],zoom:10},layers:{mask:true,arab:false,jew:false,unrec:false,demo:false,grid:false,indJ:true,indA:true,arab7:true,jew11:true,indBld:true,cbs:false,transit:false}},
+ {no:'03',key:'economy',view:{center:[34.85,31.25],zoom:10},layers:{mask:true,arab:false,jew:false,unrec:false,demo:false,grid:false,indJ:true,indA:true,arab7:true,jew11:true,indBld:true,cbs:false,transit:false,econ:true}},
  {no:'04',key:'transit',view:{center:[35.0,31.6],zoom:7.9},layers:{mask:false,routes:true,arab:false,jew:false,unrec:false,demo:false,grid:false,indJ:false,indA:false,arab7:false,jew11:false,indBld:false,cbs:false,transit:true,access:true}},
  {no:'05',key:'services',view:{center:[34.86,31.22],zoom:9.8},layers:{mask:true,arab:true,jew:true,unrec:false,demo:false,grid:false,indJ:false,indA:false,arab7:false,jew11:false,indBld:false,cbs:false,transit:false,svc:true}},
  {no:'06',key:'violence',view:{center:[34.85,31.25],zoom:9.6},layers:{mask:true,arab:true,jew:true,unrec:true,demo:false,grid:true,indJ:false,indA:false,cbs:false,transit:false}}
@@ -899,7 +913,7 @@ function openChapter(key,keepView){
   const c=CHAPTERS.find(c=>c.key===key); document.body.classList.toggle('tl',!!(c&&c.timeline));
   if(!c){ stopPlayer(); resetHi(); document.getElementById('card').style.display='none'; return; }
   stopPlayer(); resetHi();
-  document.getElementById('card').style.display=''; Object.assign(state,{frames:false,nat:false,routes:false,mask2:false,access:false,svc:false},c.layers); applyState(); renderPanel();
+  document.getElementById('card').style.display=''; Object.assign(state,{frames:false,nat:false,routes:false,mask2:false,access:false,svc:false,econ:false},c.layers); applyState(); renderPanel();
   if(!keepView) map.flyTo({...c.view,duration:1600});
   document.getElementById('card').innerHTML=`<div class="hd"><span class="no">${c.no}</span><h2>${CH_TITLE[L][key]}</h2></div><div class="bd">${chapterCard(key)}</div>`;
   if(c.timeline) setYear(tlRange.value);
@@ -929,18 +943,18 @@ const FRAMES={
  // 02: camera fixed on the country; grey polygons accumulate, hatched Arab localities stay frozen
  housing:()=>{ const ys=[]; for(let y=1948;y<=2024;y+=2) ys.push(y); if(ys[ys.length-1]!==2024) ys.push(2024);
    return ys.map(y=>({cap:()=>{const c=tlCounts(y);return `<b>${y}</b><span class="sq g"></span>${c.j} &nbsp; <span class="sq h"></span>${c.a} &nbsp; <span class="sq r"></span>${c.b}`;},apply:()=>setYear(y)})); },
- // 03: two towns with about the same population, their industrial land as a square at the same scale; then the whole picture
- economy:()=>{ const R=(DATA.istats&&DATA.istats.rows)||[], m2=f=>{const X=R.filter(f);return X.reduce((s,r)=>s+r.ind_dunam,0)*1000/X.reduce((s,r)=>s+r.pop,0);};
-   const mA=m2(r=>r.grp==='arab'), mJ=m2(r=>r.grp==='jewish'), g=k=>R.find(r=>r.key===k)||{}, nm=r=>r[L]||r.en||'';
-   return [...ECON_PAIRS.map(([a,j],i)=>({hold:4,cap:`<b>${String(i+1).padStart(2,'0')}</b>${nm(g(a))} <small>${T4({ar:'مقابل',he:'מול',en:'vs'})}</small> ${nm(g(j))}`,apply:()=>showEconPair(i)})),
-     {hold:4,cap:`<b>×${(mJ/mA).toFixed(1)}</b>${T4({ar:`${Math.round(mA)} م² أرض صناعية لكل ساكن في البلدات العربية — مقابل ${Math.round(mJ)} م² في اليهودية`,he:`${Math.round(mA)} מ״ר קרקע תעשייה לתושב ביישובים הערביים — לעומת ${Math.round(mJ)} מ״ר ביהודיים`,en:`${Math.round(mA)} m² of industrial land per resident in Arab towns — vs ${Math.round(mJ)} m² in Jewish towns`})}`,
-      apply:()=>{ Object.assign(state,{indJ:true,indA:true,arab7:true,jew11:true}); applyState(); fly({center:[34.95,31.25],zoom:9.3}); }}]; },
- // 05: the same village/town windows, now with elementary schools; then 100 twelfth-graders; then the map
- services:()=>{ const V=DATA.svc&&DATA.svc.school.groups;
-   return [0,1].map(i=>({hold:4,cap:()=>{const P=PAIRS_DATA&&PAIRS_DATA.pairs[i];return P?`<b>${String(i+1).padStart(2,'0')}</b>${P.a.name[L]||P.a.name.en} <small>${T4({ar:'مقابل',he:'מול',en:'vs'})}</small> ${P.j.name[L]||P.j.name.en}`:`<b>${String(i+1).padStart(2,'0')}</b>…`;},apply:()=>showPair(i,'school')})).concat([
-     {hold:4,cap:`<b>03</b>${T4({ar:'البجروت: من كل 100 طالب',he:'בגרות: מכל 100 תלמידים',en:'Bagrut: out of every 100 pupils'})}`,apply:showBagrut},
-     {hold:4,cap:V?`<b>×${(V.jewish_towns.pct_lt1k/V.unrec.pct_lt1k).toFixed(1)}</b>${T4({ar:`${V.unrec.pct_lt1k}% من بيوت القرى غير المعترف بها على بُعد 1 كم من مدرسة ابتدائية — مقابل ${V.jewish_towns.pct_lt1k}% في البلدات اليهودية`,he:`${V.unrec.pct_lt1k}% מבתי הכפרים הלא מוכרים עד 1 ק"מ מבי"ס יסודי — לעומת ${V.jewish_towns.pct_lt1k}% ביישובים היהודיים`,en:`${V.unrec.pct_lt1k}% of unrecognized-village homes are within 1 km of an elementary school — vs ${V.jewish_towns.pct_lt1k}% in Jewish towns`})}`:'',
-      apply:()=>{ Object.assign(state,{svc:true}); applyState(); fly({center:[34.86,31.22],zoom:9.8}); }}]); },
+ // 03: on the real map — an Arab town and its Jewish neighbour a few km away, each with a square whose AREA = industrial land per resident
+ economy:()=>{ const R=(DATA.istats&&DATA.istats.rows)||[], g=k=>R.find(r=>r.key===k)||{}, nm=r=>r[L]||r.en||'', per=r=>r.ind_dunam*1000/r.pop;
+   const m2=f=>{const X=R.filter(f);return X.reduce((s,r)=>s+r.ind_dunam,0)*1000/X.reduce((s,r)=>s+r.pop,0);}, mA=m2(r=>r.grp==='arab'), mJ=m2(r=>r.grp==='jewish');
+   const P=(DATA.tprof&&DATA.tprof.rows)||[], wv=(gp,k)=>{const X=P.filter(r=>r.grp===gp&&r[k]!=null&&r.pop_cbs_2024);const pp=X.reduce((s,r)=>s+r.pop_cbs_2024,0);return pp?X.reduce((s,r)=>s+r[k]*r.pop_cbs_2024,0)/pp:0;};
+   const bA=wv('arab','biz_arnona_pc'), bJ=wv('jewish','biz_arnona_pc'), all=R.map(r=>r.key), xr=v=>v>=10?Math.round(v):v.toFixed(1);
+   const intro={hold:3,cap:`<b>m²</b>${T4({ar:'كل مربّع أصفر = أرض صناعية لكل ساكن في البلدة. المربّع الأكبر = أرض عمل وأرنونا أكثر.',he:'כל ריבוע צהוב = קרקע תעשייה לכל תושב ביישוב. ריבוע גדול יותר = יותר קרקע לתעסוקה ולארנונה.',en:'Each yellow square = industrial land per resident. A bigger square = more land for jobs and business tax.'})}`,
+     apply:()=>{ state.econ=true; applyState(); econShow([],[]); fly({center:[35.0,31.22],zoom:9.25}); }};
+   const shown=[];
+   const pf=ECON_NEIGH.map(([a,j])=>{ const sh=[...new Set([...shown,a,j])]; shown.push(a,j); const A=g(a), J=g(j), x=per(A)>0?per(J)/per(A):0;
+     return {hold:3,cap:`<b>×${xr(x)}</b>${nm(A)} ${Math.round(per(A))} m² <small>· ${T4({ar:'جارتها',he:'השכנה',en:'its neighbour'})} ·</small> ${nm(J)} ${Math.round(per(J))} m²`,apply:()=>econShow(sh,[a,j])}; });
+   return [intro,...pf,{hold:4,cap:`<b>×${(mJ/mA).toFixed(1)}</b>${T4({ar:`بالمجموع: ${Math.round(mA)} م² لكل ساكن في البلدات العربية مقابل ${Math.round(mJ)} م² في اليهودية — وأرنونا المصالح ${Math.round(bA)} ₪ مقابل ${Math.round(bJ).toLocaleString()} ₪ للساكن (×${xr(bJ/bA)})`,he:`בסך הכול: ${Math.round(mA)} מ״ר לתושב ביישובים הערביים לעומת ${Math.round(mJ)} ביהודיים — וארנונת עסקים ${Math.round(bA)} ₪ לעומת ${Math.round(bJ).toLocaleString()} ₪ לתושב (×${xr(bJ/bA)})`,en:`Overall: ${Math.round(mA)} m² per resident in Arab towns vs ${Math.round(mJ)} m² in Jewish towns — and business arnona ₪${Math.round(bA)} vs ₪${Math.round(bJ).toLocaleString()} per resident (×${xr(bJ/bA)})`})}`,
+     apply:()=>econShow(all,all)}]; },
  // 04: same-scale pairs - an unrecognized village beside a recognized town (3.2 km windows, scripts/transit_pairs.py),
  //     then the overall gap on the map
  transit:()=>{ const NP=3, nm=o=>o[L]||o.en, no=i=>String(i+1).padStart(2,'0');
@@ -993,23 +1007,21 @@ function showPair(i,mode='transit'){
   const src=`${T4({ar:'نفس المقياس: كل شبّاك 3.2 × 3.2 كم',he:'אותו קנה מידה: כל חלון 3.2 × 3.2 ק״מ',en:'same scale: each window 3.2 × 3.2 km'})} · ${mode==='school'?T4({ar:'وزارة التربية (data.gov.il)',he:'משרד החינוך (data.gov.il)',en:'Ministry of Education (data.gov.il)'}):`GTFS ${DATA.access?DATA.access.date:''}`} · Microsoft · OSM`;
   pairsShow(pq(q)+`<div class="pp">${panel(P.a,'a')}${panel(P.j,'j')}</div>`+pairFoot(x,xl,src,lg));
 }
-// economy: two towns with about the same number of people — their industrial land drawn as a square at the same scale
-const ECON_PAIRS=[['tel sheva','arad'],['kseifa','yeruham'],['lakia','omer']];
-function showEconPair(i){
-  const R=(DATA.istats&&DATA.istats.rows)||[], g=k=>R.find(r=>r.key===k); const A=g(ECON_PAIRS[i][0]), J=g(ECON_PAIRS[i][1]); if(!A||!J) return;
-  const BOX=2400, side=r=>Math.sqrt(r.ind_dunam*1000);   // metres; every frame uses the same 2.4 km box
-  const per=r=>r.ind_dunam*1000/r.pop;
-  const dots=r=>{const n=Math.round(r.pop/1000);return `<div class="dots">${'<i></i>'.repeat(n)}</div><div class="dl">${r.pop.toLocaleString()} ${T4({ar:'ساكن',he:'תושבים',en:'residents'})} · <i></i> = 1,000</div>`;};
-  const sq=r=>{const a=side(r);return `<svg viewBox="0 0 ${BOX} ${BOX}" role="img" aria-label="${r.en}"><rect x="0" y="${BOX-a}" width="${a}" height="${a}" fill="#f2c230"/>`+
-    `<path d="M${BOX-620} 140h500" stroke="#e9e6df" stroke-width="14"/><text x="${BOX-620}" y="110" fill="#e9e6df" font-size="100" font-family="Jost,sans-serif">500 m</text></svg>`;};
-  const panel=(r,cls)=>`<div class="pn ${cls}"><div class="ph"><b>${r[L]||r.en}</b><small>${T4(r.grp==='arab'?{ar:'بلدة عربية',he:'יישוב ערבי',en:'Arab town'}:{ar:'بلدة يهودية',he:'יישוב יהודי',en:'Jewish town'})}</small></div>`+
-    `${dots(r)}${sq(r)}<div class="pv"><b>${Math.round(per(r))} ${T4({ar:'م²',he:'מ״ר',en:'m²'})}</b><span>${T4({ar:'أرض صناعية لكل ساكن',he:'קרקע תעשייה לכל תושב',en:'industrial land per resident'})}<br>${T4({ar:'المربع الأصفر',he:'הריבוע הצהוב',en:'yellow square'})}: ${Math.round(r.ind_dunam).toLocaleString()} ${T4({ar:'دونم',he:'דונם',en:'dunam'})}</span></div></div>`;
-  const pa=per(A), pj=per(J);
-  pairsShow(pq({ar:'سكان بنفس الحجم تقريباً — كم أرض صناعية لكل بلدة؟',he:'אוכלוסייה בגודל דומה — כמה קרקע תעשייה לכל יישוב?',en:'About the same number of people — how much industrial land does each town get?'})+
-    `<div class="pp">${panel(A,'a')}${panel(J,'j')}</div>`+
-    pairFoot(`×${pj/pa>=10?Math.round(pj/pa):(pj/pa).toFixed(1)}`,T4({ar:`أرض صناعية لكل ساكن في ${J[L]||J.en} مقابل ${A[L]||A.en}. المربع الأصفر = كل المناطق الصناعية في البلدة، مرسومة بنفس المقياس.`,he:`קרקע תעשייה לתושב ב${J.he} לעומת ${A.he}. הריבוע הצהוב = כל אזורי התעשייה ביישוב, באותו קנה מידה.`,en:`industrial land per resident in ${J.en} vs ${A.en}. Yellow square = all of the town's industrial zones, same scale.`}),
-      T4({ar:'طبقات الفريق (ArcGIS): المناطق الصناعية ∩ حدود البلديات · سكان 2026',he:'שכבות הצוות (ArcGIS): אזורי תעשייה ∩ גבולות שיפוט · אוכלוסייה 2026',en:'Team ArcGIS layers: industrial zones ∩ municipal limits · population 2026'})));
-}
+// economy: every town gets a yellow square ON THE MAP whose area = industrial land per resident (m²).
+// The GIF walks through neighbours — an Arab town and the Jewish town a few km away.
+const ECON_ID={'rahat':'Rahat','hura':'Hura','kseifa':'Kseyfe','lakia':'Lakiye','tel sheva':'Tel Sheva','shegev shalom':'Segev Shalom','arara negev':"Ar'ara Banegev",'netivot':'Netivot','ofakim':'Ofakim','dimona':'Dimona','arad':'Arad','eilat':'Eilat','omer':'Omer','yeruham':'Yeroham','lehavim':'Lehavim','meytar':'Meitar','mizpe ramon':'Mitspe Ramon','beer sheva':"Be'er Sheva"};
+const ECON_NEIGH=[['tel sheva','omer'],['arara negev','dimona'],['lakia','lehavim'],['hura','omer'],['kseifa','arad'],['rahat','lehavim'],['shegev shalom','beer sheva']];
+function econFC(){ const R=(DATA&&DATA.istats&&DATA.istats.rows)||[], pos={};
+  DATA.loc.features.forEach(f=>{ if(!pos[f.properties.en]) pos[f.properties.en]=centroid(f.geometry); });
+  return {type:'FeatureCollection',features:R.filter(r=>pos[ECON_ID[r.key]]).map(r=>({type:'Feature',geometry:{type:'Point',coordinates:pos[ECON_ID[r.key]]},
+    properties:{key:r.key,grp:r.grp,name:r[L]||r.en,v:Math.round(r.ind_dunam*1000/r.pop),pop:r.pop}}))}; }
+function econShow(shown,cur){ if(!map.getLayer('econ-sq')) return;
+  const op=['case',['in',['get','key'],['literal',cur]],1,['in',['get','key'],['literal',shown]],.4,0];
+  ['econ-sq'].forEach(id=>map.setPaintProperty(id,'icon-opacity',op)); ['econ-num','econ-name','econ-zero'].forEach(id=>map.setPaintProperty(id,'text-opacity',op));
+  const F=econFC().features, at=k=>(F.find(f=>f.properties.key===k)||{}).geometry;
+  const link=cur.length===2&&at(cur[0])&&at(cur[1])?[{type:'Feature',geometry:{type:'LineString',coordinates:[at(cur[0]).coordinates,at(cur[1]).coordinates]},
+    properties:{km:Math.round(Math.hypot((at(cur[0]).coordinates[0]-at(cur[1]).coordinates[0])*95.3,(at(cur[0]).coordinates[1]-at(cur[1]).coordinates[1])*111))}}]:[];
+  map.getSource('econlink').setData({type:'FeatureCollection',features:link}); }
 // bagrut: 100 twelfth-graders on each side
 function showBagrut(){
   const B=DATA.bagrut; if(!B) return;
@@ -1059,7 +1071,7 @@ function renderPanel(){
     <h3>${t('bounds')}</h3>${row('arab',t('arab'),sw('#e9e6df'))}${row('jew',t('jew'),`<span class="sw" style="border:2px solid #8a8a86"></span>`)}${row('ind',t('ind'),sw('#5a5a55'))}${row('rc',t('rc'),sw('#8a8a86',1))}
     <h3>${t('red')}</h3>${row('unrec',t('unrec'),sw('#e8452c'))}${row('grid',CHT('offmapCell'),sw('#e8452c'))}${row('cbs',CH_TITLE[L].housing+' · 1870–2024',sw('#8a8a86'))}${row('transit',CH_TITLE[L].transit+' · GTFS',sw('#e8452c',1))}${row('access',CHT('access')+' · GTFS',sw('#ff5a3c'))}${row('svc',CHT('svc'),sw('#e9e6df'))}${row('demo',t('demo'),'<span class="sw" style="color:#e8452c;font-weight:800;text-align:center">✕</span>')}
     <div class="note">${t('unrecNote')}</div>
-    <h3>${t('econ')}</h3>${row('indA',t('indA'),'<span class="sw" style="background:#f2c230;outline:2px solid #000;outline-offset:-3px"></span>')}${row('indJ',t('indJ'),'<span class="sw" style="background:#f2c230;opacity:.55"></span>')}${row('arab7',t('arab7'),sw('#e9e6df',1))}
+    <h3>${t('econ')}</h3>${row('econ',T4({ar:'أرض صناعية لكل ساكن (مربع)',he:'קרקע תעשייה לתושב (ריבוע)',en:'industrial land per resident (square)'}),'<span class="sw" style="background:#f2c230;outline:2px solid #000;outline-offset:-2px"></span>')}${row('indA',t('indA'),'<span class="sw" style="background:#f2c230;outline:2px solid #000;outline-offset:-3px"></span>')}${row('indJ',t('indJ'),'<span class="sw" style="background:#f2c230;opacity:.55"></span>')}${row('arab7',t('arab7'),sw('#e9e6df',1))}
     <h3>${t('plan')}</h3>${row('xplan',t('xplan'),'',1)}${row('landuse',t('landuse'),'',1)}${row('tmm',t('tmm'),'',1)}${row('vatmal',t('vatmal'),'',1)}
     <div class="note">${t('liveNote')}</div>`;
   document.querySelectorAll('#panel input').forEach(i=>i.onchange=()=>{state[i.dataset.k]=i.checked;applyState();});
@@ -1199,6 +1211,7 @@ function setLang(l){
     map.setLayoutProperty('un-lbl','text-field',['get',l]); }
   if(DATA){ if(map.getLayer('frames-lbl')) map.setLayoutProperty('frames-lbl','text-field',['case',['==',['get','en'],'unnamed'],['to-string',['get','n']],['concat',['get',l==='ar'?'ar':'en'],'  ',['to-string',['get','n']]]]);
     renderPanel(); renderStats(); buildChapters(); if(map.getSource('transit')) map.getSource('transit').setData(transitFC());
+    if(map.getSource('econ')) map.getSource('econ').setData(econFC());
     if(map.getSource('trdest')) map.getSource('trdest').setData({type:'FeatureCollection',features:Object.entries(DESTS).map(([k,d])=>({type:'Feature',geometry:{type:'Point',coordinates:d.c},properties:{k,name:d[l]||d.en}}))}); }
   if(document.body.classList.contains('about')) renderAbout();
 }

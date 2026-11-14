@@ -136,6 +136,24 @@ body.chap #card{display:block}
 #card .big b.r{color:var(--red-deep)}
 #card .big span{font-size:11px;letter-spacing:.04em;text-transform:uppercase}
 #card .src{font-size:11px;color:#444;border-top:1px solid #000;margin-top:10px;padding-top:6px}
+/* unified gap card (end of every chapter): Arab line vs Jewish line, same unit, ×N in red */
+#card .gap{margin-top:14px;border:3px solid #000;background:#fff}
+#card .gap .gh{background:#000;color:var(--bone);font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:6px 10px}
+#card .gap .gq{padding:8px 10px 2px;font-weight:700;font-size:13px;line-height:1.35}
+#card .gap .gr{display:grid;grid-template-columns:1fr auto;align-items:baseline;gap:8px;padding:4px 10px;border-top:1px solid #0002}
+#card .gap .gr b{font-family:"Jost";font-weight:800;font-size:26px;line-height:1.1}
+#card .gap .gr.a b{color:#000} #card .gap .gr.j b{color:#6b6b67}
+#card .gap .gr span{font-size:12px}
+#card .gap .gx{display:flex;align-items:baseline;gap:8px;padding:6px 10px 8px;border-top:2px solid #000}
+#card .gap .gx b{font-family:"Jost";font-weight:800;font-size:44px;line-height:1;color:var(--red-deep)}
+#card .gap .gx span{font-size:12px;line-height:1.3}
+#card .gap .src{margin:0;padding:6px 10px 8px}
+/* 100% stacked distance bars */
+.stk{display:flex;flex-direction:column;gap:5px;margin:4px 0 6px}
+.stk .sr{display:grid;grid-template-columns:118px 1fr;gap:6px;align-items:center;font-size:12px}
+.stk .sb{display:flex;height:16px;border:1px solid #000}
+.stk .sb i{display:block;height:100%;font-style:normal;font-size:10px;color:#fff;text-align:center;line-height:16px;overflow:hidden}
+#card .go{display:inline-block;margin:6px 0 2px;background:#000;color:var(--bone);font-size:12px;font-weight:700;padding:6px 10px;cursor:pointer;border:0}
 #card .todo{background:#000;color:var(--bone);padding:8px 10px;font-size:12px;margin-top:8px}
 #card table{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
 #card td,#card th{border-top:1px solid #0003;padding:3px 4px;text-align:start}
@@ -371,7 +389,10 @@ async function loadData(){
   frames.features.forEach((f,i)=>f.properties.i=i);
   [...frames.features].sort((a,b)=>b.properties.n-a.properties.n).forEach((f,r)=>f.properties.rank=r);
   const [nat, routes] = await Promise.all([opt('national_localities.geojson'), opt('transit_routes.geojson')]);
-  return {nat, routes, frames, israel, cbs, grid, bsum, transit, ind, indBld, istats, tprof, jew11, arab7, nafa, negevGeom, loc:{type:'FeatureCollection',features:loc}, rc:{type:'FeatureCollection',features:rc},
+  // 04 — walking access: served stops + distance from every off-map house (scripts/transit_access.py)
+  const [access, stops, gridD] = await Promise.all([get('transit_access.json').catch(()=>null), opt('transit_stops.geojson'), get('grid_stopdist.json').catch(()=>[])]);
+  grid.features.forEach((f,i)=>{ if(gridD[i]!=null) f.properties.d=gridD[i]; });
+  return {access, stops, nat, routes,frames, israel, cbs, grid, bsum, transit, ind, indBld, istats, tprof, jew11, arab7, nafa, negevGeom, loc:{type:'FeatureCollection',features:loc}, rc:{type:'FeatureCollection',features:rc},
           unrec:{type:'FeatureCollection',features:unrec}, demo:{type:'FeatureCollection',features:demo}};
 }
 
@@ -412,7 +433,7 @@ const state = { // layer id -> visible
   basemap:true, sat:false, mask:true, labels:true,
   arab:true, jew:true, ind:true, rc:false,
   unrec:true, demo:true,
-  indJ:true, indA:true, arab7:false, grid:false, frames:false, nat:false, routes:false, mask2:false, cbs:false, transit:false, jew11:false, indBld:false,
+  indJ:true, indA:true, arab7:false, grid:false, frames:false, nat:false, routes:false, mask2:false, cbs:false, transit:false, access:false, jew11:false, indBld:false,
   xplan:false, landuse:false, tmm:false, vatmal:false
 };
 try{ Object.assign(state, JSON.parse(localStorage.getItem('offmap-state')||'{}')); }catch(e){}
@@ -422,7 +443,7 @@ const LAYERMAP = {
   arab:['loc-arab-fill','loc-arab-line','loc-arab-lbl'], jew:['loc-jew-line','loc-jew-lbl'], ind:['loc-ind'], rc:['rc-line'],
   unrec:['un-cluster','un-count','un-pt','un-lbl'], demo:['demo-halo','demo-pt'],
   indJ:['ind-j-fill','ind-j-line'], indA:['ind-a-fill','ind-a-line'], arab7:['arab7-line'],
-  grid:['grid-fill'], frames:['frames-fill','frames-line','frames-line-e','frames-lbl','bld-u','bld-e','bld-e-line'], mask2:['mask2'], nat:['nat-arab','nat-arab-line','nat-jew','nat-new','nat-bt'], routes:['rt-line','rt-miss','rt-miss-lbl'], cbs:['cbs-pt','cbs-new'], transit:['tr-circ','tr-num','tr-name','tr-dest','tr-dest-lbl'],
+  grid:['grid-fill'], frames:['frames-fill','frames-line','frames-line-e','frames-lbl','bld-u','bld-e','bld-e-line'], mask2:['mask2'], nat:['nat-arab','nat-arab-line','nat-jew','nat-new','nat-bt'], routes:['rt-line','rt-miss','rt-miss-lbl'], cbs:['cbs-pt','cbs-new'], transit:['tr-circ','tr-num','tr-name','tr-dest','tr-dest-lbl'], access:['acc-grid','acc-bld','acc-stop'],
   jew11:['jew11-line'], indBld:['indbld-fill'],
   xplan:['live-xplan'], landuse:['live-landuse'], tmm:['live-tmm'], vatmal:['live-vatmal']
 };
@@ -491,9 +512,18 @@ map.once('style.load', async ()=>{
   map.addLayer({id:'bld-u',type:'fill',source:'bld',minzoom:11.5,filter:['==',['get','c'],'u'],paint:{'fill-color':'#e8452c','fill-opacity':.9}});
   map.addLayer({id:'bld-e',type:'fill',source:'bld',minzoom:11.5,filter:['==',['get','c'],'e'],paint:{'fill-color':'#e8452c','fill-opacity':.25}});
   map.addLayer({id:'bld-e-line',type:'line',source:'bld',minzoom:11.5,filter:['==',['get','c'],'e'],paint:{'line-color':'#e8452c','line-width':1.4}});
-  fetch('data/offmap_buildings.json').then(r=>r.json()).then(arr=>{ map.getSource('bld').setData({type:'FeatureCollection',features:arr.map(a=>{
+  Promise.all([fetch('data/offmap_buildings.json').then(r=>r.json()),fetch('data/offmap_stopdist.json').then(r=>r.json()).catch(()=>[])]).then(([arr,dist])=>{ map.getSource('bld').setData({type:'FeatureCollection',features:arr.map((a,k)=>{
       let x=a[2],y=a[3]; const ring=[[x/1e5,y/1e5]]; for(let i=4;i<a.length;i+=2){x+=a[i];y+=a[i+1];ring.push([x/1e5,y/1e5]);} ring.push(ring[0]);
-      return {type:'Feature',geometry:{type:'Polygon',coordinates:[ring]},properties:{c:a[0],s:a[1]}};})}); }).catch(()=>{});
+      return {type:'Feature',geometry:{type:'Polygon',coordinates:[ring]},properties:{c:a[0],s:a[1],d:dist[k]!=null?dist[k]:-1}};})}); }).catch(()=>{});
+  // 04 — distance to the nearest served bus stop: grey = within 400 m, darker→brighter red = farther
+  map.addLayer({id:'acc-grid',type:'fill',source:'grid',maxzoom:11.5,filter:['has','d'],layout:{visibility:'none'},paint:{'fill-color':ACC_RAMP(['get','d']),'fill-opacity':.92}});
+  map.addLayer({id:'acc-bld',type:'fill',source:'bld',minzoom:11.5,filter:['>=',['get','d'],0],layout:{visibility:'none'},paint:{'fill-color':ACC_RAMP(['get','d'])}});
+  map.addSource('stops',{type:'geojson',data:DATA.stops});
+  map.addLayer({id:'acc-stop',type:'circle',source:'stops',minzoom:8.5,layout:{visibility:'none'},paint:{'circle-color':'#000','circle-stroke-color':'#e9e6df','circle-stroke-width':1,
+    'circle-radius':['interpolate',['linear'],['zoom'],8.5,1.6,12,3.5,15,6]}});
+  map.on('click','acc-grid',e=>{const p=e.features[0].properties;new maplibregl.Popup().setLngLat(e.lngLat).setHTML(`<div class="card"><div class="hd">${CHT('accCell')}</div><div class="bd"><b>${(+p.d).toLocaleString()} m</b>${CHT('accMedian')} · ${p.n} ${CHT('houses')}<div class="src">GTFS ${DATA.access?DATA.access.date:''} · Microsoft footprints · OSM</div></div></div>`).addTo(map);});
+  map.on('click','acc-stop',e=>{const p=e.features[0].properties;new maplibregl.Popup().setLngLat(e.lngLat).setHTML(`<div class="card"><div class="hd grey">${p.nm}</div><div class="bd"><b>${p.t}</b>${CHT('stopTrips')}<div class="src">GTFS ${DATA.access?DATA.access.date:''}</div></div></div>`).addTo(map);});
+  ['acc-grid','acc-stop'].forEach(id=>{map.on('mouseenter',id,()=>map.getCanvas().style.cursor='pointer');map.on('mouseleave',id,()=>map.getCanvas().style.cursor='');});
   if(DATA.israel){ const hole=DATA.israel.geometry.coordinates.map(p=>p[0]);
     map.addSource('mask2',{type:'geojson',data:{type:'Feature',geometry:{type:'Polygon',coordinates:[[[-180,-85],[180,-85],[180,85],[-180,85],[-180,-85]],...hole]}}});
     map.addLayer({id:'mask2',type:'fill',source:'mask2',layout:{visibility:'none'},paint:{'fill-color':'#000','fill-opacity':.62}},'mask'); }
@@ -556,13 +586,15 @@ const DESTS={bs:{c:[34.7913,31.2520],en:"Be'er Sheva",he:'באר שבע',ar:'ب�
 const CH_T={
  ar:{grp_jewish:'بلدة يهودية',grp_arab:'بلدة عربية',grp_bedouin_town:'بلدة تركيز بدوية (تخطيط الدولة)',grp_tribe:'عشيرة مسجّلة بلا بلدة',grp_mixed:'مدينة مختلطة',founded:'سنة التأسيس',pre48:'قبل 1948',pop:'السكان',
   offmapCell:'مبانٍ خارج الخريطة',bldInCell:'مبنى في مربع 250م',trips:'رحلات مباشرة يومياً',fastest:'أسرع رحلة',none:'لا يوجد خط مباشر',lines:'الخطوط',
-  tlJ:'بلدة يهودية جديدة منذ 1948',tlA:'بلدة عربية جديدة (غير التركيز)',tlB:'بلدات تركيز بدوية',play:'تشغيل'},
+  tlJ:'بلدة يهودية جديدة منذ 1948',tlA:'بلدة عربية جديدة (غير التركيز)',tlB:'بلدات تركيز بدوية',play:'تشغيل',accCell:'البُعد عن محطة باص',accMedian:'الوسيط لبيوت المربع',houses:'بيت',stopTrips:'رحلة تمرّ من المحطة يوم الثلاثاء',access:'البُعد عن محطة الباص'},
  he:{grp_jewish:'יישוב יהודי',grp_arab:'יישוב ערבי',grp_bedouin_town:'יישוב ריכוז בדואי (תכנון המדינה)',grp_tribe:'שבט רשום ללא יישוב',grp_mixed:'עיר מעורבת',founded:'שנת ייסוד',pre48:'לפני 1948',pop:'אוכלוסייה',
   offmapCell:'מבנים מחוץ למפה',bldInCell:'מבנים בריבוע 250 מ\'',trips:'נסיעות ישירות ביום',fastest:'הנסיעה המהירה',none:'אין קו ישיר',lines:'קווים',
-  tlJ:'יישובים יהודיים חדשים מאז 1948',tlA:'יישובים ערביים חדשים (לא ריכוז)',tlB:'יישובי ריכוז בדואיים',play:'הפעלה'},
+  tlJ:'יישובים יהודיים חדשים מאז 1948',tlA:'יישובים ערביים חדשים (לא ריכוז)',tlB:'יישובי ריכוז בדואיים',play:'הפעלה',accCell:'מרחק לתחנת אוטובוס',accMedian:'חציון לבתים בריבוע',houses:'בתים',stopTrips:'נסיעות שעוברות בתחנה ביום שלישי',access:'מרחק לתחנת אוטובוס'},
  en:{grp_jewish:'Jewish locality',grp_arab:'Arab locality',grp_bedouin_town:'Bedouin concentration town (state-planned)',grp_tribe:'Registered tribe, no locality',grp_mixed:'Mixed city',founded:'Founded',pre48:'Before 1948',pop:'Population',
   offmapCell:'Off-map buildings',bldInCell:'buildings in a 250 m cell',trips:'direct trips / weekday',fastest:'fastest trip',none:'no direct line',lines:'Lines',
-  tlJ:'new Jewish localities since 1948',tlA:'new Arab localities (non-concentration)',tlB:'Bedouin concentration towns',play:'Play'}};
+  tlJ:'new Jewish localities since 1948',tlA:'new Arab localities (non-concentration)',tlB:'Bedouin concentration towns',play:'Play',accCell:'Distance to a bus stop',accMedian:'median for the houses in this cell',houses:'houses',stopTrips:'trips calling here on Tuesday',access:'Distance to a bus stop'}};
+// distance ramp (m): grey = within walking standard, then red getting brighter with distance
+const ACC_RAMP=v=>['step',v,'#8a8a86',400,'#6e2519',1000,'#b5361f',3000,'#ff5a3c'];
 const CHT=k=>(CH_T[L]||CH_T.en)[k]||CH_T.en[k]||k;
 
 function tlFilter(y){return ['all',['!=',['get','grp'],'tribe'],['any',['==',['get','old'],true],['<=',['coalesce',['get','year'],9999],y]]];}
@@ -603,7 +635,7 @@ const CHAPTERS=[
  {no:'01',key:'land',view:{center:[34.86,31.2],zoom:9.7},layers:{mask:true,arab:true,jew:true,rc:false,unrec:false,demo:true,grid:false,frames:true,indJ:false,indA:false,cbs:false,transit:false,xplan:false,landuse:false}},
  {no:'02',key:'housing',view:{center:[35.0,31.55],zoom:7.2},layers:{mask:false,mask2:true,arab:false,jew:false,unrec:false,demo:false,grid:false,indJ:false,indA:false,cbs:false,nat:true,transit:false},timeline:true},
  {no:'03',key:'economy',view:{center:[34.85,31.25],zoom:10},layers:{mask:true,arab:false,jew:false,unrec:false,demo:false,grid:false,indJ:true,indA:true,arab7:true,jew11:true,indBld:true,cbs:false,transit:false}},
- {no:'04',key:'transit',view:{center:[35.0,31.6],zoom:7.9},layers:{mask:false,routes:true,arab:false,jew:false,unrec:false,demo:false,grid:false,indJ:false,indA:false,arab7:false,jew11:false,indBld:false,cbs:false,transit:true}},
+ {no:'04',key:'transit',view:{center:[35.0,31.6],zoom:7.9},layers:{mask:false,routes:true,arab:false,jew:false,unrec:false,demo:false,grid:false,indJ:false,indA:false,arab7:false,jew11:false,indBld:false,cbs:false,transit:true,access:true}},
  {no:'05',key:'violence',view:{center:[34.85,31.25],zoom:9.6},layers:{mask:true,arab:true,jew:true,unrec:true,demo:false,grid:true,indJ:false,indA:false,cbs:false,transit:false}}
 ];
 const CH_TITLE={ar:{land:'الأرض والاعتراف',housing:'السكن والاستيطان',economy:'الاقتصاد والتشغيل',transit:'المواصلات',violence:'العنف والأمان'},
@@ -634,6 +666,11 @@ function chapterCard(key){
     const row=g=>`<div class="tl-row"><div class="tl-h">${tr3(g==='arab'?{ar:'البلدات العربية السبع',he:'7 היישובים הערביים',en:'7 Arab towns'}:{ar:'11 بلدة يهودية',he:'11 יישובים יהודיים',en:'11 Jewish towns'})}</div><div class="tl-wrap">${
       R.filter(r=>r.grp===g).sort((a,b)=>b.ind_pct-a.ind_pct).map(r=>`<div class="tl" title="${(r[L]||r.en)}: ${Math.round(r.total_dunam).toLocaleString()} / ${Math.round(r.ind_dunam).toLocaleString()} ${t('dunam')}"><div class="tl-box ${g}" style="width:${px(r.total_dunam)}px;height:${px(r.total_dunam)}px"><div class="tl-ind" style="width:${px(r.ind_dunam)}px;height:${px(r.ind_dunam)}px"></div></div><div class="tl-n">${r[L]||r.en}</div><div class="tl-p">${r.ind_pct.toFixed(1)}%</div></div>`).join('')}</div></div>`;
     return row('arab')+row('jewish'); };
+  // unified gap card: one Arab line vs one Jewish line, same unit, and how many times bigger (red)
+  const gapCard=({q,a,j,unit,x,xl,src})=>`<div class="gap"><div class="gh">${tr3({ar:'الفجوة',he:'הפער',en:'The gap'})}</div><div class="gq">${tr3(q)}</div>`+
+    `<div class="gr a"><span>${tr3(a.l)}</span><b>${a.v}${unit}</b></div><div class="gr j"><span>${tr3(j.l)}</span><b>${j.v}${unit}</b></div>`+
+    `<div class="gx"><b>×${x}</b><span>${tr3(xl)}</span></div><div class="src">${src}</div></div>`;
+  const ratio=(hi,lo)=>{const r=hi/lo; return r>=10?Math.round(r):r.toFixed(1);};
   // legend: [[swatchCSS, label], ...]
   const leg=items=>`<div class="leg">${items.map(([css,l])=>`<span><i style="${css}"></i>${tr3(l)}</span>`).join('')}</div>`;
   // horizontal bar chart: rows [{label, v, grp, note}]
@@ -681,6 +718,28 @@ function chapterCard(key){
      fiscal()+
      `<div class="src">${t('teamSrc')} · ${tr3({ar:'المباني: OSM داخل المناطق الصناعية. السكان 2026.',he:'מבנים: OSM בתוך אזורי התעשייה. אוכלוסייה 2026.',en:'Buildings: OSM inside industrial zones. Population 2026.'})}</div>`;
   }
+  // 04b — walking distance from the house to the nearest served bus stop
+  const accessBlock=()=>{ const A=DATA.access; if(!A) return '';
+    const G=A.groups, OUT=A.towns.filter(r=>!r.in_totals).map(r=>r[L]||r.en).join(L==='en'?', ':'، '), srcTxt=tr3({ar:`وزارة المواصلات · GTFS ${A.date} (${A.stops_served.toLocaleString()} محطة فيها خدمة؛ ${(A.stops_in_bbox-A.stops_served).toLocaleString()} محطة بلا أي رحلة استُبعدت) · بصمات مباني Microsoft · OSM · حدود البلديات: مديرية التخطيط. مسافة هوائية من مركز كل مبنى؛ مسافة المشي الحقيقية أطول. طبقات أولية: زميلة في الفريق؛ إعادة الحساب: scripts/transit_access.py. البلدة = المنطقة المبنية المتصلة داخل حدود البلدية. ${OUT} خارج المقارنة: بيانات Microsoft لا تغطيها. داخل حدود عراد تبقى تجمعات بدوية محسوبة على "عراد" — هذا يخفّض النسبة اليهودية، أي أن الفجوة الحقيقية أكبر.`,
+      he:`משרד התחבורה · GTFS ${A.date} (${A.stops_served.toLocaleString()} תחנות עם שירות; ${(A.stops_in_bbox-A.stops_served).toLocaleString()} תחנות בלי אף נסיעה הוצאו) · טביעות מבנים Microsoft · OSM · גבולות שיפוט: מנהל התכנון. מרחק אווירי ממרכז כל מבנה; מרחק ההליכה בפועל ארוך יותר. שכבות ראשונות: חברת צוות; חישוב מחדש: scripts/transit_access.py. יישוב = השטח הבנוי הרציף בתוך גבול השיפוט. ${OUT} מחוץ להשוואה: אין להם כיסוי בנתוני Microsoft. בתוך גבול ערד נשארים ריכוזים בדואיים שנספרים כ"ערד" — זה מוריד את השיעור היהודי, כלומר הפער האמיתי גדול יותר.`,
+      en:`Ministry of Transport · GTFS ${A.date} (${A.stops_served.toLocaleString()} served stops; ${(A.stops_in_bbox-A.stops_served).toLocaleString()} stops with no trip that day dropped) · Microsoft building footprints · OSM · municipal limits: Planning Administration. Straight-line distance from each building's centre; real walking distance is longer. First layers: team member; recomputed in scripts/transit_access.py. Town = the connected built-up area inside the municipal limit. ${OUT} left out: Microsoft has no footprints there. Bedouin clusters inside Arad's limit remain counted as "Arad" — this lowers the Jewish share, so the real gap is larger.`});
+    const SEG=[['lt400','#8a8a86','<400 m'],['m400_1k','#6e2519','0.4–1 km'],['k1_3','#b5361f','1–3 km'],['gt3k','#ff5a3c','>3 km']];
+    const stack=(lab,g)=>`<div class="sr"><span>${tr3(lab)} <small>(${g.n.toLocaleString()})</small></span><span class="sb">${SEG.map(([k,c])=>`<i style="width:${g['pct_'+k]}%;background:${c}">${g['pct_'+k]>=8?Math.round(g['pct_'+k])+'%':''}</i>`).join('')}</span></div>`;
+    const T=[...A.towns].filter(r=>r.in_totals).sort((a,b)=>b.pct_lt400-a.pct_lt400);
+    const nJ=G.jewish_towns.towns, nA=G.arab_towns.towns;
+    return `<h4>${tr3({ar:'كم يمشي الساكن لأقرب محطة باص؟',he:'כמה הולכים עד תחנת האוטובוס הקרובה?',en:'How far do people walk to the nearest bus stop?'})}</h4>`+
+     leg(SEG.map(([k,c,l])=>[`background:${c}`,{ar:l,he:l,en:l}]).concat([['background:#000;border:1px solid #e9e6df;border-radius:50%',{ar:'محطة فيها خدمة',he:'תחנה עם שירות',en:'served stop'}]]))+
+     `<p>${tr3({ar:'كل مربع (ومن قريب: كل بيت) ملوّن حسب بُعده عن أقرب محطة فيها باص فعلاً. الرمادي = أقل من 400 م، المعيار المقبول للمشي لمحطة.',he:'כל ריבוע (ומקרוב: כל בית) צבוע לפי המרחק לתחנה הקרובה שבאמת עוצר בה אוטובוס. אפור = פחות מ-400 מ׳, התקן המקובל להליכה לתחנה.',en:'Each cell (and, zoomed in, each house) is coloured by its distance to the nearest stop a bus actually calls at. Grey = under 400 m, the accepted walking standard.'})}</p>`+
+     `<div class="stk">${stack({ar:'قرى غير معترف بها',he:'כפרים לא מוכרים',en:'Unrecognized villages'},G.unrec)}${stack({ar:'بيوت خارج الخط الأزرق',he:'בתים מחוץ לקו הכחול',en:'Beyond the blue line'},G.expansion)}${stack({ar:`${nA} بلدات عربية`,he:`${nA} יישובים ערביים`,en:`${nA} Arab towns`},G.arab_towns)}${stack({ar:`${nJ} بلدات يهودية`,he:`${nJ} יישובים יהודיים`,en:`${nJ} Jewish towns`},G.jewish_towns)}</div>`+
+     `<button class="go" onclick="map.flyTo({center:[34.86,31.22],zoom:10.3,duration:1600})">${tr3({ar:'← قرّبي على القرى والمحطات',he:'← זום לכפרים ולתחנות',en:'→ Zoom to the villages and stops'})}</button>`+
+     `<h4>${tr3({ar:'نسبة المباني على بُعد أقل من 400 م من محطة، حسب البلدة',he:'שיעור המבנים עד 400 מ׳ מתחנה, לפי יישוב',en:'Share of buildings within 400 m of a stop, by town'})}</h4>`+
+     bars([{label:`<b>${tr3({ar:'قرى غير معترف بها',he:'כפרים לא מוכרים',en:'Unrecognized villages'})}</b>`,v:G.unrec.pct_lt400,grp:'red'},...T.map(r=>({label:r[L]||r.en,v:r.pct_lt400,grp:r.grp}))],100,'%')+
+     `<div class="src">${srcTxt}</div>`+
+     gapCard({q:{ar:'كم بيت من كل 100 على بُعد مشي (أقل من 400 م) من محطة باص؟',he:'כמה בתים מכל 100 נמצאים במרחק הליכה (עד 400 מ׳) מתחנת אוטובוס?',en:'How many homes in 100 are within walking distance (400 m) of a bus stop?'},
+       a:{l:{ar:'القرى غير المعترف بها',he:'הכפרים הלא מוכרים',en:'Unrecognized villages'},v:G.unrec.pct_lt400},
+       j:{l:{ar:`${nJ} بلدات يهودية في النقب`,he:`${nJ} יישובים יהודיים בנגב`,en:`${nJ} Jewish Naqab towns`},v:G.jewish_towns.pct_lt400},unit:'%',
+       x:ratio(G.jewish_towns.pct_lt400,G.unrec.pct_lt400),xl:{ar:`ضعف — وسيط المسافة ${G.unrec.median_m.toLocaleString()} م مقابل ${G.jewish_towns.median_m.toLocaleString()} م (×${ratio(G.unrec.median_m,G.jewish_towns.median_m)} أبعد)`,he:`פעמים — חציון המרחק ${G.unrec.median_m.toLocaleString()} מ' לעומת ${G.jewish_towns.median_m.toLocaleString()} מ' (×${ratio(G.unrec.median_m,G.jewish_towns.median_m)} רחוק יותר)`,en:`times — median distance ${G.unrec.median_m.toLocaleString()} m vs ${G.jewish_towns.median_m.toLocaleString()} m (×${ratio(G.unrec.median_m,G.jewish_towns.median_m)} farther)`},
+       src:`GTFS ${A.date} · Microsoft footprints · OSM · iplan`}); };
   if(key==='transit'){
     const rows=transitRows().filter(r=>TR2POP[r.id]&&popOf(r.id)).map(r=>({r,pop:popOf(r.id),tot:(r.ta_trips||0)+(r.jm_trips||0)})).sort((a,b)=>b.pop-a.pop);
     const mx=Math.max(...rows.map(x=>x.tot),1);
@@ -692,7 +751,8 @@ function chapterCard(key){
      (ra&&nt?big([[ra.tot,`${trName(ra.r)} · ${ra.pop.toLocaleString()} ${CHT('pop')}`,1],[nt.tot,`${trName(nt.r)} · ${nt.pop.toLocaleString()} ${CHT('pop')}`,0]]):'')+T3[L]+
      `<h4>${tr3({ar:'رحلات مباشرة يومياً إلى تل أبيب + القدس (مرتبة حسب عدد السكان)',he:'נסיעות ישירות ביום לת"א + ירושלים (לפי גודל אוכלוסייה)',en:'Direct weekday trips to Tel Aviv + Jerusalem (sorted by population)'})}</h4>`+
      bars(rows.map(x=>({label:`${trName(x.r)} <small>${Math.round(x.pop/1000)}k</small>`,v:x.tot,grp:x.r.grp})),mx)+
-     `<div class="src">משרד התחבורה · GTFS · ${DATA.transit?DATA.transit.date:''}. ${{ar:'تُحسب المحطات داخل حدود البلدة فقط؛ محطات على الشارع الرئيسي خارج الحدود غير محسوبة.',he:'נספרות תחנות בתוך גבול היישוב בלבד; תחנות בכביש הראשי מחוץ לגבול אינן נספרות.',en:'Only stops inside the locality limit are counted; stops on the highway outside the limit are not.'}[L]}</div>`;
+     `<div class="src">משרד התחבורה · GTFS · ${DATA.transit?DATA.transit.date:''}. ${{ar:'تُحسب المحطات داخل حدود البلدة فقط؛ محطات على الشارع الرئيسي خارج الحدود غير محسوبة.',he:'נספרות תחנות בתוך גבול היישוב בלבד; תחנות בכביש הראשי מחוץ לגבול אינן נספרות.',en:'Only stops inside the locality limit are counted; stops on the highway outside the limit are not.'}[L]}</div>`+
+     accessBlock();
   }
   if(key==='violence'){
     T3.ar=`<p>العنف ليس "ثقافة" — له جغرافيا: شوارع بلا إنارة، أحياء بلا عنوان، قرى بلا شرطة ولا خدمات، وشباب بلا عمل. هذا الفصل يربط الجريمة بالفجوات المكانية في الفصول 01–04.</p>`;
@@ -714,7 +774,7 @@ function openChapter(key,keepView){
   const c=CHAPTERS.find(c=>c.key===key); document.body.classList.toggle('tl',!!(c&&c.timeline));
   if(!c){ stopPlayer(); resetHi(); document.getElementById('card').style.display='none'; return; }
   stopPlayer(); resetHi();
-  document.getElementById('card').style.display=''; Object.assign(state,{frames:false,nat:false,routes:false,mask2:false},c.layers); applyState(); renderPanel();
+  document.getElementById('card').style.display=''; Object.assign(state,{frames:false,nat:false,routes:false,mask2:false,access:false},c.layers); applyState(); renderPanel();
   if(!keepView) map.flyTo({...c.view,duration:1600});
   document.getElementById('card').innerHTML=`<div class="hd"><span class="no">${c.no}</span><h2>${CH_TITLE[L][key]}</h2></div><div class="bd">${chapterCard(key)}</div>`;
   if(c.timeline) setYear(tlRange.value);
@@ -758,7 +818,7 @@ const FRAMES={
          const op=['case',['in',['get','id'],['literal',shown.map(s=>s.properties.id)]],1,.12];
          map.setPaintProperty('tr-circ','circle-opacity',op); map.setPaintProperty('tr-num','text-opacity',op); map.setPaintProperty('tr-name','text-opacity',op); }}; }); },
  // 05: camera fixed; disadvantage layers stack up
- violence:()=>{ const st=(o)=>()=>{Object.assign(state,{grid:false,frames:false,indJ:false,indA:false,transit:false,unrec:false},o);applyState();};
+ violence:()=>{ const st=(o)=>()=>{Object.assign(state,{grid:false,frames:false,indJ:false,indA:false,transit:false,access:false,unrec:false},o);applyState();};
    return [
     {cap:`<b>01</b>${T4({ar:'بلا اعتراف',he:'ללא הכרה',en:'no recognition'})}`,apply:st({frames:true})},
     {cap:`<b>03</b>${T4({ar:'+ بلا صناعة',he:'+ ללא תעשייה',en:'+ no industry'})}`,apply:st({frames:true,indJ:true,indA:true})},
@@ -793,7 +853,7 @@ function renderPanel(){
   document.getElementById('panel').innerHTML=
    `<h3>${t('base')}</h3>${row('basemap',t('basemap'))}${row('sat',t('sat'))}${row('mask',t('mask'))}${row('mask2',t('mask2'))}${row('labels',t('labels'))}
     <h3>${t('bounds')}</h3>${row('arab',t('arab'),sw('#e9e6df'))}${row('jew',t('jew'),`<span class="sw" style="border:2px solid #8a8a86"></span>`)}${row('ind',t('ind'),sw('#5a5a55'))}${row('rc',t('rc'),sw('#8a8a86',1))}
-    <h3>${t('red')}</h3>${row('unrec',t('unrec'),sw('#e8452c'))}${row('grid',CHT('offmapCell'),sw('#e8452c'))}${row('cbs',CH_TITLE[L].housing+' · 1870–2024',sw('#8a8a86'))}${row('transit',CH_TITLE[L].transit+' · GTFS',sw('#e8452c',1))}${row('demo',t('demo'),'<span class="sw" style="color:#e8452c;font-weight:800;text-align:center">✕</span>')}
+    <h3>${t('red')}</h3>${row('unrec',t('unrec'),sw('#e8452c'))}${row('grid',CHT('offmapCell'),sw('#e8452c'))}${row('cbs',CH_TITLE[L].housing+' · 1870–2024',sw('#8a8a86'))}${row('transit',CH_TITLE[L].transit+' · GTFS',sw('#e8452c',1))}${row('access',CHT('access')+' · GTFS',sw('#ff5a3c'))}${row('demo',t('demo'),'<span class="sw" style="color:#e8452c;font-weight:800;text-align:center">✕</span>')}
     <div class="note">${t('unrecNote')}</div>
     <h3>${t('econ')}</h3>${row('indA',t('indA'),'<span class="sw" style="background:#f2c230;outline:2px solid #000;outline-offset:-3px"></span>')}${row('indJ',t('indJ'),'<span class="sw" style="background:#f2c230;opacity:.55"></span>')}${row('arab7',t('arab7'),sw('#e9e6df',1))}
     <h3>${t('plan')}</h3>${row('xplan',t('xplan'),'',1)}${row('landuse',t('landuse'),'',1)}${row('tmm',t('tmm'),'',1)}${row('vatmal',t('vatmal'),'',1)}
@@ -904,6 +964,7 @@ function renderAbout(){
     <tr><td>CBS (הלמ"ס) — Localities file 2024</td><td>1,249 localities: founding year, group, population (ch. 02)</td></tr>
     <tr><td>Microsoft Global ML Building Footprints (2026)</td><td>258,871 Naqab buildings classified by recognition status (ch. 01, 02)</td></tr>
     <tr><td>Ministry of Transport — GTFS</td><td>Direct no-transfer trips to Be'er Sheva / Tel Aviv / Jerusalem (ch. 04)</td></tr>
+    <tr><td>Ministry of Transport — GTFS (served stops only) · Microsoft footprints</td><td>Straight-line distance from every off-map house and every town building to the nearest bus stop with a weekday trip (ch. 04)</td></tr>
     <tr><td>Team ArcGIS layers</td><td>Arab / Jewish industrial zones 2022 (ch. 03)</td></tr>
     <tr><td>Ministry of Interior — audited municipal financial reports 2024</td><td>Own revenue, business arnona, budget self-reliance per town (ch. 03)</td></tr>
     <tr><td>Sikkuy-Aufoq · RCUV · NCF (Dukium)</td><td>Partners / verification sources (to integrate)</td></tr></table></div>

@@ -712,6 +712,20 @@ function chapterCard(key){
     `<div class="gr a"><span>${tr3(a.l)}</span><b>${a.v}${unit}</b></div><div class="gr j"><span>${tr3(j.l)}</span><b>${j.v}${unit}</b></div>`+
     `<div class="gx"><b>×${x}</b><span>${tr3(xl)}</span></div><div class="src">${src}</div></div>`;
   const ratio=(hi,lo)=>{const r=hi/lo; return r>=10?Math.round(r):r.toFixed(1);};
+  // 01 gap: how much municipal land each resident's council controls (jurisdiction dunam / population)
+  const landGap=()=>{ const R=(DATA.istats&&DATA.istats.rows)||[]; if(!R.length) return '';
+    const per=f=>{const X=R.filter(f);return X.reduce((s,r)=>s+r.total_dunam,0)*1000/X.reduce((s,r)=>s+r.pop,0);};
+    const BIG=['dimona','arad','mizpe ramon','eilat','yeruham'];
+    const mA=per(r=>r.grp==='arab'), mJ=per(r=>r.grp==='jewish'), mJs=per(r=>r.grp==='jewish'&&!BIG.includes(r.key));
+    const S=DATA.bsum, off=S?S.outside_recognized:0, inA=S?S.by_group.arab.buildings:0, sh=off&&inA?Math.round(off/(off+inA)*100):null;
+    const f=v=>Math.round(v).toLocaleString();
+    return gapCard({q:{ar:'كم متراً مربعاً من أرض البلدية (منطقة النفوذ) لكل ساكن؟',he:'כמה מ״ר משטח השיפוט של הרשות יש לכל תושב?',en:'How many m² of municipal jurisdiction per resident?'},
+      a:{l:{ar:'7 بلدات عربية',he:'7 יישובים ערביים',en:'7 Arab towns'},v:f(mA)},j:{l:{ar:'11 بلدة يهودية',he:'11 יישובים יהודיים',en:'11 Jewish towns'},v:f(mJ)},
+      unit:' '+tr3({ar:'م²',he:'מ״ר',en:'m²'}),x:ratio(mJ,mA),
+      xl:{ar:`ضعف — أغلب الفرق من مناطق نفوذ واسعة لبلدات صحراوية (ديمونا، عراد، متسبيه رامون، إيلات، يروحام)؛ بدونها ${f(mJs)} م² (×${ratio(mJs,mA)}).${sh?` وفوق ذلك ${off.toLocaleString()} مبنى بدوي (≈${sh}%) خارج أي حدود معترف بها أصلاً.`:''}`,
+          he:`פעמים — רוב הפער משטחי שיפוט גדולים של עיירות מדבר (דימונה, ערד, מצפה רמון, אילת, ירוחם); בלעדיהם ${f(mJs)} מ״ר (×${ratio(mJs,mA)}).${sh?` ומעבר לזה ${off.toLocaleString()} מבנים בדואיים (≈${sh}%) נמצאים מחוץ לכל גבול מוכר.`:''}`,
+          en:`times — most of the gap comes from the large jurisdictions of desert towns (Dimona, Arad, Mitzpe Ramon, Eilat, Yeruham); without them ${f(mJs)} m² (×${ratio(mJs,mA)}).${sh?` On top of that ${off.toLocaleString()} Bedouin buildings (≈${sh}%) stand outside any recognized boundary at all.`:''}`},
+      src:tr3({ar:'مديرية التخطيط — حدود النفوذ (طبقات الفريق) · سكان 2026 · بصمات Microsoft: مبانٍ داخل البلدات العربية مقابل خارج الحدود (تقريبي).',he:'מנהל התכנון — גבולות שיפוט (שכבות הצוות) · אוכלוסייה 2026 · טביעות Microsoft: מבנים בתוך יישובים ערביים לעומת מחוץ לגבולות (בקירוב).',en:'Planning Administration — municipal limits (team layers) · population 2026 · Microsoft footprints: buildings inside Arab localities vs outside any limit (approximate).'})}); };
   // legend: [[swatchCSS, label], ...]
   const leg=items=>`<div class="leg">${items.map(([css,l])=>`<span><i style="${css}"></i>${tr3(l)}</span>`).join('')}</div>`;
   // horizontal bar chart: rows [{label, v, grp, note}]
@@ -726,7 +740,7 @@ function chapterCard(key){
      big([[f(off),{ar:'مبنى خارج الحدود',he:'מבנים מחוץ לגבולות',en:'buildings off the map'}[L],1],[nv,{ar:'قرية مرشّحة',he:'כפרים מועמדים',en:'candidate villages'}[L],1]])+T3[L]+
      (top.length?`<h4>${tr3({ar:'أكبر التجمعات خارج الحدود (عدد المباني ضمن 2 كم)',he:'הריכוזים הגדולים מחוץ לגבולות (מבנים ברדיוס 2 ק"מ)',en:'Largest off-map clusters (buildings within 2 km)'})}</h4>`+bars(top.map(v=>({label:L==='ar'?v.ar:v.en,v:v.buildings,grp:'red'})),top[0].buildings):'')+
      `<div class="todo">${{ar:'قيد العمل: مقارنة البصمات مع صور 2014→2026 (أداة الذكاء الاصطناعي) لتحديد المباني المهدومة + مطابقة مع تقارير منتدى التعايش.',he:'בעבודה: השוואת טביעות המבנים לתצלומי 2014→2026 (כלי AI) לזיהוי מבנים שנהרסו + הצלבה עם דוחות פורום דו-קיום.',en:'In progress: matching footprints against 2014→2026 aerials (AI tool) to flag demolished buildings, cross-checked with NCF reports.'}[L]}</div>`+
-     `<div class="src">Microsoft ML Building Footprints (2026) · מנהל התכנון · OSM. ${{ar:'المعيار: مبنى خارج كل الحدود المعترف بها، وعلى بُعد ≤2.5 كم من قرية مرشّحة أو داخل مجلسي نفيه مدبار/القسوم. تقدير أولي للتحقق.',he:'הכלל: מבנה מחוץ לכל גבול מוכר, ובמרחק ≤2.5 ק"מ מכפר מועמד או בתוך מ"א נווה מדבר/אל-קסום. אומדן ראשוני לאימות.',en:'Rule: building outside every recognized limit and ≤2.5 km from a candidate village or inside the Neve Midbar / al-Kasum councils. Preliminary estimate, to be verified.'}[L]}</div>`;
+     `<div class="src">Microsoft ML Building Footprints (2026) · מנהל התכנון · OSM. ${{ar:'المعيار: مبنى خارج كل الحدود المعترف بها، وعلى بُعد ≤2.5 كم من قرية مرشّحة أو داخل مجلسي نفيه مدبار/القسوم. تقدير أولي للتحقق.',he:'הכלל: מבנה מחוץ לכל גבול מוכר, ובמרחק ≤2.5 ק"מ מכפר מועמד או בתוך מ"א נווה מדבר/אל-קסום. אומדן ראשוני לאימות.',en:'Rule: building outside every recognized limit and ≤2.5 km from a candidate village or inside the Neve Midbar / al-Kasum councils. Preliminary estimate, to be verified.'}[L]}</div>`+landGap();
   }
   if(key==='housing'){
     const c=tlCounts(2024), A=S&&S.by_group.arab, Jw=S&&S.by_group.jewish;
@@ -738,7 +752,12 @@ function chapterCard(key){
     return leg([['background:#8a8a86',{ar:'بلدة يهودية (تظهر بسنة تأسيسها)',he:'יישוב יהודי (מופיע בשנת הייסוד)',en:'Jewish locality (appears in its founding year)'}],['background:repeating-linear-gradient(45deg,#e9e6df 0 1.5px,transparent 1.5px 5px);outline:1px solid #e9e6df',{ar:'بلدة عربية (موجودة قبل 1948)',he:'יישוב ערבי (קיים לפני 1948)',en:'Arab locality (pre-1948)'}],['background:repeating-linear-gradient(45deg,#e9e6df 0 1.5px,transparent 1.5px 5px);outline:2px solid #e8452c',{ar:'بلدة تركيز بدوية',he:'יישוב ריכוז בדואי',en:'Bedouin concentration town'}],['border:2px solid #fff',{ar:'جديدة في هذه السنة',he:'חדש בשנה זו',en:'new this year'}]])+
      big([[c.j,CHT('tlJ'),0],[c.a,CHT('tlA'),1],[c.b,CHT('tlB'),1]])+T3[L]+
      big([[f(dA),{ar:'مبنى/كم² — بلدات عربية بالنقب',he:'מבנים לקמ"ר — ערביים בנגב',en:'buildings/km² — Arab, Naqab'}[L],1],[f(dJ),{ar:'مبنى/كم² — بلدات يهودية بالنقب',he:'מבנים לקמ"ר — יהודיים בנגב',en:'buildings/km² — Jewish, Naqab'}[L],0]])+
-     `<div class="src">הלמ"ס, קובץ יישובים 2024 · Microsoft footprints · ${{ar:'سنوات بلدات التركيز من مصادر تاريخية؛ قرى أبو بسمة تقريبية (~2004). البلدات العربية بلا سنة في הלמ"ס اعتُبرت قبل 1948.',he:'שנות יישובי הריכוז ממקורות היסטוריים; כפרי אבו בסמה בקירוב (~2004). יישובים ערביים ללא שנה בלמ"ס נחשבו לפני 1948.',en:'Township years from historical sources; Abu Basma villages approximate (~2004). Arab localities without a CBS year treated as pre-1948.'}[L]}</div>`;
+     `<div class="src">הלמ"ס, קובץ יישובים 2024 · Microsoft footprints · ${{ar:'سنوات بلدات التركيز من مصادر تاريخية؛ قرى أبو بسمة تقريبية (~2004). البلدات العربية بلا سنة في הלמ"ס اعتُبرت قبل 1948.',he:'שנות יישובי הריכוז ממקורות היסטוריים; כפרי אבו בסמה בקירוב (~2004). יישובים ערביים ללא שנה בלמ"ס נחשבו לפני 1948.',en:'Township years from historical sources; Abu Basma villages approximate (~2004). Arab localities without a CBS year treated as pre-1948.'}[L]}</div>`+
+     gapCard({q:{ar:'كم بلدة جديدة أُقيمت في البلاد منذ 1948؟',he:'כמה יישובים חדשים הוקמו בארץ מאז 1948?',en:'How many new localities have been founded in the country since 1948?'},
+       a:{l:{ar:'عربية — كلها بلدات تركيز بدوية خطّطتها الدولة',he:'ערביים — כולם יישובי ריכוז בדואיים שתכננה המדינה',en:'Arab — all of them Bedouin concentration towns planned by the state'},v:c.a+c.b},
+       j:{l:{ar:'يهودية',he:'יהודיים',en:'Jewish'},v:c.j},unit:'',x:ratio(c.j,c.a+c.b),
+       xl:{ar:`ضعف — ولم تُقَم ولا بلدة عربية واحدة خارج سياسة التركيز (${c.a})`,he:`פעמים — ולא הוקם אף יישוב ערבי אחד מחוץ למדיניות הריכוז (${c.a})`,en:`times — and not one Arab locality outside the concentration policy (${c.a})`},
+       src:tr3({ar:'الدائرة المركزية للإحصاء — ملف البلدات 2024 (سنة التأسيس). المدن المختلطة غير محسوبة.',he:'הלמ"ס — קובץ יישובים 2024 (שנת ייסוד). ערים מעורבות לא נספרו.',en:'CBS localities file 2024 (founding year). Mixed cities not counted.'})});
   }
   if(key==='economy'){
     const g=grp=>DATA.ind.features.filter(x=>x.properties.grp===grp), km=fs=>fs.reduce((s,x)=>s+(+x.properties.BRUTOAREA||0),0)/1e6, A=g('arab'),Jw=g('jewish');

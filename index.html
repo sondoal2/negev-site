@@ -435,8 +435,9 @@ async function loadData(){
   grid.features.forEach((f,i)=>{ if(gridD[i]!=null) f.properties.d=gridD[i]; });
   // 05 — schools / clinics (scripts/services_access.py) and bagrut (scripts/cbs_education.py)
   const [svc, svcPts, gridS, bagrut] = await Promise.all([get('services_access.json').catch(()=>null), opt('services_points.geojson'), get('grid_svcdist.json').catch(()=>({})), get('bagrut.json').catch(()=>null)]);
-  grid.features.forEach((f,i)=>{ const a=(gridS.school||[])[i], c=(gridS.clinic||[])[i]; if(a!=null) f.properties.ds=a; if(c!=null) f.properties.dc=c; });
-  return {svc, svcPts, bagrut, access, stops, nat, routes,frames, israel, cbs, grid, bsum, transit, ind, indBld, istats, tprof, jew11, arab7, nafa, negevGeom, loc:{type:'FeatureCollection',features:loc}, rc:{type:'FeatureCollection',features:rc},
+  grid.features.forEach((f,i)=>{ const a=(gridS.school||[])[i], c=(gridS.clinic||[])[i], sp=(gridS.sport||[])[i]; if(a!=null) f.properties.ds=a; if(c!=null) f.properties.dc=c; if(sp!=null) f.properties.dsp=sp; });
+  const [sportPts, sport] = await Promise.all([opt('sport_facilities.geojson'), get('sport_stats.json').catch(()=>null)]);
+  return {sportPts, sport, svc, svcPts, bagrut, access, stops, nat, routes,frames, israel, cbs, grid, bsum, transit, ind, indBld, istats, tprof, jew11, arab7, nafa, negevGeom, loc:{type:'FeatureCollection',features:loc}, rc:{type:'FeatureCollection',features:rc},
           unrec:{type:'FeatureCollection',features:unrec}, demo:{type:'FeatureCollection',features:demo}};
 }
 
@@ -487,7 +488,7 @@ const LAYERMAP = {
   arab:['loc-arab-fill','loc-arab-line','loc-arab-lbl'], jew:['loc-jew-line','loc-jew-lbl'], ind:['loc-ind'], rc:['rc-line'],
   unrec:['un-cluster','un-count','un-pt','un-lbl'], demo:['demo-halo','demo-pt'],
   indJ:['ind-j-fill','ind-j-line'], indA:['ind-a-fill','ind-a-line'], arab7:['arab7-line'],
-  grid:['grid-fill'], frames:['frames-fill','frames-line','frames-line-e','frames-lbl','bld-u','bld-e','bld-e-line'], mask2:['mask2'], nat:['nat-arab','nat-arab-line','nat-jew','nat-new','nat-bt'], routes:['rt-line','rt-miss','rt-miss-lbl'], cbs:['cbs-pt','cbs-new'], transit:['tr-circ','tr-num','tr-name','tr-dest','tr-dest-lbl'], access:['acc-grid','acc-bld','acc-stop'], svc:['svc-grid','svc-school','svc-clinic'], econ:['econ-link','econ-link-lbl','econ-sq','econ-zero','econ-num','econ-name'],
+  grid:['grid-fill'], frames:['frames-fill','frames-line','frames-line-e','frames-lbl','bld-u','bld-e','bld-e-line'], mask2:['mask2'], nat:['nat-arab','nat-arab-line','nat-jew','nat-new','nat-bt'], routes:['rt-line','rt-miss','rt-miss-lbl'], cbs:['cbs-pt','cbs-new'], transit:['tr-circ','tr-num','tr-name','tr-dest','tr-dest-lbl'], access:['acc-grid','acc-bld','acc-stop'], svc:['svc-grid','svc-sport-l','svc-sport','svc-school','svc-clinic'], econ:['econ-link','econ-link-lbl','econ-sq','econ-zero','econ-num','econ-name'],
   jew11:['jew11-line'], indBld:['indbld-fill'],
   xplan:['live-xplan'], landuse:['live-landuse'], tmm:['live-tmm'], vatmal:['live-vatmal']
 };
@@ -572,6 +573,12 @@ map.once('style.load', async ()=>{
   map.addSource('svc',{type:'geojson',data:DATA.svcPts});
   map.addLayer({id:'svc-school',type:'circle',source:'svc',filter:['in',['get','k'],['literal',['e','h','o']]],layout:{visibility:'none'},paint:{'circle-color':['match',['get','k'],'e','#e9e6df','#000'],'circle-stroke-color':'#e9e6df','circle-stroke-width':1.5,
     'circle-radius':['interpolate',['linear'],['zoom'],8,2.5,12,6]}});
+  // sports: full facilities (halls, pitches, pools) as bone rings; street fitness / other as faint dots (not counted)
+  map.addSource('sport',{type:'geojson',data:DATA.sportPts});
+  map.addLayer({id:'svc-sport-l',type:'circle',source:'sport',minzoom:11,filter:['==',['get','k'],'l'],layout:{visibility:'none'},paint:{'circle-color':'#5a5a55','circle-radius':2.5}});
+  map.addLayer({id:'svc-sport',type:'circle',source:'sport',filter:['==',['get','k'],'f'],layout:{visibility:'none'},paint:{'circle-color':'rgba(0,0,0,0)','circle-stroke-color':'#e9e6df','circle-stroke-width':1.8,
+    'circle-radius':['interpolate',['linear'],['zoom'],8,2.5,12,6]}});
+  map.on('click','svc-sport',e=>{const p=e.features[0].properties;new maplibregl.Popup().setLngLat(e.lngLat).setHTML(`<div class="card"><div class="hd grey">${p.nm||'—'}</div><div class="bd">${p.type}<br>${p.loc}<div class="src">משרד התרבות והספורט · מאגר מתקני ספורט (data.gov.il, 2021)</div></div></div>`).addTo(map);});
   map.addLayer({id:'svc-clinic',type:'symbol',source:'svc',filter:['==',['get','k'],'c'],layout:{visibility:'none','text-field':'+','text-font':['Noto Sans Bold'],'text-size':['interpolate',['linear'],['zoom'],8,14,12,22],'text-allow-overlap':true},paint:{'text-color':'#fff','text-halo-color':'#000','text-halo-width':2}});
   map.on('click','svc-grid',e=>{const p=e.features[0].properties;new maplibregl.Popup().setLngLat(e.lngLat).setHTML(`<div class="card"><div class="hd">${CHT('svcCell')}</div><div class="bd"><b>${(+p.ds).toLocaleString()} m</b>${CHT('accMedian')} · ${p.n} ${CHT('houses')}${p.dc!=null?`<br>${CHT('svcClinic')}: ${(+p.dc).toLocaleString()} m*`:''}<div class="src">משרד החינוך · data.gov.il · OSM (*${CHT('svcOsm')})</div></div></div>`).addTo(map);});
   map.on('click','svc-school',e=>{const p=e.features[0].properties;new maplibregl.Popup().setLngLat(e.lngLat).setHTML(`<div class="card"><div class="hd bone">${p.nm}</div><div class="bd">${p.loc}<div class="src">משרד החינוך · מוסדות חינוך (data.gov.il)</div></div></div>`).addTo(map);});
@@ -861,6 +868,24 @@ function chapterCard(key){
      `<div class="src">משרד התחבורה · GTFS · ${DATA.transit?DATA.transit.date:''}. ${{ar:'تُحسب المحطات داخل حدود البلدة فقط؛ محطات على الشارع الرئيسي خارج الحدود غير محسوبة.',he:'נספרות תחנות בתוך גבול היישוב בלבד; תחנות בכביש הראשי מחוץ לגבול אינן נספרות.',en:'Only stops inside the locality limit are counted; stops on the highway outside the limit are not.'}[L]}</div>`+
      accessBlock();
   }
+  // 05b — sports halls, pitches, pools per young people + distance from village homes
+  const sportBlock=()=>{ const SP=DATA.sport, V=DATA.svc&&DATA.svc.sport; if(!SP) return '';
+    const T=[...SP.towns].filter(r=>r.per_1000_youth!=null).sort((a,b)=>b.per_1000_youth-a.per_1000_youth), G=SP.groups;
+    const src=tr3({ar:'وزارة الثقافة والرياضة — سجل المنشآت الرياضية (data.gov.il، 2021)، استخراج: عضوة في الفريق. نُظّف: 18 نقطة بمكان خاطئ و31 منشأة غير فعّالة حُذفت؛ تُعدّ القاعات والملاعب والبرك فقط (أجهزة اللياقة في الشارع و«أخرى» على الخريطة دون عدّ). الشباب 6–18: جدول الزميلة من سجل السكان. scripts/sport_clean.py',
+      he:'משרד התרבות והספורט — מאגר מתקני ספורט (data.gov.il, 2021), חילוץ: חברת צוות. ניקוי: 18 נקודות במיקום שגוי ו-31 מתקנים לא פעילים הוסרו; נספרים רק אולמות, מגרשים ובריכות (מתקני כושר ברחוב ו"אחר" במפה בלי ספירה). בני 6–18: טבלת חברת הצוות ממרשם האוכלוסין. scripts/sport_clean.py',
+      en:'Ministry of Culture & Sport — sports facilities register (data.gov.il, 2021), extracted by a team member. Cleaned: 18 mis-located points and 31 inactive facilities removed; only halls, pitches/courts and pools are counted (street fitness and "other" shown on the map, not counted). Youth 6–18: the team member\'s population-registry table. scripts/sport_clean.py'});
+    return `<h4>${tr3({ar:'قاعات وملاعب وبرك لكل 1,000 شاب (6–18)',he:'אולמות, מגרשים ובריכות לכל 1,000 בני 6–18',en:'Sports halls, pitches and pools per 1,000 young people (6–18)'})}</h4>`+
+     bars(T.map(r=>({label:r[L]||r.en,v:r.per_1000_youth,grp:r.grp})),T[0].per_1000_youth)+
+     (V?`<p class="note2">${tr3({ar:`في البلدات المعترف بها الملعب قريب غالباً، لكنه مزدحم: عدد المنشآت لكل شاب أقل بكثير. في القرى غير المعترف بها لا يوجد شيء قريب أصلاً: ${V.groups.unrec.pct_lt1k}% فقط من البيوت على بُعد 1 كم من قاعة أو ملعب (الوسيط ${V.groups.unrec.median_m.toLocaleString()} م).`,
+        he:`ביישובים המוכרים המגרש לרוב קרוב, אבל צפוף: הרבה פחות מתקנים לכל צעיר. בכפרים הלא מוכרים אין דבר קרוב בכלל: רק ${V.groups.unrec.pct_lt1k}% מהבתים עד 1 ק"מ מאולם או מגרש (חציון ${V.groups.unrec.median_m.toLocaleString()} מ׳).`,
+        en:`In recognized towns a pitch is usually close but crowded: far fewer facilities per young person. In the unrecognized villages there is nothing close at all: only ${V.groups.unrec.pct_lt1k}% of homes are within 1 km of a hall or pitch (median ${V.groups.unrec.median_m.toLocaleString()} m).`})}</p>`:'')+
+     `<div class="src">${src}</div>`+
+     gapCard({q:{ar:'لكل 1,000 شاب (6–18): كم قاعة أو ملعب أو بركة؟',he:'לכל 1,000 בני 6–18: כמה אולמות, מגרשים או בריכות?',en:'Per 1,000 young people (6–18): how many sports halls, pitches or pools?'},
+       a:{l:{ar:`${G.arab_towns.towns} بلدات عربية`,he:`${G.arab_towns.towns} יישובים ערביים`,en:`${G.arab_towns.towns} Arab towns`},v:G.arab_towns.per_1000_youth},
+       j:{l:{ar:`${G.jewish_towns.towns} بلدة يهودية`,he:`${G.jewish_towns.towns} יישובים יהודיים`,en:`${G.jewish_towns.towns} Jewish towns`},v:G.jewish_towns.per_1000_youth},unit:'',
+       x:ratio(G.jewish_towns.per_1000_youth,G.arab_towns.per_1000_youth),
+       xl:V?{ar:`ضعف — وفي القرى غير المعترف بها ${V.groups.unrec.pct_lt1k}% من البيوت على بُعد 1 كم من منشأة، مقابل ${V.groups.jewish_towns.pct_lt1k}% في البلدات اليهودية`,he:`פעמים — ובכפרים הלא מוכרים ${V.groups.unrec.pct_lt1k}% מהבתים עד 1 ק"מ ממתקן, לעומת ${V.groups.jewish_towns.pct_lt1k}% ביישובים היהודיים`,en:`times — and in the unrecognized villages ${V.groups.unrec.pct_lt1k}% of homes are within 1 km of a facility, vs ${V.groups.jewish_towns.pct_lt1k}% in Jewish towns`}:{ar:'ضعف',he:'פעמים',en:'times'},
+       src:tr3({ar:'وزارة الثقافة والرياضة (data.gov.il، 2021) · عضوة في الفريق',he:'משרד התרבות והספורט (data.gov.il, 2021) · חברת צוות',en:'Ministry of Culture & Sport (data.gov.il, 2021) · team member'})}); };
   if(key==='services'){
     const V=DATA.svc, B=DATA.bagrut; if(!V) return '';
     const G=V.school.groups, nJ=G.jewish_towns.towns;
@@ -879,13 +904,14 @@ function chapterCard(key){
     const srcBag=B?tr3({ar:`الدائرة المركزية للإحصاء، «السلطات المحلية في إسرائيل 2023» (منشور 1987)، ملف كل سلطة؛ بيانات التعليم ${B.year} مصدرها وزارة التربية. المتوسطات موزونة بعدد السكان. scripts/cbs_education.py`,
       he:`הלמ"ס, "הרשויות המקומיות בישראל 2023" (פרסום 1987), פרופיל לכל רשות; נתוני החינוך ${B.year} ממשרד החינוך. ממוצעים משוקללים באוכלוסייה. scripts/cbs_education.py`,
       en:`CBS, "Local Authorities in Israel 2023" (publication 1987), one profile per authority; education data ${B.year} from the Ministry of Education. Averages weighted by population. scripts/cbs_education.py`}):'';
-    return leg([...SEG.map(([k,c,l])=>[`background:${c}`,{ar:l,he:l,en:l}]),['background:#e9e6df;border:1px solid #000;border-radius:50%',{ar:'مدرسة ابتدائية',he:'בי"ס יסודי',en:'elementary school'}],['background:#000;border:1px solid #e9e6df;border-radius:50%',{ar:'مدرسة ثانوية/أخرى',he:'תיכון/אחר',en:'secondary/other school'}],['border:1px dashed #000',{ar:'+ عيادة (OSM)',he:'+ מרפאה (OSM)',en:'+ clinic (OSM)'}]])+
+    return leg([...SEG.map(([k,c,l])=>[`background:${c}`,{ar:l,he:l,en:l}]),['background:#e9e6df;border:1px solid #000;border-radius:50%',{ar:'مدرسة ابتدائية',he:'בי"ס יסודי',en:'elementary school'}],['background:#000;border:1px solid #e9e6df;border-radius:50%',{ar:'مدرسة ثانوية/أخرى',he:'תיכון/אחר',en:'secondary/other school'}],['border:2px solid #000;border-radius:50%',{ar:'قاعة/ملعب/بركة',he:'אולם/מגרש/בריכה',en:'sports hall/pitch/pool'}],['border:1px dashed #000',{ar:'+ عيادة (OSM)',he:'+ מרפאה (OSM)',en:'+ clinic (OSM)'}]])+
      T3[L]+
      `<h4>${tr3({ar:'كم تبعد أقرب مدرسة ابتدائية عن البيت؟',he:'כמה רחוק בית הספר היסודי הקרוב?',en:'How far is the nearest elementary school?'})}</h4>`+
      `<div class="stk">${stack({ar:'قرى غير معترف بها',he:'כפרים לא מוכרים',en:'Unrecognized villages'},G.unrec)}${stack({ar:'بيوت خارج الخط الأزرق',he:'בתים מחוץ לקו הכחול',en:'Beyond the blue line'},G.expansion)}${stack({ar:`${G.arab_towns.towns} بلدات عربية`,he:`${G.arab_towns.towns} יישובים ערביים`,en:`${G.arab_towns.towns} Arab towns`},G.arab_towns)}${stack({ar:`${nJ} بلدات يهودية`,he:`${nJ} יישובים יהודיים`,en:`${nJ} Jewish towns`},G.jewish_towns)}</div>`+
      `<h4>${tr3({ar:'نسبة البيوت على بُعد أقل من 1 كم من مدرسة ابتدائية',he:'שיעור הבתים עד 1 ק"מ מבית ספר יסודי',en:'Share of homes within 1 km of an elementary school'})}</h4>`+
      bars([{label:`<b>${tr3({ar:'قرى غير معترف بها',he:'כפרים לא מוכרים',en:'Unrecognized villages'})}</b>`,v:G.unrec.pct_lt1k,grp:'red'},...TS.map(r=>({label:r[L]||r.en,v:r.pct_lt1k,grp:r.grp}))],100,'%')+
      `<div class="src">${srcSchool}</div>`+
+     sportBlock()+
      `<div class="todo">${tr3({ar:`العيادات: في OSM ${V.counts.clinics} نقطة صحية فقط في المنطقة، وكثير من عيادات القرى وصناديق المرضى غير مرسوم. لذلك تظهر العيادات على الخريطة (+) لكننا لا نحسب منها فجوة. المطلوب: قائمة عيادات وزارة الصحة وصناديق المرضى مع عناوين.`,he:`מרפאות: ב-OSM יש רק ${V.counts.clinics} נקודות בריאות באזור, ומרפאות רבות בכפרים ובקופות לא ממופות. לכן המרפאות מוצגות במפה (+) אבל לא מחושב מהן פער. נדרש: רשימת מרפאות משרד הבריאות והקופות עם כתובות.`,en:`Clinics: OSM has only ${V.counts.clinics} health points in the area and many village and HMO clinics are unmapped, so clinics are shown on the map (+) but no gap is computed from them. Needed: Ministry of Health / HMO clinic list with addresses.`})}</div>`+
      (B?`<h4>${tr3({ar:'البجروت: نسبة المستحقين الذين يستوفون شروط القبول في الجامعة، من طلاب الصف 12',he:'בגרות: זכאים העומדים בדרישות הסף של האוניברסיטאות, מתוך תלמידי יב',en:'Bagrut meeting university entrance thresholds, % of 12th graders'})} · ${B.year}</h4>`+
        bars(BR.map(r=>({label:r[L]||r.en,v:r.bagrut_univ,grp:r.grp==='arab_council'?'red':r.grp,note:` <small>/ ${r.bagrut}</small>`})),100,tr3({ar:'الرقم الصغير = نسبة الاستحقاق للبجروت عامةً. الأحمر = المجلسان الإقليميان البدويان (مدارس القرى غير المعترف بها وقرى أبو بسمة).',he:'המספר הקטן = שיעור הזכאות לבגרות בכלל. אדום = שתי המועצות האזוריות הבדואיות (בתי הספר של הכפרים הלא מוכרים וכפרי אבו בסמה).',en:'Small number = general bagrut eligibility. Red = the two Bedouin regional councils (schools of the unrecognized and Abu Basma villages).'}))+
@@ -989,7 +1015,17 @@ const FRAMES={
        sides:{a:{ar:'7 بلدات عربية',he:'7 יישובים ערביים',en:'7 Arab towns'},j:{ar:'11 بلدة يهودية',he:'11 יישובים יהודיים',en:'11 Jewish towns'}},
        q:{ar:'من كل 100 طالب صف 12 — كم واحد يخرج ببجروت تكفي للجامعة؟',he:'מכל 100 תלמידי יב — כמה יוצאים עם בגרות שמספיקה לאוניברסיטה?',en:'Of every 100 twelfth-graders — how many leave with a bagrut good enough for university?'},
        unit:{ar:'من 100 طالب',he:'מתוך 100 תלמידים',en:'of 100 pupils'},cap:{ar:'بجروت تكفي للجامعة',he:'בגרות לאוניברסיטה',en:'university-level bagrut'},
-       src:{ar:`الدائرة المركزية للإحصاء، السلطات المحلية 2023 · وزارة التربية ${B.year} · موزون بعدد السكان`,he:`הלמ"ס, הרשויות המקומיות 2023 · משרד החינוך ${B.year} · משוקלל באוכלוסייה`,en:`CBS, Local Authorities 2023 · Ministry of Education ${B.year} · population-weighted`}}):[])]; },
+       src:{ar:`الدائرة المركزية للإحصاء، السلطات المحلية 2023 · وزارة التربية ${B.year} · موزون بعدد السكان`,he:`הלמ"ס, הרשויות המקומיות 2023 · משרד החינוך ${B.year} · משוקלל באוכלוסייה`,en:`CBS, Local Authorities 2023 · Ministry of Education ${B.year} · population-weighted`}}):[]),
+     ...(DATA.sport?fillFrames({kind:'court',cells:50,a:DATA.sport.groups.arab_towns.per_1000_youth*10,j:DATA.sport.groups.jewish_towns.per_1000_youth*10,steps:8,dec:0,
+       sides:{a:{ar:'7 بلدات عربية',he:'7 יישובים ערביים',en:'7 Arab towns'},j:{ar:'11 بلدة يهودية',he:'11 יישובים יהודיים',en:'11 Jewish towns'}},
+       q:{ar:'لكل 10,000 شاب (6–18) — كم قاعة رياضة أو ملعب أو بركة؟',he:'לכל 10,000 בני 6–18 — כמה אולמות ספורט, מגרשים או בריכות?',en:'For every 10,000 young people (6–18) — how many sports halls, pitches or pools?'},
+       unit:{ar:'قاعة/ملعب/بركة',he:'אולמות/מגרשים/בריכות',en:'halls/pitches/pools'},cap:{ar:'منشآت رياضية لكل 10,000 شاب',he:'מתקני ספורט לכל 10,000 צעירים',en:'sports facilities per 10,000 young people'},
+       src:{ar:'وزارة الثقافة والرياضة — سجل المنشآت (data.gov.il، 2021) · عضوة في الفريق · بعد التنظيف',he:'משרד התרבות והספורט — מאגר מתקנים (data.gov.il, 2021) · חברת צוות · אחרי ניקוי',en:'Ministry of Culture & Sport register (data.gov.il, 2021) · team member · cleaned'}}):[]),
+     ...(DATA.svc&&DATA.svc.sport?fillFrames({kind:'home',a:DATA.svc.sport.groups.unrec.pct_lt1k,j:DATA.svc.sport.groups.jewish_towns.pct_lt1k,steps:10,dec:0,
+       sides:{a:{ar:'قرى غير معترف بها',he:'כפרים לא מוכרים',en:'Unrecognized villages'},j:{ar:'بلدات يهودية',he:'יישובים יהודיים',en:'Jewish towns'}},
+       q:{ar:'من كل 100 بيت — كم بيت عنده قاعة أو ملعب على بُعد أقل من 1 كم؟',he:'מכל 100 בתים — לכמה יש אולם או מגרש עד 1 ק"מ?',en:'Of every 100 homes — how many have a sports hall or pitch within 1 km?'},
+       unit:{ar:'من 100 بيت',he:'מתוך 100 בתים',en:'of 100 homes'},cap:{ar:'ملعب/قاعة على بُعد 1 كم',he:'מגרש/אולם עד 1 ק"מ',en:'hall/pitch within 1 km'},
+       src:{ar:'وزارة الثقافة والرياضة (2021) · بصمات Microsoft · OSM',he:'משרד התרבות והספורט (2021) · Microsoft · OSM',en:'Ministry of Culture & Sport (2021) · Microsoft footprints · OSM'}}):[])]; },
  // 05: camera fixed; disadvantage layers stack up
  violence:()=>{ const st=(o)=>()=>{Object.assign(state,{grid:false,frames:false,indJ:false,indA:false,transit:false,access:false,unrec:false},o);applyState();};
    return [
@@ -1042,7 +1078,7 @@ function fillFrames(c){ const N=c.steps||10, out=[];
     out.push({hold:fin?5:1,cap:`<b>${fin?'×'+xN(c.j,c.a):Math.round(t*100)+'%'}</b>${T4(c.cap)}`,apply:()=>showFill(c,t,fin)}); }
   return out; }
 const xN=(hi,lo)=>{ if(!lo) return '∞'; const r=hi/lo; return r>=10?Math.round(r):r.toFixed(1); };
-function unitsHTML(kind,v,v2,cls){
+function unitsHTML(kind,v,v2,cls,cells=100){
   const full=Math.floor(v+1e-9), part=v-full;
   if(kind==='pitch'){ const one=f=>`<svg viewBox="0 0 105 68" class="pitch"><rect x="0.8" y="0.8" width="103.4" height="66.4" fill="none" stroke="#5a5a55" stroke-width="1.6" stroke-dasharray="3 3"/>`+
       `<svg x="0" y="0" width="${(105*f).toFixed(1)}" height="68"><rect x="0" y="0" width="105" height="68" fill="#f2c230"/><g fill="none" stroke="#000" stroke-width="1.6"><rect x="1" y="1" width="103" height="66"/><path d="M52.5 1v66"/><circle cx="52.5" cy="34" r="9"/></g></svg></svg>`;
@@ -1050,12 +1086,12 @@ function unitsHTML(kind,v,v2,cls){
   if(kind==='coin') return `<div class="coins">${[...Array(full)].map(()=>'<i>₪</i>').join('')}${part>.15?'<i class="pt">₪</i>':''}</div>`;
   // home / pupil: a 10×10 grid of identical units
   const n=Math.round(v), n2=Math.round(v2||0);
-  return `<div class="hund ${kind}">${[...Array(100).keys()].map(k=>`<i class="${k<n?'u':k<n2?'b':''}"></i>`).join('')}</div>`;
+  return `<div class="hund ${kind}" style="${cells!==100?'aspect-ratio:2':''}">${[...Array(cells).keys()].map(k=>`<i class="${k<n?'u':k<n2?'b':''}"></i>`).join('')}</div>`;
 }
 function showFill(c,t,fin){
   const top=Math.max(c.a,c.j), sv=v=>Math.min(v,t*top), d=v=>(+v).toFixed(c.dec||0);
   const side=(k,cls)=>{ const v=c[k], s=fin?v:sv(v), s2=c[k+'2']!=null?(fin?c[k+'2']:Math.min(c[k+'2'],t*Math.max(c.a2||0,c.j2||0))):null;
-    return `<div class="pn ${cls}"><div class="ph"><b>${T4(c.sides[k])}</b></div>${unitsHTML(c.kind,s,s2,cls)}`+
+    return `<div class="pn ${cls}"><div class="ph"><b>${T4(c.sides[k])}</b></div>${unitsHTML(c.kind,s,s2,cls,c.cells||100)}`+
       `<div class="pv"><b>${d(s)}</b><span>${T4(c.unit)}${c.kind==='pupil'&&s2!=null?`<br>${Math.round(s2)} ${T4({ar:'معهم بجروت عامةً (المخطّط)',he:'עם בגרות כלשהי (מקווקו)',en:'with any bagrut (hatched)'})}`:''}</span></div></div>`; };
   pairsShow(pq(c.q)+`<div class="pp">${side('a','a')}${side('j','j')}</div>`+
     (fin?`<div class="pf"><span class="x">×${xN(c.j,c.a)}</span><span>${T4({ar:'الفرق بين الجهتين',he:'הפער בין שני הצדדים',en:'the gap between the two sides'})}</span></div>`:'')+
@@ -1209,6 +1245,7 @@ function renderAbout(){
     <tr><td>Ministry of Transport — GTFS (served stops only) · Microsoft footprints</td><td>Straight-line distance from every off-map house and every town building to the nearest bus stop with a weekday trip (ch. 04)</td></tr>
     <tr><td>Ministry of Education — institutions + coordinates (data.gov.il)</td><td>Distance from every home to the nearest active elementary school (ch. 05)</td></tr>
     <tr><td>CBS — Local Authorities in Israel 2023 (publ. 1987)</td><td>Bagrut 2022/23 per town and Bedouin regional council, source Ministry of Education (ch. 05)</td></tr>
+    <tr><td>Ministry of Culture & Sport — sports facilities register (data.gov.il #408, 2021), extracted by a team member</td><td>Sports halls, pitches and pools per young person and distance from village homes (ch. 05); cleaned in scripts/sport_clean.py</td></tr>
     <tr><td>OpenStreetMap — health facilities</td><td>Clinics on the map only; too incomplete for a gap figure (ch. 05)</td></tr>
     <tr><td>Team ArcGIS layers</td><td>Arab / Jewish industrial zones 2022 (ch. 03)</td></tr>
     <tr><td>Ministry of Interior — audited municipal financial reports 2024</td><td>Own revenue, business arnona, budget self-reliance per town (ch. 03)</td></tr>

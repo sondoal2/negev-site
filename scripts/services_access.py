@@ -16,8 +16,8 @@ Method (same building sets and town cores as transit_access.py)
   * Straight-line distance from each building centroid. Classes: <500 m, 0.5-1 km, 1-3 km, >3 km.
 Outputs (data/)
   services_points.geojson   schools (k = e elementary, h high school, o other) and clinics (k = c) in the subdistrict
-  services_access.json      shares per group and per town, for 'school' and 'clinic'
-  grid_svcdist.json         {school:[...], clinic:[...]} median distance per cell of bld_offmap_grid.geojson
+  services_access.json      shares per group and per town, for 'school', 'clinic' and 'sport' (if sport_facilities.geojson exists)
+  grid_svcdist.json         {school:[...], clinic:[...], sport:[...]} median distance per cell of bld_offmap_grid.geojson
 """
 import json, sys, os, math, gzip, glob, statistics, urllib.request, urllib.parse
 msb_dir, raw_dir, data_dir = sys.argv[1:4]
@@ -96,6 +96,11 @@ def index(pts):
             r += 1
     return near_m
 NEAR = {'school': index([s for s in schools if s['k'] == 'e']), 'clinic': index(clinics)}
+# full sports facilities (halls, pitches/courts, pools, stadiums) cleaned by sport_clean.py
+sp = os.path.join(data_dir, 'sport_facilities.geojson')
+if os.path.exists(sp):
+    sport = [{'x': f['geometry']['coordinates'][0], 'y': f['geometry']['coordinates'][1]} for f in J('sport_facilities.geojson')['features'] if f['properties']['k'] == 'f']
+    NEAR['sport'] = index(sport); print('sports facilities (full)', len(sport))
 CLS = [(500, 'lt500'), (1000, 'm500_1k'), (3000, 'k1_3'), (1e12, 'gt3k')]
 def summary(ds):
     n = len(ds); c = {k: 0 for _, k in CLS}

@@ -1,0 +1,243 @@
+{
+ "source": "Ministry of Culture & Sport facilities register, data.gov.il #408 (25.7.2021), extracted by a team member; youth 6-18 from the team member's population-registry table",
+ "cleaning": {
+  "inactive": 31,
+  "outside": 18
+ },
+ "groups": {
+  "arab_towns": {
+   "towns": 7,
+   "full": 80,
+   "youth": 67594,
+   "per_1000_youth": 1.18
+  },
+  "jewish_towns": {
+   "towns": 11,
+   "full": 459,
+   "youth": 107307,
+   "per_1000_youth": 4.28
+  }
+ },
+ "towns": [
+  {
+   "key": "arad",
+   "grp": "jewish",
+   "ar": "عراد",
+   "he": "ערד",
+   "en": "Arad",
+   "full": 27,
+   "sites": 27,
+   "youth_6_18": 7902,
+   "per_1000_youth": 3.42
+  },
+  {
+   "key": "beer sheva",
+   "grp": "jewish",
+   "ar": "بئر السبع",
+   "he": "באר שבע",
+   "en": "Be'er Sheva",
+   "full": 168,
+   "sites": 156,
+   "youth_6_18": 41502,
+   "per_1000_youth": 4.05
+  },
+  {
+   "key": "dimona",
+   "grp": "jewish",
+   "ar": "ديمونا",
+   "he": "דימונה",
+   "en": "Dimona",
+   "full": 58,
+   "sites": 50,
+   "youth_6_18": 8328,
+   "per_1000_youth": 6.96
+  },
+  {
+   "key": "eilat",
+   "grp": "jewish",
+   "ar": "إيلات",
+   "he": "אילת",
+   "en": "Eilat",
+   "full": 98,
+   "sites": 91,
+   "youth_6_18": 10963,
+   "per_1000_youth": 8.94
+  },
+  {
+   "key": "lehavim",
+   "grp": "jewish",
+   "ar": "لهافيم",
+   "he": "להבים",
+   "en": "Lehavim",
+   "full": 10,
+   "sites": 10,
+   "youth_6_18": 1663,
+   "per_1000_youth": 6.01
+  },
+  {
+   "key": "meytar",
+   "grp": "jewish",
+   "ar": "ميتار",
+   "he": "מיתר",
+   "en": "Meitar",
+   "full": 13,
+   "sites": 10,
+   "youth_6_18": 3592,
+   "per_1000_youth": 3.62
+  },
+  {
+   "key": "mizpe ramon",
+   "grp": "jewish",
+   "ar": "متسبيه رامون",
+   "he": "מצפה רמון",
+   "en": "Mitzpe Ramon",
+   "full": 8,
+   "sites": 8,
+   "youth_6_18": 1199,
+   "per_1000_youth": 6.67
+  },
+  {
+   "key": "netivot",
+   "grp": "jewish",
+   "ar": "نتيفوت",
+   "he": "נתיבות",
+   "en": "Netivot",
+   "full": 25,
+   "sites": 24,
+   "youth_6_18": 16129,
+   "per_1000_youth": 1.55
+  },
+  {
+   "key": "ofakim",
+   "grp": "jewish",
+   "ar": "أوفاكيم",
+   "he": "אופקים",
+   "en": "Ofakim",
+   "full": 15,
+   "sites": 14,
+   "youth_6_18": 10993,
+   "per_1000_youth": 1.36
+  },
+  {
+   "key": "omer",
+   "grp": "jewish",
+   "ar": "عومر",
+   "he": "עומר",
+   "en": "Omer",
+   "full": 25,
+   "sites": 17,
+   "youth_6_18": 1868,
+   "per_1000_youth": 13.38
+  },
+  {
+   "key": "yeruham",
+   "grp": "jewish",
+   "ar": "يروحام",
+   "he": "ירוחם",
+   "en": "Yeruham",
+   "full": 12,
+   "sites": 12,
+   "youth_6_18": 3168,
+   "per_1000_youth": 3.79
+  },
+  {
+   "key": "arara negev",
+   "grp": "arab",
+   "ar": "عرعرة النقب",
+   "he": "ערערה בנגב",
+   "en": "Ar'ara BaNegev",
+   "full": 12,
+   "sites": 11,
+   "youth_6_18": 7419,
+   "per_1000_youth": 1.62
+  },
+  {
+   "key": "hura",
+   "grp": "arab",
+   "ar": "حورة",
+   "he": "חורה",
+   "en": "Hura",
+   "full": 16,
+   "sites": 16,
+   "youth_6_18": 7905,
+   "per_1000_youth": 2.02
+  },
+  {
+   "key": "kseifa",
+   "grp": "arab",
+   "ar": "كسيفة",
+   "he": "כסייפה",
+   "en": "Kuseife",
+   "full": 4,
+   "sites": 4,
+   "youth_6_18": 7461,
+   "per_1000_youth": 0.54
+  },
+  {
+   "key": "lakia",
+   "grp": "arab",
+   "ar": "اللقية",
+   "he": "לקיה",
+   "en": "Lakiya",
+   "full": 8,
+   "sites": 8,
+   "youth_6_18": 6120,
+   "per_1000_youth": 1.31
+  },
+  {
+   "key": "rahat",
+   "grp": "arab",
+   "ar": "رهط",
+   "he": "רהט",
+   "en": "Rahat",
+   "full": 28,
+   "sites": 28,
+   "youth_6_18": 25957,
+   "per_1000_youth": 1.08
+  },
+  {
+   "key": "shegev shalom",
+   "grp": "arab",
+   "ar": "شقيب السلام",
+   "he": "שגב שלום",
+   "en": "Segev Shalom",
+   "full": 3,
+   "sites": 3,
+   "youth_6_18": 4572,
+   "per_1000_youth": 0.66
+  },
+  {
+   "key": "tel sheva",
+   "grp": "arab",
+   "ar": "تل السبع",
+   "he": "תל שבע",
+   "en": "Tel Sheva",
+   "full": 9,
+   "sites": 9,
+   "youth_6_18": 8160,
+   "per_1000_youth": 1.1
+  },
+  {
+   "key": "al kasum",
+   "grp": "arab_council",
+   "ar": null,
+   "he": null,
+   "en": "al kasum",
+   "full": 5,
+   "sites": 5,
+   "youth_6_18": null,
+   "per_1000_youth": null
+  },
+  {
+   "key": "neve midbar",
+   "grp": "arab_council",
+   "ar": null,
+   "he": null,
+   "en": "neve midbar",
+   "full": 3,
+   "sites": 3,
+   "youth_6_18": null,
+   "per_1000_youth": null
+  }
+ ]
+}

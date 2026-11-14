@@ -496,7 +496,7 @@ map.once('style.load', async ()=>{
   // dim mask: world minus the Naqab
   const holes = (DATA.negevGeom.type==='Polygon'?[DATA.negevGeom.coordinates]:DATA.negevGeom.coordinates).map(p=>p[0]);
   map.addSource('mask',{type:'geojson',data:{type:'Feature',geometry:{type:'Polygon',coordinates:[[[-180,-85],[180,-85],[180,85],[-180,85],[-180,-85]],...holes]}}});
-  map.addLayer({id:'mask',type:'fill',source:'mask',paint:{'fill-color':'#000','fill-opacity':.62}});
+  map.addLayer({id:'mask',type:'fill',source:'mask',paint:{'fill-color':'#000','fill-opacity':.78}});
   map.addSource('negev',{type:'geojson',data:DATA.nafa});
   map.addLayer({id:'negev-edge',type:'line',source:'negev',paint:{'line-color':'#e9e6df','line-width':1.2,'line-opacity':.7}});
   // regional councils
@@ -1039,8 +1039,11 @@ document.querySelectorAll('#player .sp').forEach(b=>{ b.classList.toggle('on',+b
     document.querySelectorAll('#player .sp').forEach(x=>x.classList.toggle('on',x===b)); runTimer(); }; });
 document.addEventListener('keydown',e=>{ if(e.code==='Space'&&document.body.classList.contains('pl')&&e.target===document.body){e.preventDefault();plPlay.click();} });
 
+const LBL_BASE=['in',['get','class'],['literal',['city','town','village']]];
 function applyState(){
   if(!map.getLayer('mask')) return;
+  // the atlas is the Be'er Sheva subdistrict only: while the mask is on, base-map place names outside it (West Bank, Gaza, Sinai, Jordan) are hidden
+  if(map.getLayer('place-lbl')&&DATA&&DATA.negevGeom) map.setFilter('place-lbl',state.mask?['all',LBL_BASE,['within',{type:'Feature',geometry:DATA.negevGeom,properties:{}}]]:LBL_BASE);
   Object.entries(LAYERMAP).forEach(([k,ids])=>ids.forEach(id=>map.getLayer(id)&&map.setLayoutProperty(id,'visibility',state[k]?'visible':'none')));
   try{ localStorage.setItem('offmap-state',JSON.stringify(state)); }catch(e){}
 }

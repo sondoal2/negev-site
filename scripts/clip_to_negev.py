@@ -25,7 +25,11 @@ def in_ring(x, y, r):
     return ins
 g = J('negev_nafa.geojson')['features'][0]['geometry']
 PS = [g['coordinates']] if g['type'] == 'Polygon' else g['coordinates']
-def in_negev(x, y): return any(in_ring(x, y, p[0]) and not any(in_ring(x, y, h) for h in p[1:]) for p in PS)
+# The subdistrict polygon itself runs a little past the Green Line in the south Hebron hills (Shani/Livne, Masafer Yatta
+# hamlets such as Halaweh and al-Markaz stayed in). OSM's West Bank relation has gaps there, so the rule is explicit:
+# nothing north of 31.345 N between 34.95 and 35.30 E is counted (the northernmost Negev village there, Atir, is at 31.32 N).
+def beyond_green_line(x, y): return y > 31.345 and 34.95 <= x <= 35.30
+def in_negev(x, y): return not beyond_green_line(x, y) and any(in_ring(x, y, p[0]) and not any(in_ring(x, y, h) for h in p[1:]) for p in PS)
 
 # 1. buildings
 off = J('offmap_buildings.json'); keep = []; ring_of = []
@@ -66,7 +70,7 @@ S = J('buildings_summary.json')
 S['outside_recognized'] = len(keep)
 S['v2'].update({'houses': len(keep), 'unrecognized': sum(a[0] == 'u' for a in keep), 'expansion': sum(a[0] == 'e' for a in keep),
                 'osm': sum(a[1] == 'o' for a in keep), 'ms': sum(a[1] == 'm' for a in keep), 'clusters': len(fr['features']),
-                'clip': "centroid inside the Be'er Sheva subdistrict (West Bank buildings removed 2026-11-14)"})
+                'clip': "centroid inside the Be'er Sheva subdistrict and south of the Green Line band (West Bank buildings removed 2026-11-14)"})
 vb = len(S['villages']); S['villages'] = [v for v in S['villages'] if in_negev(v['lon'], v['lat'])]
 print('summary villages', vb, '->', len(S['villages']))
 json.dump(S, open(P('buildings_summary.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)

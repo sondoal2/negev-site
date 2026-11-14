@@ -10,13 +10,13 @@
  "school": {
   "groups": {
    "unrec": {
-    "n": 37529,
-    "pct_lt500": 4.6,
-    "pct_m500_1k": 9.8,
-    "pct_k1_3": 48.0,
-    "pct_gt3k": 37.5,
-    "pct_lt1k": 14.5,
-    "median_m": 2421
+    "n": 37128,
+    "pct_lt500": 4.7,
+    "pct_m500_1k": 9.9,
+    "pct_k1_3": 48.5,
+    "pct_gt3k": 36.9,
+    "pct_lt1k": 14.6,
+    "median_m": 2396
    },
    "expansion": {
     "n": 7876,
@@ -324,13 +324,13 @@
  "clinic": {
   "groups": {
    "unrec": {
-    "n": 37529,
+    "n": 37128,
     "pct_lt500": 0.0,
     "pct_m500_1k": 0.0,
-    "pct_k1_3": 7.1,
-    "pct_gt3k": 92.9,
+    "pct_k1_3": 7.2,
+    "pct_gt3k": 92.8,
     "pct_lt1k": 0.0,
-    "median_m": 6784
+    "median_m": 6816
    },
    "expansion": {
     "n": 7876,

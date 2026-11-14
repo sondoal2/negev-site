@@ -34,7 +34,7 @@ Compare view → "Mark demolished building" → click vertices, double-click to 
 | 05 | Education & services | MoE institutions + coordinates (data.gov.il), CBS Local Authorities 2023 profiles, OSM clinics (`services_access.json`, `services_points.geojson`, `grid_svcdist.json`, `bagrut.json`) | Distance from every home to the nearest active elementary school (`scripts/services_access.py`); bagrut 2022/23 per town incl. the Bedouin regional councils (`scripts/cbs_education.py`). Clinics shown on the map only — OSM too incomplete for a gap figure. |
 | 06 | Violence | — (being collected with Sikkuy-Aufoq / Abraham Initiatives) | Planned: victims by locality, distance to police, AI street-image audit |
 
-**Scope:** the atlas covers the Be'er Sheva subdistrict only. Off-map houses are clipped to it (`scripts/clip_to_negev.py`); an earlier version wrongly counted 3,548 West Bank buildings (Masafer Yatta / Susiya) as unrecognized-village houses.
+**Scope:** the atlas covers the Be'er Sheva subdistrict only. Off-map houses are clipped to it (`scripts/clip_to_negev.py`); an earlier version wrongly counted 3,949 West Bank buildings (Masafer Yatta, Susiya, Shani/Livne area) as unrecognized-village houses; because the subdistrict polygon itself overshoots the Green Line in the south Hebron hills, nothing north of 31.345 N between 34.95 and 35.30 E is counted.
 
 Processing scripts are in `scripts/` (run with ArcGIS Pro Python): `lpkx_to_geojson.py`, `localities.py`, `buildings.py`, `gtfs_direct.py`, `transit_access.py`, `clip_to_negev.py`, `transit_pairs.py`, `services_access.py`, `cbs_education.py` (chapter 04 player: an unrecognized village beside a recognized town, both 3.2 km windows at the same scale).
 

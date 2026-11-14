@@ -397,6 +397,8 @@ async function loadData(){
     const p=f.properties, c=f.geometry.coordinates;
     if(!hasArabic(p.name) || !c || !c[0]) return;
     if(!inGeom(c,negevGeom)) return;
+    // same Green Line rule as scripts/clip_to_negev.py (the subdistrict polygon overshoots into the south Hebron hills); nothing east of 35.30 (Dead Sea shore, Ein Gedi)
+    if((c[1]>31.345&&c[0]>=34.95&&c[0]<=35.30)||c[0]>35.30) return;
     if(loc.some(l=>inGeom(c,l.geometry))) return;
     const key=(p.ar||p.name)+Math.round(c[0]*100)+Math.round(c[1]*100); if(seen.has(key)) return; seen.add(key);
     unrec.push({type:'Feature',geometry:f.geometry,properties:{ar:p.ar||p.name,he:p.he||p.ar||p.name,en:p.en||p.ar||p.name,place:p.place}});

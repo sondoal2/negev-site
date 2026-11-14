@@ -48,7 +48,7 @@ for f in J('vaadim.geojson')['features']:
     if v and not v.upper().startswith('GENERAL'): (arab if m in ARAB else jew).append(prep(f['geometry']))
 SIYAG = (34.70, 31.02, 35.22, 31.42)
 NAFA = prep(J('negev_nafa.geojson')['features'][0]['geometry'])   # the box crosses the Green Line: keep the Be'er Sheva subdistrict only (fix 2026-11-14)
-def in_region(x, y): return inside(x, y, NAFA) and ((SIYAG[0] <= x <= SIYAG[2] and SIYAG[1] <= y <= SIYAG[3]) or any(inside(x, y, P) for P in rc))
+def in_region(x, y): return not (y > 31.345 and 34.95 <= x <= 35.30) and inside(x, y, NAFA) and ((SIYAG[0] <= x <= SIYAG[2] and SIYAG[1] <= y <= SIYAG[3]) or any(inside(x, y, P) for P in rc))
 def classify(x, y):
     if not in_region(x, y): return None
     if any(inside(x, y, P) for P in arab) or any(inside(x, y, P) for P in jew): return None

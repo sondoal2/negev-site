@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>OFF—MAP · GIF stage</title>
+<!-- GIF stage: one story per GIF. Left = the map (camera never moves), right = topic, one question, the two sides in identical units, the gap ×N, the source.
+     gif.html?g=<id>&lang=ar|he|en            plays live
+     gif.html?g=<id>&lang=ar&f=all            stacks every frame vertically (used by scripts/make_gifs.py to export the .gif files)
+     ids: homes, localities, industry, arnona, bus, school, bagrut, sport, sportdist -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;700;800&family=Alexandria:wght@400;600;800&family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0d0d0d;--concrete:#8a8a86;--bone:#e9e6df;--red:#e8452c;--line:#3a3a38;--font:"Alexandria","Jost","Dubai","Segoe UI",sans-serif}
+html[lang=he]{--font:"Rubik","Jost","Segoe UI",sans-serif} html[lang=en]{--font:"Jost","Segoe UI",sans-serif}
+*{box-sizing:border-box} html,body{margin:0;background:#000;color:var(--bone);font-family:var(--font)}
+.fr{position:relative;width:1200px;height:675px;overflow:hidden;background:var(--ink);display:flex;direction:ltr}
+.mp{position:relative;width:700px;height:675px;flex:none;background:#0a0a0a;overflow:hidden}
+.mp canvas{position:absolute;inset:0}
+.lb{position:absolute;transform:translate(-50%,-50%);font-size:12px;font-weight:600;white-space:nowrap;background:rgba(0,0,0,.74);padding:1px 5px 2px;line-height:1.2;text-align:center}
+.lb.b{transform:translate(-50%,0)} .lb.t{transform:translate(-50%,-100%)} .lb.r{transform:translate(0,-50%)} .lb.l{transform:translate(-100%,-50%)}
+.lb.j{color:#b9b7b1} .lb.a{color:#fff} .lb small{font-family:"Jost";font-weight:800;font-size:13px;margin-inline-start:5px;direction:ltr;display:inline-block}
+.lb.a small{color:#ff6a4d}
+.lgd{position:absolute;left:10px;bottom:10px;background:#000c;border:1px solid var(--line);padding:7px 9px;font-size:11.5px;line-height:1.75;max-width:330px}
+.lgd i{display:inline-block;width:11px;height:11px;margin-inline-end:6px;vertical-align:-1px}
+.lgd i.c{border-radius:50%}
+.sc{position:absolute;right:14px;top:14px;font-family:"Jost";font-size:11px;color:var(--concrete);text-align:center;direction:ltr}
+.sc b{display:block;height:5px;border:1px solid var(--concrete);border-top:0;margin-bottom:2px}
+.south{position:absolute;left:505px;top:543px;width:187px;height:124px;border:1px dashed #666;font-size:10.5px;color:var(--concrete);padding:2px 6px;direction:ltr;text-align:left}
+.yr{position:absolute;left:28px;top:22px;font-family:"Jost";font-weight:800;font-size:92px;line-height:1;color:var(--bone);direction:ltr}
+.yr small{display:block;font-family:var(--font);font-size:15px;font-weight:600;color:var(--concrete);margin-top:6px}
+.pn{flex:1;display:flex;flex-direction:column;padding:16px 20px 12px;border-left:1px solid var(--line);min-width:0}
+.hd{display:flex;align-items:baseline;gap:10px;border-bottom:1px solid var(--line);padding-bottom:8px}
+.hd .no{font-family:"Jost";font-weight:800;font-size:30px;color:var(--red);line-height:1}
+.hd h2{margin:0;font-size:17px;font-weight:800;flex:1}
+.hd .br{font-family:"Jost";font-weight:800;font-size:13px;color:var(--concrete);direction:ltr;white-space:nowrap}
+.q{font-size:21px;font-weight:800;line-height:1.4;color:#fff;margin:12px 0 10px;min-height:88px}
+.pp{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.sd .sh{font-size:13.5px;font-weight:800;margin-bottom:6px;min-height:20px}
+.sd.a .sh{color:#ff6a4d}
+.hund{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;aspect-ratio:1;background:#151514;padding:7px}
+.hund i{display:block;border:1px solid #444;border-radius:2px} .hund i.u{background:var(--bone);border-color:var(--bone)}
+.hund i.b{background:repeating-linear-gradient(45deg,#8a8a86 0 2px,transparent 2px 5px);border-color:#8a8a86}
+.sd.a .hund i.u{background:var(--red);border-color:var(--red)}
+.pitches{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;align-content:start;height:214px;background:#151514;padding:8px}
+.pitch{display:block;width:100%;height:auto}
+.coins{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;align-content:end;height:214px;background:#151514;padding:8px}
+.coins i{display:flex;align-items:center;justify-content:center;aspect-ratio:1;border-radius:50%;background:var(--bone);color:#000;font-style:normal;font-weight:800;font-size:12px;border:2px solid #8a8a86}
+.sd.a .coins i{background:var(--red);border-color:#000} .coins i.pt{opacity:.45}
+.pv{display:flex;align-items:baseline;gap:8px;margin-top:8px;min-height:52px}
+.pv b{font-family:"Jost";font-weight:800;font-size:46px;line-height:1;color:var(--bone)} .sd.a .pv b{color:var(--red)}
+.pv span{font-size:12.5px;line-height:1.35;color:#d8d5ce}
+.gap{display:flex;align-items:center;gap:14px;border-top:1px solid var(--line);margin-top:10px;padding-top:8px;min-height:66px;font-size:14px;font-weight:600;line-height:1.4}
+.gap .x{font-family:"Jost";font-weight:800;font-size:54px;color:var(--red);line-height:1;direction:ltr}
+.src{margin-top:auto;font-size:11px;line-height:1.5;color:var(--concrete);border-top:1px solid var(--line);padding-top:6px}
+.bar{position:absolute;left:0;bottom:0;height:4px;background:var(--red)}
+.one{display:grid;grid-template-columns:230px 1fr;gap:16px;align-items:start}
+.one .tx{font-size:14px;line-height:1.6} .one .tx b{font-family:"Jost";font-size:22px;font-weight:800}
+.cnt{font-family:"Jost";font-weight:800;font-size:64px;line-height:1;color:var(--red);direction:ltr;text-align:start}
+.cnt+div{font-size:15px;font-weight:700;margin:4px 0 14px}
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<script>
+const Q=new URLSearchParams(location.search), G=Q.get('g')||'bus', L=Q.get('lang')||'ar', FQ=Q.get('f'), STEPS=+Q.get('steps')||10;
+document.documentElement.lang=L; document.documentElement.dir=L==='en'?'ltr':'rtl';
+const T=o=>typeof o==='string'?o:(o[L]||o.en), DIR=L==='en'?'ltr':'rtl';
+const get=f=>fetch('data/'+f).then(r=>r.json());
+const fmt=v=>Math.round(v).toLocaleString('en-US');
+/* ---------- projection: equirectangular, fixed window ---------- */
+const VIEW={belt:{x0:34.50,y1:31.527,s:9.55,lat:31.2},nat:{x0:32.69,y1:33.36,s:1.56,lat:31.5}};
+let PJ=VIEW.belt;
+const px=(lon,lat)=>[(lon-PJ.x0)*111.32*Math.cos(PJ.lat*Math.PI/180)*PJ.s,(PJ.y1-lat)*110.9*PJ.s];
+const TOWNS={ // CBS locality points
+ 'beer sheva':{g:'j',c:[34.7843,31.2535],ar:'بئر السبع',he:'באר שבע',en:"Be'er Sheva",muni:"Be'er Sheva"},
+ 'rahat':{g:'a',c:[34.754,31.3901],ar:'رهط',he:'רהט',en:'Rahat',muni:'Rahat'},
+ 'hura':{g:'a',c:[34.9354,31.2969],ar:'حورة',he:'חורה',en:'Hura',muni:'Hura'},
+ 'kseifa':{g:'a',c:[35.0885,31.2433],ar:'كسيفة',he:'כסייפה',en:'Kuseife',muni:'Kseyfe'},
+ 'lakia':{g:'a',c:[34.8667,31.3238],ar:'اللقية',he:'לקיה',en:'Lakiya',muni:'Lakiye'},
+ 'tel sheva':{g:'a',c:[34.8599,31.2481],ar:'تل السبع',he:'תל שבע',en:'Tel Sheva',muni:'Tel Sheva'},
+ 'shegev shalom':{g:'a',c:[34.8385,31.1966],ar:'شقيب السلام',he:'שגב שלום',en:'Segev Shalom',muni:'Segev Shalom'},
+ 'arara negev':{g:'a',c:[35.0227,31.1581],ar:'عرعرة النقب',he:'ערערה בנגב',en:"Ar'ara",muni:"Ar'ara Banegev"},
+ 'netivot':{g:'j',c:[34.5824,31.422],ar:'نتيفوت',he:'נתיבות',en:'Netivot',muni:'Netivot'},
+ 'ofakim':{g:'j',c:[34.6201,31.3061],ar:'أوفاكيم',he:'אופקים',en:'Ofakim',muni:'Ofakim'},
+ 'dimona':{g:'j',c:[35.0354,31.07],ar:'ديمونا',he:'דימונה',en:'Dimona',muni:'Dimona'},
+ 'arad':{g:'j',c:[35.2133,31.2585],ar:'عراد',he:'ערד',en:'Arad',muni:'Arad'},
+ 'omer':{g:'j',c:[34.8499,31.2674],ar:'عومر',he:'עומר',en:'Omer',muni:'Omer'},
+ 'yeruham':{g:'j',c:[34.927,30.9873],ar:'يروحام',he:'ירוחם',en:'Yeruham',muni:'Yeroham'},
+ 'lehavim':{g:'j',c:[34.8118,31.3687],ar:'لهافيم',he:'להבים',en:'Lehavim',muni:'Lehavim'},
+ 'meytar':{g:'j',c:[34.9303,31.3274],ar:'ميتار',he:'מיתר',en:'Meitar',muni:'Meitar'},
+ 'mizpe ramon':{g:'j',c:[34.8009,30.6225],ar:'متسبي رمون',he:'מצפה רמון',en:'Mitzpe Ramon',muni:'Mitspe Ramon',south:[547,592]},
+ 'eilat':{g:'j',c:[34.9425,29.5526],ar:'إيلات',he:'אילת',en:'Eilat',muni:'Eilat',south:[642,592]}};
+const tpx=(k,south)=>{const t=TOWNS[k]; return south&&t.south?t.south:px(...t.c);};
+/* label nudges so names do not sit on their own symbol */
+const NUDGE={'omer':[26,-12],'tel sheva':[30,10],'beer sheva':[-30,16],'lakia':[-22,-14],'meytar':[26,-14],'hura':[24,14],'lehavim':[0,-16],'shegev shalom':[0,18]};
+/* ---------- geometry helpers ---------- */
+const inRing=(x,y,r)=>{let ins=false;for(let i=0,j=r.length-1;i<r.length;j=i++){const xi=r[i][0],yi=r[i][1],xj=r[j][0],yj=r[j][1];if((yi>y)!==(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)ins=!ins;}return ins;};
+const polys=g=>g.type==='Polygon'?[g.coordinates]:g.type==='MultiPolygon'?g.coordinates:[];
+const geomOf=o=>o.type==='FeatureCollection'?o.features.map(f=>f.geometry):o.type==='Feature'?[o.geometry]:o.type==='GeometryCollection'?o.geometries:[o];
+function path(ctx,g){ctx.beginPath();polys(g).forEach(p=>p.forEach(r=>{r.forEach(([x,y],i)=>{const [a,b]=px(x,y);i?ctx.lineTo(a,b):ctx.moveTo(a,b);});ctx.closePath();}));}
+const distM=(x1,y1,x2,y2)=>{const dx=(x1-x2)*95217,dy=(y1-y2)*110900;return Math.sqrt(dx*dx+dy*dy);};
+function nearest(H,P){ // homes [[lon,lat]], points [[lon,lat]] -> metres
+  return H.map(([x,y])=>{let m=1e12;for(let i=0;i<P.length;i++){const dx=(x-P[i][0])*95217,dy=(y-P[i][1])*110900,d=dx*dx+dy*dy;if(d<m)m=d;}return Math.sqrt(m);});}
+let seed=7; const rnd=()=>{seed=(seed*1664525+1013904223)%4294967296;return seed/4294967296;};
+/* ---------- data ---------- */
+const D={};
+async function load(){
+  const need={homes:['nafa','muni','vaadim','bld','bsum'],localities:['israel','cbs'],industry:['nafa','muni','indJ','indA','istats'],arnona:['nafa','muni','tprof'],
+    bus:['nafa','muni','bld','stopdist','stops','access'],school:['nafa','muni','bld','svcpts','svc'],bagrut:['nafa','muni','bagrut'],sport:['nafa','muni','sportf','sport'],sportdist:['nafa','muni','bld','sportf','svc']}[G];
+  const F={nafa:'negev_nafa.geojson',muni:'muni.geojson',vaadim:'vaadim.geojson',bld:'offmap_buildings.json',bsum:'buildings_summary.json',israel:'israel_outline.geojson',cbs:'cbs_localities.geojson',
+    indJ:'jewishh_industrial.geojson',indA:'arabb_industrial.geojson',istats:'industry_stats.json',tprof:'town_profile.json',stopdist:'offmap_stopdist.json',stops:'transit_stops.geojson',access:'transit_access.json',
+    svcpts:'services_points.geojson',svc:'services_access.json',bagrut:'bagrut.json',sportf:'sport_facilities.geojson',sport:'sport_stats.json'};
+  await Promise.all(need.map(k=>get(F[k]).then(d=>{D[k]=d;})));
+  if(D.muni){ const r=await get('rahat.geojson').catch(()=>null); if(r) geomOf(r).forEach(g=>D.muni.features.push({type:'Feature',geometry:g,properties:{Muni_Eng:'Rahat'}})); }
+  if(D.nafa){ const g=D.nafa.features[0].geometry; D.negev=polys(g); D.inNegev=(x,y)=>!(y>31.345&&x>=34.95&&x<=35.30)&&D.negev.some(p=>inRing(x,y,p[0])); }
+  if(D.bld){ // unrecognized-village homes only (class u): centroid of the first vertex is enough at this scale
+    D.H=[]; D.Hd=[]; D.bld.forEach((a,k)=>{ if(a[0]==='u'){ D.H.push([a[2]/1e5,a[3]/1e5]); if(D.stopdist) D.Hd.push(D.stopdist[k]); } });
+    D.E=D.bld.filter(a=>a[0]==='e').map(a=>[a[2]/1e5,a[3]/1e5]);
+    D.rk=D.H.map(()=>rnd()); D.rkE=D.E.map(()=>rnd()); }
+}
+/* ---------- base map ---------- */
+function base(ctx,o={}){
+  ctx.fillStyle='#0a0a0a';ctx.fillRect(0,0,700,675);
+  if(D.nafa){ const g=D.nafa.features[0].geometry; path(ctx,g); ctx.fillStyle='#191918'; ctx.fill(); ctx.strokeStyle='#4a4a47'; ctx.lineWidth=1; ctx.stroke(); }
+  if(D.muni&&!o.noTowns){ const byName={}; Object.values(TOWNS).forEach(t=>byName[t.muni]=t);
+    D.muni.features.forEach(f=>{const t=byName[f.properties.Muni_Eng]; if(!t) return; path(ctx,f.geometry);
+      if(t.g==='j'){ctx.fillStyle='rgba(138,138,134,.22)';ctx.fill();ctx.strokeStyle='rgba(138,138,134,.75)';ctx.lineWidth=1;ctx.setLineDash([]);ctx.stroke();}
+      else{ctx.fillStyle='rgba(233,230,223,.10)';ctx.fill();ctx.strokeStyle='#e9e6df';ctx.lineWidth=1.3;ctx.setLineDash([4,3]);ctx.stroke();ctx.setLineDash([]);} }); }
+}
+/* symbol maps (arnona, bagrut): which side of its symbol each name sits on, and small symbol shifts where two towns touch */
+const SIDE={'beer sheva':'l','omer':'t','tel sheva':'r','lakia':'t','meytar':'r','hura':'r','rahat':'l','lehavim':'r','dimona':'l'};
+const SIDE_EQ={...SIDE,'beer sheva':'b','omer':'l','meytar':'r','lehavim':'t'}; // all symbols the same size (bagrut)
+function labels(el,o={}){ let h='';
+  Object.entries(TOWNS).forEach(([k,t])=>{ if(t.south&&!o.south) return; let [x,y]=o.pos?o.pos(k):tpx(k,o.south), cl='', v=o.val?o.val(k):null;
+    if(o.rad){ const r=o.rad(k)+4, sd=(o.side||SIDE)[k]||'b'; cl=sd; if(sd==='b')y+=r; else if(sd==='t')y-=r; else if(sd==='r')x+=r; else x-=r; }
+    else{ const n=NUDGE[k]||[0,-14]; x+=n[0]; y+=n[1]; }
+    h+=`<div class="lb ${t.g} ${cl}" style="left:${x.toFixed(0)}px;top:${y.toFixed(0)}px">${T(t)}${v!=null?`<small>${v}</small>`:''}</div>`; });
+  h+=`<div class="sc" style="width:${(10*PJ.s).toFixed(0)}px"><b></b>10 km</div>`;
+  if(o.south) h+=`<div class="south">${T({ar:'↓ جنوباً، خارج الإطار',he:'↓ דרומה, מחוץ למסגרת',en:'↓ further south, off frame'})}</div>`;
+  el.insertAdjacentHTML('beforeend',h); }
+const southBox=ctx=>{ctx.fillStyle='#0d0d0d';ctx.fillRect(505,543,187,124);};
+const legend=(el,rows)=>el.insertAdjacentHTML('beforeend',`<div class="lgd" dir="${DIR}">${rows.map(([st,tx,c])=>`<div><i class="${c||''}" style="${st}"></i>${T(tx)}</div>`).join('')}</div>`);
+const LJ=['background:rgba(138,138,134,.35);border:1px solid #8a8a86',{ar:'بلدة يهودية (حدود البلدية)',he:'יישוב יהודי (גבול שיפוט)',en:'Jewish town (municipal limit)'}];
+const LA=['background:rgba(233,230,223,.12);border:1px dashed #e9e6df',{ar:'بلدة عربية معترف بها',he:'יישוב ערבי מוכר',en:'recognized Arab town'}];
+const RAMP=['#8a8a86','#b5361f','#ff5a3c'];
+function dots(ctx,P,col,r,sq){ ctx.fillStyle=col; P.forEach(([x,y])=>{const [a,b]=px(x,y); if(sq) ctx.fillRect(a-r,b-r,2*r,2*r); else{ctx.beginPath();ctx.arc(a,b,r,0,6.2832);ctx.fill();}}); }
+function homesByDist(ctx,dist,thr,t){ // far homes on top
+  [[d=>d<=thr,RAMP[0]],[d=>d>thr&&d<=3000,RAMP[1]],[d=>d>3000,RAMP[2]]].forEach(([f,c])=>{ctx.fillStyle=c; D.H.forEach(([x,y],i)=>{ if(D.rk[i]<=t&&f(dist[i])){const [a,b]=px(x,y);ctx.fillRect(a-.9,b-.9,1.8,1.8);} });}); }
+/* ---------- side panel ---------- */
+const xN=(hi,lo)=>{const r=hi/lo;return r>=10?Math.round(r):r.toFixed(1);};
+function unitsHTML(kind,v,v2,cells=100){ const full=Math.floor(v+1e-9), part=v-full;
+  if(kind==='pitch'){ const one=f=>`<svg viewBox="0 0 105 68" class="pitch"><rect x="0.8" y="0.8" width="103.4" height="66.4" fill="none" stroke="#5a5a55" stroke-width="1.6" stroke-dasharray="3 3"/><svg x="0" y="0" width="${(105*f).toFixed(1)}" height="68"><rect width="105" height="68" fill="#f2c230"/><g fill="none" stroke="#000" stroke-width="1.6"><rect x="1" y="1" width="103" height="66"/><path d="M52.5 1v66"/><circle cx="52.5" cy="34" r="9"/></g></svg></svg>`;
+    return `<div class="pitches">${[...Array(full)].map(()=>one(1)).join('')}${part>.02?one(part):''}</div>`; }
+  if(kind==='coin') return `<div class="coins">${[...Array(full)].map(()=>'<i>₪</i>').join('')}${part>.15?'<i class="pt">₪</i>':''}</div>`;
+  const n=Math.floor(v+1e-6), half=v-n>=.25, n2=Math.round(v2||0);
+  return `<div class="hund" style="${cells!==100?`aspect-ratio:${10/(cells/10)}`:''}">${[...Array(cells).keys()].map(k=>`<i class="${k<n?'u':k===n&&half?'u':k<n2?'b':''}"${k===n&&half&&v-n<.75?' style="opacity:.55"':''}></i>`).join('')}</div>`; }
+const head=c=>`<div class="hd" dir="${DIR}"><span class="no">${c.no}</span><h2>${T(c.title)}</h2><span class="br">OFF—MAP · ${T({ar:'النقب',he:'הנגב',en:'Naqab'})}</span></div><div class="q" dir="${DIR}">${T(c.q)}</div>`;
+function panelFill(c,t,fin){
+  const top=Math.max(c.a,c.j), d=v=>c.dec?(+v).toFixed(c.dec):(fin&&c.kind==='home'&&!c.mul&&v<10&&Math.abs(v-Math.round(v))>.05)?(+v).toFixed(1):fmt(v);
+  const side=k=>{ const v=c[k], s=fin?v:Math.min(v,t*top), s2=c[k+'2']!=null?(fin?c[k+'2']:Math.min(c[k+'2'],t*Math.max(c.a2||0,c.j2||0))):null;
+    return `<div class="sd ${k}"><div class="sh">${T(c.sides[k])}</div>${unitsHTML(c.kind,s*(c.mul||1),s2,c.cells||100)}<div class="pv"><b>${c.pre||''}${d(s*(c.show||1))}</b><span>${T(c.unit)}</span></div></div>`; };
+  const tiny=c.a<0.5&&c.zero;
+  return head(c)+`<div class="pp" dir="${DIR}">${side('a')}${side('j')}</div>`+
+    `<div class="gap" dir="${DIR}">${fin?(tiny?`<span class="x">0</span><span>${T(c.zero)}</span>`:`<span class="x">×${xN(c.j,c.a)}</span><span>${T(c.gap||{ar:'الفرق بين الجهتين',he:'הפער בין שני הצדדים',en:'the gap between the two sides'})}</span>`):''}</div>`+
+    `<div class="src" dir="${DIR}">${T(c.src)}</div>`; }
+const S7={ar:'7 بلدات عربية معترف بها',he:'7 יישובים ערביים מוכרים',en:'7 recognized Arab towns'}, S11={ar:'11 بلدة يهودية',he:'11 יישובים יהודיים',en:'11 Jewish towns'};
+const SU={ar:'قرى غير معترف بها',he:'כפרים לא מוכרים',en:'Unrecognized villages'};
+const HOMES_L=thr=>[['background:#fff',thr.pt,'c'],[`background:${RAMP[0]}`,thr.near],[`background:${RAMP[1]}`,thr.far],[`background:${RAMP[2]}`,{ar:'بيت أبعد من 3 كم',he:'בית במרחק מעל 3 ק"מ',en:'home more than 3 km away'}],LJ,LA];
+const fillSeq=(n=STEPS)=>[...Array(n+1).keys()].map(k=>({t:k/n,fin:k===n}));
+/* ---------- the GIFs ---------- */
+const GIFS={
+ homes:()=>{ const S=D.bsum, off=S.outside_recognized, inA=S.by_group.arab.buildings, sh=off/(off+inA)*100, un=S.v2.unrecognized, ex=S.v2.expansion;
+   const rec=D.vaadim.features.filter(f=>['al Kasum','Neve Midbar'].includes(f.properties.Muni_Eng));
+   const c={no:'01',title:{ar:'الأرض والاعتراف',he:'קרקע והכרה',en:'Land & recognition'},q:{ar:'كم بيت بدوي في النقب يقف خارج أي حدود بلدة معترف بها؟',he:'כמה בתים בדואיים בנגב עומדים מחוץ לכל גבול יישוב מוכר?',en:'How many Bedouin homes in the Naqab stand outside every recognized town limit?'}};
+   return {frames:[{t:0,first:1},...fillSeq().slice(1)],
+     map:(ctx,el,f)=>{ base(ctx); rec.forEach(v=>{path(ctx,v.geometry);ctx.fillStyle='rgba(233,230,223,.10)';ctx.fill();ctx.strokeStyle='#e9e6df';ctx.lineWidth=1;ctx.setLineDash([3,3]);ctx.stroke();ctx.setLineDash([]);});
+       ctx.fillStyle='#8a2a1a'; D.E.forEach(([x,y],i)=>{if(D.rkE[i]<=f.t){const [a,b]=px(x,y);ctx.fillRect(a-.9,b-.9,1.8,1.8);}});
+       ctx.fillStyle='#ff5a3c'; D.H.forEach(([x,y],i)=>{if(D.rk[i]<=f.t){const [a,b]=px(x,y);ctx.fillRect(a-.9,b-.9,1.8,1.8);}});
+       labels(el); legend(el,[['background:#ff5a3c',{ar:'بيت في قرية غير معترف بها',he:'בית בכפר לא מוכר',en:'home in an unrecognized village'}],['background:#8a2a1a',{ar:'بيت خارج الحدود على أطراف بلدة معترف بها',he:'בית מחוץ לגבול, בשולי יישוב מוכר',en:'home outside the limit, on the edge of a recognized town'}],LA,LJ]); },
+     panel:f=>{ const n=f.fin?off:Math.round(off*f.t), r=f.fin?sh:Math.min(sh,f.t*sh);
+       return head(c)+`<div dir="${DIR}"><div class="cnt">${fmt(n)}</div><div>${T({ar:'بيت خارج الخريطة الرسمية',he:'בתים מחוץ למפה הרשמית',en:'homes off the official map'})}</div></div>`+
+        `<div class="one" dir="${DIR}"><div class="sd a">${unitsHTML('home',r,100)}</div><div class="tx">${T({ar:'من كل <b>100</b> مبنى بدوي في النقب',he:'מכל <b>100</b> מבנים בדואיים בנגב',en:'Of every <b>100</b> Bedouin buildings in the Naqab'})}<br><b style="color:var(--red);font-size:40px">${Math.round(r)}</b> ${T({ar:'خارج أي حدود معترف بها',he:'מחוץ לכל גבול מוכר',en:'stand outside any recognized limit'})}<br><span style="font-size:11.5px;color:var(--concrete)">${T({ar:'المخطّط = داخل بلدة أو قرية معترف بها',he:'מקווקו = בתוך יישוב מוכר',en:'hatched = inside a recognized town or village'})}</span>`+
+        (f.fin?`<br><br>${fmt(un)} ${T({ar:'في قرى غير معترف بها',he:'בכפרים לא מוכרים',en:'in unrecognized villages'})}<br>${fmt(ex)} ${T({ar:'على أطراف بلدات معترف بها',he:'בשולי יישובים מוכרים',en:'on the edges of recognized towns'})}`:'')+`</div></div>`+
+        `<div class="src" dir="${DIR}">${T({ar:'بصمات المباني Microsoft Global ML (2026) + OpenStreetMap · حدود البلدات: מינהל התכנון (iplan) · داخل قضاء بئر السبع فقط، بدون الضفة الغربية',he:'טביעות מבנים Microsoft Global ML (2026) + OpenStreetMap · גבולות יישובים: מינהל התכנון (iplan) · נפת באר שבע בלבד, ללא הגדה המערבית',en:'Microsoft Global ML building footprints (2026) + OpenStreetMap · locality limits: Israel Planning Administration (iplan) · Be\'er Sheva subdistrict only, West Bank excluded'})}</div>`; }}; },
+ localities:()=>{ const P=D.cbs.features.filter(f=>f.geometry&&f.geometry.coordinates[0]), ys=[1948,1952,1956,1960,1966,1972,1978,1984,1990,1996,2002,2008,2014,2019,2024];
+   const cnt=(g,y)=>P.filter(f=>f.properties.grp===g&&f.properties.year>=1948&&f.properties.year<=y).length; const J=cnt('jewish',2024), A=cnt('arab',2024)+cnt('bedouin_town',2024);
+   const c={no:'02',title:{ar:'السكن',he:'דיור',en:'Housing'},q:{ar:'كم بلدة جديدة أُقيمت في البلاد منذ 1948؟ كل مربّع = 10 بلدات',he:'כמה יישובים חדשים הוקמו בארץ מאז 1948? כל ריבוע = 10 יישובים',en:'How many new localities have been founded in the country since 1948? Each square = 10 localities'},
+     kind:'home',cells:80,mul:.1,a:A,j:J,sides:{a:{ar:'عربية — كلها بلدات تركيز بدوية',he:'ערביים — כולם יישובי ריכוז בדואיים',en:'Arab — all Bedouin concentration towns'},j:{ar:'يهودية',he:'יהודיים',en:'Jewish'}},unit:{ar:'بلدة جديدة',he:'יישובים חדשים',en:'new localities'},
+     gap:{ar:'ضعف — ولا بلدة عربية واحدة خارج سياسة التركيز',he:'פעמים — ואף יישוב ערבי אחד מחוץ למדיניות הריכוז',en:'times — and not one Arab locality outside the concentration policy'},
+     src:{ar:'الدائرة المركزية للإحصاء (הלמ"ס) — ملف البلدات 2024، سنة التأسيس · المدن المختلطة غير محسوبة · سنوات بلدات التركيز من مصادر تاريخية',he:'הלמ"ס — קובץ יישובים 2024, שנת ייסוד · ערים מעורבות לא נספרו · שנות יישובי הריכוז ממקורות היסטוריים',en:'CBS localities file 2024 (founding year) · mixed cities not counted · township years from historical sources'}};
+   return {view:'nat',frames:ys.map((y,i)=>({y,py:i?ys[i-1]:1947,fin:i===ys.length-1})),
+     map:(ctx,el,f)=>{ ctx.fillStyle='#0a0a0a';ctx.fillRect(0,0,700,675); geomOf(D.israel).forEach(g=>{path(ctx,g);ctx.fillStyle='#191918';ctx.fill();ctx.strokeStyle='#4a4a47';ctx.lineWidth=1;ctx.stroke();});
+       const dot=(f2,col,r,ring)=>{const [a,b]=px(...f2.geometry.coordinates);ctx.beginPath();ctx.arc(a,b,r,0,6.2832);if(ring){ctx.strokeStyle=col;ctx.lineWidth=1;ctx.stroke();}else{ctx.fillStyle=col;ctx.fill();}};
+       P.forEach(q=>{const p=q.properties; if(p.grp==='arab') dot(q,'#e9e6df',2.2,1);});
+       P.forEach(q=>{const p=q.properties; if(p.grp==='jewish'&&p.year>=1948&&p.year<=f.py) dot(q,'#8a8a86',2.1);});
+       P.forEach(q=>{const p=q.properties; if(p.grp==='jewish'&&p.year>f.py&&p.year<=f.y) dot(q,'#ffffff',2.6);});
+       P.forEach(q=>{const p=q.properties; if(p.grp==='bedouin_town'&&p.year<=f.y) dot(q,'#ff5a3c',3.6);});
+       el.insertAdjacentHTML('beforeend',`<div class="yr">${f.y}<small>1948 → 2024</small></div>`);
+       legend(el,[['background:#8a8a86',{ar:'بلدة يهودية جديدة (بعد 1948)',he:'יישוב יהודי חדש (אחרי 1948)',en:'new Jewish locality (after 1948)'},'c'],['background:#fff',{ar:'أُقيمت في هذه السنوات',he:'הוקם בשנים אלה',en:'founded in these years'},'c'],['border:1px solid #e9e6df',{ar:'بلدة عربية (موجودة قبل 1948)',he:'יישוב ערבי (קיים לפני 1948)',en:'Arab locality (existed before 1948)'},'c'],['background:#ff5a3c',{ar:'بلدة تركيز بدوية خطّطتها الدولة',he:'יישוב ריכוז בדואי שתכננה המדינה',en:'Bedouin concentration town planned by the state'},'c']]); },
+     panel:f=>panelFill({...c,a:cnt('arab',f.y)+cnt('bedouin_town',f.y)||0.0001,j:cnt('jewish',f.y)||0.0001,...(f.fin?{a:A,j:J}:{})},1,true).replace(/<div class="gap"[^]*?<\/div>(?=<div class="src")/,m=>f.fin?m:`<div class="gap"></div>`)}; },
+ industry:()=>{ const R=D.istats.rows, m2=f=>{const X=R.filter(f);return X.reduce((s,r)=>s+r.ind_dunam,0)*1000/X.reduce((s,r)=>s+r.pop,0);}, PITCH=7140;
+   const c={no:'03',title:{ar:'الاقتصاد · الأرض الصناعية',he:'כלכלה · קרקע לתעשייה',en:'Economy · industrial land'},kind:'pitch',dec:1,a:m2(r=>r.grp==='arab')*1000/PITCH,j:m2(r=>r.grp==='jewish')*1000/PITCH,sides:{a:S7,j:S11},
+     q:{ar:'لكل 1,000 ساكن — كم ملعب كرة قدم من الأرض الصناعية (مصانع، ورش، أماكن عمل)؟',he:'לכל 1,000 תושבים — כמה מגרשי כדורגל של קרקע תעשייה (מפעלים, סדנאות, מקומות עבודה)?',en:'For every 1,000 residents — how many football pitches of industrial land (factories, workshops, jobs)?'},
+     unit:{ar:'ملعب لكل 1,000 ساكن',he:'מגרשים ל-1,000 תושבים',en:'pitches per 1,000 residents'},
+     src:{ar:'ملعب = 105×68 م (7,140 م²) · طبقات الفريق (ArcGIS): المناطق الصناعية ∩ حدود البلديات · سكان 2026 · إيلات ومتسبي رمون جنوب الإطار ومحسوبتان',he:'מגרש = 105×68 מ׳ (7,140 מ״ר) · שכבות הצוות (ArcGIS): אזורי תעשייה ∩ גבולות שיפוט · אוכלוסייה 2026 · אילת ומצפה רמון מדרום למסגרת ונספרו',en:'pitch = 105×68 m (7,140 m²) · team ArcGIS layers: industrial zones ∩ municipal limits · population 2026 · Eilat and Mitzpe Ramon are south of the frame and counted'}};
+   return {frames:fillSeq(9),map:(ctx,el,f)=>{ base(ctx); [D.indJ,D.indA].forEach(fc=>fc.features.forEach(z=>{path(ctx,z.geometry);ctx.fillStyle='#f2c230';ctx.fill();ctx.strokeStyle='#f2c230';ctx.lineWidth=1.2;ctx.stroke();}));
+       labels(el); legend(el,[['background:#f2c230',{ar:'منطقة صناعية داخل حدود البلدة',he:'אזור תעשייה בתוך גבול היישוב',en:'industrial zone inside the town limit'}],LJ,LA]); },panel:f=>panelFill(c,f.t,f.fin)}; },
+ arnona:()=>{ const P=D.tprof.rows, wv=g=>{const X=P.filter(r=>r.grp===g&&r.biz_arnona_pc!=null&&r.pop_cbs_2024);const pp=X.reduce((s,r)=>s+r.pop_cbs_2024,0);return X.reduce((s,r)=>s+r.biz_arnona_pc*r.pop_cbs_2024,0)/pp;};
+   const mx=Math.max(...P.map(r=>r.biz_arnona_pc||0)), by={}; P.forEach(r=>by[r.key]=r);
+   const c={no:'03',title:{ar:'الاقتصاد · دخل البلدية',he:'כלכלה · הכנסות הרשות',en:'Economy · council income'},kind:'coin',mul:.01,pre:'₪',a:wv('arab'),j:wv('jewish'),sides:{a:S7,j:S11},
+     q:{ar:'كم تدفع المصانع والمحلات للبلدية (أرنونا) عن كل ساكن في السنة؟ كل قطعة = 100 ₪',he:'כמה משלמים מפעלים ועסקים לרשות (ארנונה) על כל תושב בשנה? כל מטבע = 100 ₪',en:'How much do factories and shops pay the council (arnona) per resident per year? Each coin = ₪100'},
+     unit:{ar:'لكل ساكن في السنة',he:'לתושב בשנה',en:'per resident per year'},
+     src:{ar:'وزارة الداخلية — تقارير مالية مدققة للسلطات المحلية 2024 (data.gov.il) · موزون بسكان הלמ"ס 2024 · مساحة الدائرة على الخريطة = المبلغ لكل ساكن',he:'משרד הפנים — דוחות כספיים מבוקרים של הרשויות 2024 (data.gov.il) · משוקלל באוכלוסיית הלמ"ס 2024 · שטח העיגול במפה = הסכום לתושב',en:'Ministry of Interior — audited local-authority financial reports 2024 (data.gov.il) · weighted by CBS 2024 population · circle area on the map = amount per resident'}};
+   return {frames:fillSeq(8),map:(ctx,el,f)=>{ base(ctx); southBox(ctx); const tt=f.fin?1:f.t, RM=38, rad=k=>Math.max(Math.sqrt((f.fin?by[k].biz_arnona_pc:Math.min(by[k].biz_arnona_pc,tt*mx))/mx)*RM,1.5);
+       Object.keys(TOWNS).sort((a,b)=>(by[b]?.biz_arnona_pc||0)-(by[a]?.biz_arnona_pc||0)).forEach(k=>{const r=by[k]; if(!r||r.biz_arnona_pc==null) return; const [x,y]=tpx(k,1);
+         ctx.beginPath();ctx.arc(x,y,rad(k),0,6.2832);ctx.fillStyle=TOWNS[k].g==='a'?'rgba(232,69,44,.92)':'rgba(233,230,223,.80)';ctx.fill();ctx.strokeStyle='#000';ctx.lineWidth=1;ctx.stroke();});
+       labels(el,{south:1,rad:k=>by[k]&&by[k].biz_arnona_pc!=null?rad(k):0,val:f.fin?k=>by[k]&&by[k].biz_arnona_pc!=null?'₪'+fmt(by[k].biz_arnona_pc):null:null});
+       legend(el,[['background:#e9e6df',{ar:'بلدة يهودية — مساحة الدائرة = أرنونا المصالح لكل ساكن',he:'יישוב יהודי — שטח העיגול = ארנונת עסקים לתושב',en:'Jewish town — circle area = business arnona per resident'},'c'],['background:#e8452c',{ar:'بلدة عربية — نفس المقياس',he:'יישוב ערבי — אותו קנה מידה',en:'Arab town — same scale'},'c']]); },panel:f=>panelFill(c,f.t,f.fin)}; },
+ bus:()=>{ const g=D.access.groups, S=D.stops.features.map(f=>f.geometry.coordinates).filter(([x,y])=>D.inNegev(x,y)), dt=String(D.access.date).replace(/(\d{4})(\d\d)(\d\d)/,'$3.$2.$1');
+   const c={no:'04',title:{ar:'المواصلات العامة',he:'תחבורה ציבורית',en:'Public transport'},kind:'home',a:g.unrec.pct_lt400,j:g.jewish_towns.pct_lt400,sides:{a:SU,j:{ar:`${g.jewish_towns.towns} بلدات يهودية`,he:`${g.jewish_towns.towns} יישובים יהודיים`,en:`${g.jewish_towns.towns} Jewish towns`}},
+     q:{ar:'من كل 100 بيت — كم بيت عنده محطة باص على بُعد مشي (أقل من 400 م)؟',he:'מכל 100 בתים — לכמה יש תחנת אוטובוס במרחק הליכה (עד 400 מ׳)?',en:'Of every 100 homes — how many have a bus stop within walking distance (400 m)?'},
+     unit:{ar:'من كل 100 بيت',he:'מכל 100 בתים',en:'of every 100 homes'},
+     src:{ar:`وزارة المواصلات GTFS — محطات فيها رحلة واحدة على الأقل يوم ${dt} · بصمات المباني Microsoft + OSM · مسافة خط مستقيم · نتيفوت وإيلات خارج المجموع (لا بصمات مبانٍ كافية)`,he:`משרד התחבורה GTFS — תחנות עם נסיעה אחת לפחות ב-${dt} · טביעות מבנים Microsoft + OSM · מרחק אווירי · נתיבות ואילת מחוץ לסיכום (אין די טביעות מבנים)`,en:`Ministry of Transport GTFS — stops with at least one departure on ${dt} · Microsoft + OSM footprints · straight-line distance · Netivot and Eilat left out of the total (too few footprints)`}};
+   return {frames:fillSeq(),map:(ctx,el,f)=>{ base(ctx); homesByDist(ctx,D.Hd,400,f.t); dots(ctx,S,'#fff',1.15);
+       labels(el); legend(el,HOMES_L({pt:{ar:'محطة باص فيها خدمة',he:'תחנת אוטובוס פעילה',en:'served bus stop'},near:{ar:'بيت في قرية غير معترف بها — المحطة أقرب من 400 م',he:'בית בכפר לא מוכר — תחנה עד 400 מ׳',en:'home in an unrecognized village — stop within 400 m'},far:{ar:'بيت بلا محطة على بُعد مشي',he:'בית ללא תחנה במרחק הליכה',en:'home with no stop within walking distance'}})); },panel:f=>panelFill(c,f.t,f.fin)}; },
+ school:()=>{ const V=D.svc.school.groups, S=D.svcpts.features.filter(f=>f.properties.k==='e').map(f=>f.geometry.coordinates), dist=nearest(D.H,S);
+   const c={no:'05',title:{ar:'التعليم · المدرسة الابتدائية',he:'חינוך · בית הספר היסודי',en:'Education · elementary school'},kind:'home',a:V.unrec.pct_lt1k,j:V.jewish_towns.pct_lt1k,sides:{a:SU,j:{ar:`${V.jewish_towns.towns} بلدات يهودية`,he:`${V.jewish_towns.towns} יישובים יהודיים`,en:`${V.jewish_towns.towns} Jewish towns`}},
+     q:{ar:'من كل 100 بيت — كم بيت عنده مدرسة ابتدائية على بُعد أقل من 1 كم؟',he:'מכל 100 בתים — לכמה יש בית ספר יסודי עד 1 ק"מ?',en:'Of every 100 homes — how many have an elementary school within 1 km?'},
+     unit:{ar:'من كل 100 بيت',he:'מכל 100 בתים',en:'of every 100 homes'},
+     src:{ar:'وزارة التربية — ملف المؤسسات التعليمية وإحداثياتها (data.gov.il)، مدارس ابتدائية فعّالة · بصمات المباني Microsoft + OSM · مسافة خط مستقيم · نتيفوت وإيلات خارج المجموع',he:'משרד החינוך — קובץ מוסדות חינוך וקואורדינטות (data.gov.il), בתי ספר יסודיים פעילים · טביעות מבנים Microsoft + OSM · מרחק אווירי · נתיבות ואילת מחוץ לסיכום',en:'Ministry of Education — institutions file with coordinates (data.gov.il), active elementary schools · Microsoft + OSM footprints · straight-line distance · Netivot and Eilat left out of the total'}};
+   return {frames:fillSeq(),map:(ctx,el,f)=>{ base(ctx); ctx.fillStyle='rgba(255,255,255,.10)'; S.forEach(([x,y])=>{const [a,b]=px(x,y);ctx.beginPath();ctx.arc(a,b,PJ.s,0,6.2832);ctx.fill();});
+       homesByDist(ctx,dist,1000,f.t); dots(ctx,S,'#fff',2.2);
+       labels(el); legend(el,HOMES_L({pt:{ar:'مدرسة ابتدائية + دائرة 1 كم',he:'בי"ס יסודי + עיגול 1 ק"מ',en:'elementary school + 1 km circle'},near:{ar:'بيت في قرية غير معترف بها — المدرسة أقرب من 1 كم',he:'בית בכפר לא מוכר — בי"ס עד 1 ק"מ',en:'home in an unrecognized village — school within 1 km'},far:{ar:'بيت أبعد من 1 كم عن أي مدرسة ابتدائية',he:'בית במרחק מעל 1 ק"מ מכל בי"ס יסודי',en:'home more than 1 km from any elementary school'}})); },panel:f=>panelFill(c,f.t,f.fin)}; },
+ bagrut:()=>{ const B=D.bagrut, R=B.rows, by={}; R.forEach(r=>by[r.key]=r); const w=(g,k)=>{const X=R.filter(r=>r.grp===g&&r[k]!=null&&r.pop);const pp=X.reduce((s,r)=>s+r.pop,0);return X.reduce((s,r)=>s+r[k]*r.pop,0)/pp;};
+   const c={no:'05',title:{ar:'التعليم · البجروت',he:'חינוך · בגרות',en:'Education · bagrut'},kind:'home',a:w('arab','bagrut_univ'),j:w('jewish','bagrut_univ'),a2:w('arab','bagrut'),j2:w('jewish','bagrut'),sides:{a:S7,j:S11},
+     q:{ar:'من كل 100 طالب صف 12 — كم واحد يخرج ببجروت تكفي للقبول في الجامعة؟',he:'מכל 100 תלמידי יב — כמה יוצאים עם בגרות שמספיקה לקבלה לאוניברסיטה?',en:'Of every 100 twelfth-graders — how many leave with a bagrut good enough for university admission?'},
+     unit:{ar:'من كل 100 طالب · المخطّط = بجروت لا تكفي للجامعة',he:'מכל 100 תלמידים · מקווקו = בגרות שאינה מספיקה לאוניברסיטה',en:'of every 100 pupils · hatched = a bagrut below the university threshold'},
+     src:{ar:`الدائرة المركزية للإحصاء (הלמ"ס)، «السلطات المحلية في إسرائيل 2023» — ملفات السلطات، معطيات التعليم للسنة الدراسية ${B.year} · موزون بعدد السكان`,he:`הלמ"ס, "הרשויות המקומיות בישראל 2023" — פרופיל הרשויות, נתוני חינוך לשנת הלימודים ${B.year} · משוקלל באוכלוסייה`,en:`CBS, "Local Authorities in Israel 2023" — authority profiles, education data for school year ${B.year} · population-weighted`}};
+   return {frames:fillSeq(),map:(ctx,el,f)=>{ base(ctx); southBox(ctx); const R0=15, SH={'omer':[-7,-11],'tel sheva':[9,11],'meytar':[0,-7],'hura':[0,7]}, pos=k=>{const [x,y]=tpx(k,1),d=SH[k]||[0,0];return [x+d[0],y+d[1]];};
+       Object.keys(TOWNS).forEach(k=>{const r=by[k]; if(!r||r.bagrut_univ==null) return; const [x,y]=pos(k), v=f.fin?r.bagrut_univ:Math.min(r.bagrut_univ,f.t*100), col=TOWNS[k].g==='a'?'#e8452c':'#e9e6df';
+         ctx.save();ctx.beginPath();ctx.arc(x,y,R0,0,6.2832);ctx.fillStyle='#0d0d0d';ctx.fill();ctx.clip();ctx.fillStyle=col;ctx.fillRect(x-R0,y+R0-2*R0*v/100,2*R0,2*R0*v/100);ctx.restore();
+         ctx.beginPath();ctx.arc(x,y,R0,0,6.2832);ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.stroke();});
+       labels(el,{south:1,pos,side:SIDE_EQ,rad:k=>R0,val:f.fin?k=>by[k]&&by[k].bagrut_univ!=null?Math.round(by[k].bagrut_univ)+'%':null:null});
+       legend(el,[['background:linear-gradient(0deg,#e9e6df 60%,#0d0d0d 60%);border:1px solid #e9e6df',{ar:'بلدة يهودية — ارتفاع التعبئة = نسبة بجروت الجامعة',he:'יישוב יהודי — גובה המילוי = שיעור בגרות לאוניברסיטה',en:'Jewish town — fill height = university-level bagrut rate'},'c'],['background:linear-gradient(0deg,#e8452c 38%,#0d0d0d 38%);border:1px solid #e8452c',{ar:'بلدة عربية — نفس المقياس',he:'יישוב ערבי — אותו קנה מידה',en:'Arab town — same scale'},'c']]); },panel:f=>panelFill(c,f.t,f.fin)}; },
+ sport:()=>{ const g=D.sport.groups, F=D.sportf.features.filter(f=>f.properties.k==='f'), rk=F.map(()=>rnd());
+   const c={no:'05',title:{ar:'الخدمات · الرياضة',he:'שירותים · ספורט',en:'Services · sport'},kind:'home',cells:50,a:g.arab_towns.per_1000_youth*10,j:g.jewish_towns.per_1000_youth*10,sides:{a:S7,j:S11},
+     q:{ar:'لكل 10,000 شاب وشابة (<span dir="ltr">6–18</span> سنة) — كم قاعة رياضة أو ملعب أو بركة سباحة؟',he:'לכל 10,000 בני <span dir="ltr">6–18</span> — כמה אולמות ספורט, מגרשים או בריכות?',en:'For every 10,000 young people (aged 6–18) — how many sports halls, pitches or pools?'},
+     unit:{ar:'منشأة لكل 10,000 شاب',he:'מתקנים ל-10,000 צעירים',en:'facilities per 10,000 young people'},
+     src:{ar:`وزارة الثقافة والرياضة — سجل المنشآت الرياضية (data.gov.il، 25.7.2021)، استخراج عضوة في الفريق؛ بعد حذف ${D.sport.cleaning.outside} نقطة بموقع خاطئ و${D.sport.cleaning.inactive} غير فعّالة · أجهزة لياقة الشارع غير محسوبة · عدد أبناء <span dir="ltr">6–18</span> من سجل السكان`,he:`משרד התרבות והספורט — מאגר מתקני הספורט (data.gov.il, 25.7.2021), חילוץ: חברת צוות; לאחר הסרת ${D.sport.cleaning.outside} נקודות במיקום שגוי ו-${D.sport.cleaning.inactive} לא פעילים · מתקני כושר רחוב לא נספרו · בני <span dir="ltr">6–18</span> ממרשם האוכלוסין`,en:`Ministry of Culture & Sport facilities register (data.gov.il, 25.7.2021), extracted by a team member; ${D.sport.cleaning.outside} mis-located and ${D.sport.cleaning.inactive} inactive facilities removed · street fitness not counted · ages 6–18 from the population registry`}};
+   return {frames:fillSeq(8),map:(ctx,el,f)=>{ base(ctx); F.forEach((q,i)=>{ if(rk[i]>f.t&&!f.fin) return; const t=TOWNS[q.properties.town], [a,b]=px(...q.geometry.coordinates); ctx.beginPath();ctx.arc(a,b,2.6,0,6.2832);ctx.fillStyle=!t?'#7a3a2e':t.g==='a'?'#ff5a3c':'#f1eee7';ctx.fill();ctx.strokeStyle='#000';ctx.lineWidth=.6;ctx.stroke(); });
+       labels(el); legend(el,[['background:#f1eee7',{ar:'قاعة / ملعب / بركة في بلدة يهودية',he:'אולם / מגרש / בריכה ביישוב יהודי',en:'hall / pitch / pool in a Jewish town'},'c'],['background:#ff5a3c',{ar:'قاعة / ملعب / بركة في بلدة عربية',he:'אולם / מגרש / בריכה ביישוב ערבי',en:'hall / pitch / pool in an Arab town'},'c'],['background:#7a3a2e',{ar:'في مجلس إقليمي بدوي (غير محسوب في المقارنة)',he:'במועצה אזורית בדואית (לא נכלל בהשוואה)',en:'in a Bedouin regional council (not in the comparison)'},'c'],LJ,LA]); },panel:f=>panelFill(c,f.t,f.fin)}; },
+ sportdist:()=>{ const V=D.svc.sport.groups, S=D.sportf.features.filter(f=>f.properties.k==='f').map(f=>f.geometry.coordinates), dist=nearest(D.H,S);
+   const c={no:'05',title:{ar:'الخدمات · الرياضة',he:'שירותים · ספורט',en:'Services · sport'},kind:'home',a:V.unrec.pct_lt1k,j:V.jewish_towns.pct_lt1k,sides:{a:SU,j:{ar:`${V.jewish_towns.towns} بلدات يهودية`,he:`${V.jewish_towns.towns} יישובים יהודיים`,en:`${V.jewish_towns.towns} Jewish towns`}},
+     q:{ar:'من كل 100 بيت — كم بيت عنده قاعة رياضة أو ملعب على بُعد أقل من 1 كم؟',he:'מכל 100 בתים — לכמה יש אולם ספורט או מגרש עד 1 ק"מ?',en:'Of every 100 homes — how many have a sports hall or pitch within 1 km?'},
+     unit:{ar:'من كل 100 بيت',he:'מכל 100 בתים',en:'of every 100 homes'},zero:{ar:`تقريباً ولا بيت (<span dir="ltr">${V.unrec.pct_lt1k}%</span>) في القرى غير المعترف بها — مقابل ${Math.round(V.jewish_towns.pct_lt1k)} من كل 100 في البلدات اليهودية`,he:`כמעט אף בית (<span dir="ltr">${V.unrec.pct_lt1k}%</span>) בכפרים הלא מוכרים — מול ${Math.round(V.jewish_towns.pct_lt1k)} מכל 100 ביישובים היהודיים`,en:`almost no home (${V.unrec.pct_lt1k}%) in the unrecognized villages — against ${Math.round(V.jewish_towns.pct_lt1k)} in 100 in the Jewish towns`},
+     src:{ar:'وزارة الثقافة والرياضة — سجل المنشآت الرياضية (data.gov.il، 2021)، بعد التنظيف: قاعات وملاعب وبرك فعّالة فقط · بصمات المباني Microsoft + OSM · مسافة خط مستقيم · نتيفوت وإيلات خارج المجموع',he:'משרד התרבות והספורט — מאגר מתקני הספורט (data.gov.il, 2021), לאחר ניקוי: אולמות, מגרשים ובריכות פעילים בלבד · טביעות מבנים Microsoft + OSM · מרחק אווירי · נתיבות ואילת מחוץ לסיכום',en:'Ministry of Culture & Sport facilities register (data.gov.il, 2021), cleaned: active halls, pitches and pools only · Microsoft + OSM footprints · straight-line distance · Netivot and Eilat left out of the total'}};
+   return {frames:fillSeq(),map:(ctx,el,f)=>{ base(ctx); ctx.fillStyle='rgba(255,255,255,.07)'; S.forEach(([x,y])=>{const [a,b]=px(x,y);ctx.beginPath();ctx.arc(a,b,PJ.s,0,6.2832);ctx.fill();});
+       homesByDist(ctx,dist,1000,f.t); dots(ctx,S,'#fff',1.8);
+       labels(el); legend(el,HOMES_L({pt:{ar:'قاعة / ملعب / بركة + دائرة 1 كم',he:'אולם / מגרש / בריכה + עיגול 1 ק"מ',en:'hall / pitch / pool + 1 km circle'},near:{ar:'بيت في قرية غير معترف بها — منشأة أقرب من 1 كم',he:'בית בכפר לא מוכר — מתקן עד 1 ק"מ',en:'home in an unrecognized village — facility within 1 km'},far:{ar:'بيت أبعد من 1 كم عن أي قاعة أو ملعب',he:'בית במרחק מעל 1 ק"מ מכל אולם או מגרש',en:'home more than 1 km from any hall or pitch'}})); },panel:f=>panelFill(c,f.t,f.fin)}; }
+};
+/* ---------- render ---------- */
+function frameEl(g,f,i,n){ const fr=document.createElement('div'); fr.className='fr';
+  fr.innerHTML=`<div class="mp"><canvas width="700" height="675"></canvas></div><div class="pn">${g.panel(f)}</div><div class="bar" style="width:${((i+1)/n*100).toFixed(1)}%"></div>`;
+  g.map(fr.querySelector('canvas').getContext('2d'),fr.querySelector('.mp'),f); return fr; }
+(async()=>{ await load(); try{ const fam=L==='ar'?'Alexandria':L==='he'?'Rubik':'Jost', tx='أبجد אבג Abc 123 ₪×'; await Promise.all(['400','600','800'].map(w=>document.fonts.load(`${w} 20px "${fam}"`,tx)).concat(['500','700','800'].map(w=>document.fonts.load(`${w} 20px "Jost"`,tx)))); await document.fonts.ready; }catch(e){}
+  const g=GIFS[G](); if(g.view) PJ=VIEW[g.view]; const st=document.getElementById('stage'), n=g.frames.length;
+  if(FQ==='all'){ g.frames.forEach((f,i)=>st.appendChild(frameEl(g,f,i,n))); document.title='ready '+n; return; }
+  let i=0; const show=()=>{ st.innerHTML=''; st.appendChild(frameEl(g,g.frames[i],i,n)); const f=g.frames[i]; setTimeout(()=>{i=(i+1)%n;show();},f.fin?4500:i===0?1400:420); }; show();
+})();
+</script>
+</body>
+</html>

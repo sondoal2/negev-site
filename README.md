@@ -39,3 +39,23 @@ Compare view → "Mark demolished building" → click vertices, double-click to 
 Processing scripts are in `scripts/` (run with ArcGIS Pro Python): `lpkx_to_geojson.py`, `localities.py`, `buildings.py`, `gtfs_direct.py`, `transit_access.py`, `clip_to_negev.py`, `transit_pairs.py`, `services_access.py`, `cbs_education.py`, `sport_clean.py` (chapter 04 player: an unrecognized village beside a recognized town, both 3.2 km windows at the same scale).
 
 Every chapter ends with a **gap card**: one Arab line vs one Jewish line in the same unit, and the ratio (×N) in red.
+
+## GIFs (one story each)
+
+`gifs/ar/*.gif` — nine 1200×675 GIFs, each a single story: the map on the left (camera never moves), and on the right the topic, one question,
+the two sides in identical units, the gap ×N and the source.
+
+| file | story |
+|---|---|
+| `01-homes-off-the-map` | homes outside every recognized limit |
+| `02-new-localities-since-1948` | new localities founded since 1948, Jewish vs Arab |
+| `03-industrial-land` | football pitches of industrial land per 1,000 residents |
+| `03-business-tax` | business arnona per resident |
+| `04-bus-stop-walking-distance` | homes within 400 m of a served bus stop |
+| `05-elementary-school-1km` | homes within 1 km of an elementary school |
+| `05-bagrut-university` | twelfth-graders with a university-level bagrut |
+| `05-sport-facilities-per-youth` | sports halls, pitches and pools per 10,000 aged 6–18 |
+| `05-sport-facility-1km` | homes within 1 km of a hall or pitch |
+
+The frames are drawn by `gif.html` from the same data files and formulas as the site (`gif.html?g=bus&lang=ar` plays one live).
+`python scripts/make_gifs.py . ar` re-exports them (headless Edge/Chrome screenshot + Pillow; `he` / `en` also work as the language).

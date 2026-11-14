@@ -158,6 +158,22 @@ body.chap #card{display:block}
 .plot .pk{font-size:12px;line-height:1.45}
 .plot .pk b{font-family:"Jost";font-weight:800;font-size:20px}
 .plot .pk .sw{display:inline-block;width:11px;height:11px;margin-inline-end:5px;vertical-align:-1px}
+/* 04 player: same-scale pairs (village vs town), 3.2 km windows */
+#pairs{position:absolute;z-index:11;top:72px;inset-inline-start:16px;width:min(760px,calc(100% - 430px));background:#0b0b0b;border:1px solid var(--line);display:none;box-shadow:0 10px 0 rgba(0,0,0,.55)}
+body.pairs #pairs{display:block}
+#pairs .pp{display:grid;grid-template-columns:1fr 1fr}
+#pairs .pn{border-inline-start:1px solid var(--line);padding:10px 12px 12px}
+#pairs .pn:first-child{border:0}
+#pairs .ph{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:6px}
+#pairs .ph b{font-size:16px;letter-spacing:.04em} #pairs .ph small{font-size:11px;color:var(--concrete);text-transform:uppercase;letter-spacing:.06em}
+#pairs svg{display:block;width:100%;height:auto;background:#151514}
+#pairs .pv{display:flex;align-items:baseline;gap:8px;margin-top:8px}
+#pairs .pv b{font-family:"Jost";font-weight:800;font-size:38px;line-height:1;color:var(--bone)} #pairs .pn.a .pv b{color:var(--red)}
+#pairs .pv span{font-size:12px;line-height:1.3;color:#d8d5ce}
+#pairs .pf{display:flex;align-items:center;gap:14px;padding:10px 12px;border-top:1px solid var(--line);font-size:12px;color:#d8d5ce;flex-wrap:wrap}
+#pairs .pf .x{font-family:"Jost";font-weight:800;font-size:30px;color:var(--red);line-height:1}
+#pairs .pf .lg{display:flex;gap:10px;flex-wrap:wrap;margin-inline-start:auto} #pairs .pf .lg i{display:inline-block;width:11px;height:11px;margin-inline-end:4px;vertical-align:-1px}
+@media (max-width:900px){#pairs{inset-inline:8px;width:auto;top:64px;max-height:calc(100% - 80px);overflow:auto} #pairs .pv b{font-size:26px}}
 /* 100% stacked distance bars */
 .stk{display:flex;flex-direction:column;gap:5px;margin:4px 0 6px}
 .stk .sr{display:grid;grid-template-columns:118px 1fr;gap:6px;align-items:center;font-size:12px}
@@ -247,6 +263,7 @@ body.chap #stats{display:none}
 <div id="stage">
   <div id="card"></div>
   <div id="player"><button id="plPlay" title="Play / pause">❚❚</button><button class="sp on" data-s="1000">1s</button><button class="sp" data-s="2000">2s</button><div id="plCap"></div><div id="plBar"><i></i></div><div id="plCount"></div></div>
+  <div id="pairs"></div>
   <div id="timeline"><button id="tlPlay">▶</button><input type="range" id="tlRange" min="1870" max="2024" value="2024"><div id="tlYear">2024</div><div id="tlCount"></div></div>
   <div id="map"></div>
   <div id="map2"></div>
@@ -818,7 +835,11 @@ const fly=(opts)=>map.easeTo({...opts,duration:Math.min(900,PL.speed*.7)});
 const fitB=(g,maxZoom)=>{const ps=g.type==='Polygon'?[g.coordinates]:g.coordinates;let x0=180,y0=90,x1=-180,y1=-90;ps.forEach(p=>p[0].forEach(([x,y])=>{x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x);y1=Math.max(y1,y);}));
   map.fitBounds([[x0,y0],[x1,y1]],{padding:{top:120,bottom:80,left:window.innerWidth>900?440:40,right:window.innerWidth>900?340:40},maxZoom,duration:Math.min(900,PL.speed*.7)});};
 const setHi=fs=>map.getSource('hi')&&map.getSource('hi').setData({type:'FeatureCollection',features:fs});
-function resetHi(){ setHi([]); if(map.getLayer('frames-line')){map.setFilter('frames-fill',null);map.setFilter('frames-line',['all',['>=',['get','n'],20],['==',['get','c'],'u']]);map.setFilter('frames-line-e',['all',['>=',['get','n'],20],['==',['get','c'],'e']]);map.setFilter('rt-line',['==',['get','o'],'__none']);map.getSource('rtmiss').setData({type:'FeatureCollection',features:[]});}
+// static 04 view: every real direct route + a red dashed '0' line for each comparison town with no direct trip to TA / Jerusalem
+function missFC(){ if(!DATA) return {type:'FeatureCollection',features:[]}; const miss=[];
+  transitFC().features.filter(f=>TR2POP[f.properties.id]).forEach(f=>['ta','jm'].forEach(d=>{ if(!+f.properties[d]) miss.push({type:'Feature',geometry:{type:'LineString',coordinates:[f.geometry.coordinates,DESTS[d].c]},properties:{}}); }));
+  return {type:'FeatureCollection',features:miss}; }
+function resetHi(){ setHi([]); if(map.getLayer('frames-line')){map.setFilter('frames-fill',null);map.setFilter('frames-line',['all',['>=',['get','n'],20],['==',['get','c'],'u']]);map.setFilter('frames-line-e',['all',['>=',['get','n'],20],['==',['get','c'],'e']]);map.setFilter('rt-line',null);map.getSource('rtmiss').setData(missFC());}
   if(map.getLayer('tr-circ')){map.setPaintProperty('tr-circ','circle-opacity',1);map.setPaintProperty('tr-num','text-opacity',1);map.setPaintProperty('tr-name','text-opacity',1);} }
 const FRAMES={
  // 01: camera fixed; Bedouin clusters light up from largest to smallest, counter climbs
@@ -834,18 +855,14 @@ const FRAMES={
    const geo=k=>[...DATA.arab7.features,...DATA.jew11.features].filter(f=>(f.properties.City_Name||'').toLowerCase()===k);
    return [...R].sort((a,b)=>b.ind_per1000-a.ind_per1000).map(r=>{const pr=P.find(p=>p.key===r.key);
      return {cap:`<b>${r.ind_per1000.toFixed(0)}</b>${r[L]||r.en}${pr&&pr.own_rev_pc?` · ${pr.own_rev_pc.toLocaleString()} ₪`:''}`,apply:()=>setHi(geo(r.key))};}); },
- // 04: camera fixed Negev→Tel Aviv/Jerusalem; towns added one by one (Jewish / Arab alternating by size):
- //     real bus routes appear for Jewish towns, a red dashed "0" for Arab towns
- transit:()=>{ const fc=transitFC().features.filter(f=>TR2POP[f.properties.id]&&f.properties.pop&&f.properties.pop!=='null');
-   const J0=fc.filter(f=>f.properties.grp==='jewish').sort((a,b)=>b.properties.pop-a.properties.pop), A0=fc.filter(f=>f.properties.grp==='arab').sort((a,b)=>b.properties.pop-a.properties.pop);
-   const ord=[]; for(let i=0;i<Math.max(J0.length,A0.length);i++){ if(J0[i]) ord.push(J0[i]); if(A0[i]) ord.push(A0[i]); }
-   return ord.map((f,i)=>{ const shown=ord.slice(0,i+1), p=f.properties;
-     return {cap:`<b style="${+p.tot?'color:var(--bone)':''}">${p.tot}</b>${p.name} <small>${Math.round(p.pop/1000)}k</small>`,
-       apply:()=>{ map.setFilter('rt-line',['in',['get','o'],['literal',shown.map(s=>s.properties.id)]]);
-         const miss=[]; shown.forEach(s=>['ta','jm'].forEach(d=>{ if(!+s.properties[d]) miss.push({type:'Feature',geometry:{type:'LineString',coordinates:[s.geometry.coordinates,DESTS[d].c]},properties:{}}); }));
-         map.getSource('rtmiss').setData({type:'FeatureCollection',features:miss});
-         const op=['case',['in',['get','id'],['literal',shown.map(s=>s.properties.id)]],1,.12];
-         map.setPaintProperty('tr-circ','circle-opacity',op); map.setPaintProperty('tr-num','text-opacity',op); map.setPaintProperty('tr-name','text-opacity',op); }}; }); },
+ // 04: same-scale pairs - an unrecognized village beside a recognized town (3.2 km windows, scripts/transit_pairs.py),
+ //     then the overall gap on the map
+ transit:()=>{ const NP=3, nm=o=>o[L]||o.en, no=i=>String(i+1).padStart(2,'0');
+   const pf=[...Array(NP).keys()].map(i=>({hold:4,cap:()=>{const P=PAIRS_DATA&&PAIRS_DATA.pairs[i];return P?`<b>${no(i)}</b>${nm(P.a.name)} <small>${T4({ar:'مقابل',he:'מול',en:'vs'})}</small> ${nm(P.j.name)}`:`<b>${no(i)}</b>…`;},
+     apply:()=>showPair(i)}));
+   const A=DATA.access, g=A&&A.groups;
+   return [...pf, {hold:4,cap:g?`<b>×${Math.round(g.jewish_towns.pct_lt400/g.unrec.pct_lt400)}</b>${T4({ar:`${g.unrec.pct_lt400}% من بيوت القرى غير المعترف بها على بُعد مشي من محطة — مقابل ${g.jewish_towns.pct_lt400}% في البلدات اليهودية`,he:`${g.unrec.pct_lt400}% מבתי הכפרים הלא מוכרים במרחק הליכה מתחנה — לעומת ${g.jewish_towns.pct_lt400}% ביישובים היהודיים`,en:`${g.unrec.pct_lt400}% of unrecognized-village homes are within walking distance of a stop — vs ${g.jewish_towns.pct_lt400}% in Jewish towns`})}`:'',
+     apply:()=>{ Object.assign(state,{access:true,transit:false,routes:false}); applyState(); fly({center:[34.86,31.22],zoom:9.6}); }}]; },
  // 05: camera fixed; disadvantage layers stack up
  violence:()=>{ const st=(o)=>()=>{Object.assign(state,{grid:false,frames:false,indJ:false,indA:false,transit:false,access:false,unrec:false},o);applyState();};
    return [
@@ -854,15 +871,42 @@ const FRAMES={
     {cap:`<b>04</b>${T4({ar:'+ بلا مواصلات',he:'+ ללא תחבורה',en:'+ no transit'})}`,apply:st({frames:true,indJ:true,indA:true,transit:true})},
     {cap:`<b>05</b>${T4({ar:'= أرض خصبة للعنف · البيانات قيد الجمع',he:'= קרקע לאלימות · הנתונים בתהליך איסוף',en:'= ground for violence · data being collected'})}`,apply:st({frames:true,indJ:true,indA:true,transit:true})}]; }
 };
-function showFrame(){ const f=PL.frames[PL.i]; if(!f) return; try{f.apply();}catch(e){}
+/* ---- 04 pairs: two 3.2 km windows drawn at the same scale ---- */
+let PAIRS_DATA=null, PAIRS_LOADING=null;
+const PAIR_RAMP=['#8a8a86','#6e2519','#b5361f','#ff5a3c'];
+function pairSVG(p,W){
+  const paths=['','','',''];
+  p.b.forEach(a=>{ let d=`M${a[1]} ${a[2]}`; for(let i=3;i<a.length;i+=2) d+=`l${a[i]} ${a[i+1]}`; paths[a[0]]+=d+'z'; });
+  const c=p.s.map(([x,y])=>`<circle cx="${x}" cy="${y}" r="400"/>`).join(''), st=p.s.map(([x,y])=>`<circle cx="${x}" cy="${y}" r="26"/>`).join('');
+  return `<svg viewBox="0 0 ${W} ${W}" role="img" aria-label="${p.name.en}"><g transform="translate(0 ${W}) scale(1 -1)">`+
+    `<g fill="#e9e6df" opacity=".14">${c}</g>`+paths.map((d,k)=>d?`<path d="${d}" fill="${PAIR_RAMP[k]}"/>`:'').join('')+
+    `<g fill="#000" stroke="#e9e6df" stroke-width="9">${st}</g></g>`+
+    `<path d="M120 ${W-120}h1000" fill="none" stroke="#e9e6df" stroke-width="14"/><text x="120" y="${W-160}" fill="#e9e6df" font-size="110" font-family="Jost,sans-serif" font-weight="700">1 km</text></svg>`;
+}
+function showPair(i){
+  if(!PAIRS_DATA){ if(!PAIRS_LOADING) PAIRS_LOADING=fetch('data/transit_pairs.json').then(r=>r.json()).then(d=>{PAIRS_DATA=d;}).catch(()=>{});
+    PAIRS_LOADING.then(()=>{ if(PL.key==='transit'&&PL.i===i&&PAIRS_DATA) showFrame(); }); return; }
+  const P=PAIRS_DATA.pairs[i]; if(!P) return; const W=PAIRS_DATA.window_m, nm=o=>o[L]||o.en;
+  const KIND={unrec:{ar:'قرية غير معترف بها',he:'כפר לא מוכר',en:'unrecognized village'},arab_town:{ar:'بلدة عربية معترف بها',he:'יישוב ערבי מוכר',en:'recognized Arab town'},jewish_town:{ar:'بلدة يهودية',he:'יישוב יהודי',en:'Jewish town'}};
+  const where={unrec:{ar:'في التجمّع',he:'בריכוז',en:'in the cluster'},arab_town:{ar:'في البلدة',he:'ביישוב',en:'in the town'},jewish_town:{ar:'في البلدة',he:'ביישוב',en:'in the town'}};
+  const panel=(p,cls)=>`<div class="pn ${cls}"><div class="ph"><b>${nm(p.name)}</b><small>${T4(KIND[p.kind])}</small></div>${pairSVG(p,W)}`+
+    `<div class="pv"><b>${p.pct_lt400}%</b><span>${T4({ar:'من البيوت على بُعد أقل من 400 م من محطة',he:'מהבתים עד 400 מ׳ מתחנה',en:'of homes within 400 m of a stop'})}<br>${T4({ar:'وسيط المسافة',he:'חציון המרחק',en:'median distance'})} ${p.median_m.toLocaleString()} ${T4({ar:'م',he:'מ׳',en:'m'})} · ${p.n.toLocaleString()} ${T4({ar:'مبنى',he:'מבנים',en:'buildings'})} ${T4(where[p.kind])}</span></div></div>`;
+  const x=P.a.pct_lt400>0?`<span class="x">×${(P.j.pct_lt400/P.a.pct_lt400).toFixed(1)}</span>`:`<span class="x">0</span><span>${T4({ar:'ولا بيت في التجمّع على بُعد مشي من محطة باص',he:'אף בית בריכוז אינו במרחק הליכה מתחנת אוטובוס',en:'not one home in the cluster is within walking distance of a bus stop'})}</span>`;
+  const lg=[['<400 m',0],['0.4–1 km',1],['1–3 km',2],['>3 km',3]].map(([l,k])=>`<span><i style="background:${PAIR_RAMP[k]}"></i>${l}</span>`).join('')+
+    `<span><i style="background:#000;border:1px solid #e9e6df;border-radius:50%"></i>${T4({ar:'محطة + دائرة 400 م',he:'תחנה + עיגול 400 מ׳',en:'stop + 400 m circle'})}</span>`;
+  document.getElementById('pairs').innerHTML=`<div class="pp">${panel(P.a,'a')}${panel(P.j,'j')}</div><div class="pf">${x}<span>${T4({ar:'نفس المقياس: كل شبّاك 3.2 × 3.2 كم',he:'אותו קנה מידה: כל חלון 3.2 × 3.2 ק״מ',en:'same scale: each window 3.2 × 3.2 km'})} · GTFS ${DATA.access?DATA.access.date:''} · Microsoft · OSM</span><span class="lg">${lg}</span></div>`;
+  document.body.classList.add('pairs');
+}
+function showFrame(){ const f=PL.frames[PL.i]; if(!f) return; document.body.classList.remove('pairs'); try{f.apply();}catch(e){}
   plCap.innerHTML=typeof f.cap==='function'?f.cap():f.cap; plCount.textContent=`${PL.i+1} / ${PL.frames.length}`;
   const bar=document.querySelector('#plBar i'); bar.style.transition='none'; bar.style.width=`${PL.i/PL.frames.length*100}%`;
-  requestAnimationFrame(()=>{bar.style.transition=PL.playing?`width ${PL.speed}ms linear`:'none'; bar.style.width=`${(PL.i+1)/PL.frames.length*100}%`;}); }
+  requestAnimationFrame(()=>{bar.style.transition=PL.playing?`width ${PL.speed*(f.hold||1)}ms linear`:'none'; bar.style.width=`${(PL.i+1)/PL.frames.length*100}%`;}); }
 function tick(){ PL.i=(PL.i+1)%PL.frames.length; showFrame(); }
-function runTimer(){ clearInterval(PL.timer); PL.timer=PL.playing?setInterval(tick,PL.speed):null; plPlay.textContent=PL.playing?'❚❚':'▶'; }
+// one timeout per frame so a frame can stay longer (f.hold = number of beats)
+function runTimer(){ clearTimeout(PL.timer); PL.timer=PL.playing?setTimeout(()=>{tick();runTimer();},PL.speed*((PL.frames[PL.i]||{}).hold||1)):null; plPlay.textContent=PL.playing?'❚❚':'▶'; }
 function startPlayer(key){ PL.frames=(FRAMES[key]&&DATA)?FRAMES[key]():[]; PL.key=key; PL.i=0; PL.playing=true;
   document.body.classList.toggle('pl',PL.frames.length>0); if(!PL.frames.length) return; showFrame(); runTimer(); }
-function stopPlayer(){ clearInterval(PL.timer); PL.timer=null; document.body.classList.remove('pl'); }
+function stopPlayer(){ clearTimeout(PL.timer); PL.timer=null; document.body.classList.remove('pl','pairs'); }
 plPlay.onclick=()=>{ PL.playing=!PL.playing; runTimer(); showFrame(); };
 document.querySelectorAll('#player .sp').forEach(b=>{ b.classList.toggle('on',+b.dataset.s===PL.speed);
   b.onclick=()=>{ PL.speed=+b.dataset.s; try{localStorage.setItem('offmap-speed',PL.speed);}catch(e){}

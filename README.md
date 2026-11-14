@@ -35,6 +35,6 @@ Compare view → "Mark demolished building" → click vertices, double-click to 
 
 **Scope:** the atlas covers the Be'er Sheva subdistrict only. Off-map houses are clipped to it (`scripts/clip_to_negev.py`); an earlier version wrongly counted 3,548 West Bank buildings (Masafer Yatta / Susiya) as unrecognized-village houses.
 
-Processing scripts are in `scripts/` (run with ArcGIS Pro Python): `lpkx_to_geojson.py`, `localities.py`, `buildings.py`, `gtfs_direct.py`, `transit_access.py`.
+Processing scripts are in `scripts/` (run with ArcGIS Pro Python): `lpkx_to_geojson.py`, `localities.py`, `buildings.py`, `gtfs_direct.py`, `transit_access.py`, `clip_to_negev.py`, `transit_pairs.py` (chapter 04 player: an unrecognized village beside a recognized town, both 3.2 km windows at the same scale).
 
 Every chapter ends with a **gap card**: one Arab line vs one Jewish line in the same unit, and the ratio (×N) in red.

@@ -23,7 +23,7 @@ Arab/Jewish classification is by council (see `ARAB` set in `index.html`).
 ## Demolition tool
 Compare view → "Mark demolished building" → click vertices, double-click to close → Export GeoJSON. Drawings are saved in the browser until exported.
 
-## Five chapters (v2)
+## Six chapters (v3)
 | # | Chapter | Data | Method |
 |---|---|---|---|
 | 01 | Land & recognition | Microsoft ML building footprints 2026, iplan limits, OSM | Buildings outside every recognized limit, ≤2.5 km from a candidate village or inside Neve Midbar / al-Kasum → 250 m grid (`bld_offmap_grid.geojson`, `buildings_summary.json`) |
@@ -31,10 +31,11 @@ Compare view → "Mark demolished building" → click vertices, double-click to 
 | 03 | Economy | Team ArcGIS layers | Gross industrial area by sector |
 | 04 | Mobility | MoT GTFS (`transit_direct.json`) | Direct trips on one weekday; only stops inside locality limits |
 | 04b | Walking access to a bus stop | MoT GTFS (served stops only), Microsoft footprints, iplan limits (`transit_access.json`, `transit_stops.geojson`, `offmap_stopdist.json`, `grid_stopdist.json`) | Straight-line distance from every off-map house and every building in the 18 comparison towns' built-up core to the nearest stop with ≥1 weekday trip (`scripts/transit_access.py`). Netivot and Eilat left out of totals (no Microsoft footprints). Bedouin clusters inside Arad's limit stay counted as Arad — conservative. |
-| 05 | Violence | — (being collected with Sikkuy-Aufoq / Abraham Initiatives) | Planned: victims by locality, distance to police, AI street-image audit |
+| 05 | Education & services | MoE institutions + coordinates (data.gov.il), CBS Local Authorities 2023 profiles, OSM clinics (`services_access.json`, `services_points.geojson`, `grid_svcdist.json`, `bagrut.json`) | Distance from every home to the nearest active elementary school (`scripts/services_access.py`); bagrut 2022/23 per town incl. the Bedouin regional councils (`scripts/cbs_education.py`). Clinics shown on the map only — OSM too incomplete for a gap figure. |
+| 06 | Violence | — (being collected with Sikkuy-Aufoq / Abraham Initiatives) | Planned: victims by locality, distance to police, AI street-image audit |
 
 **Scope:** the atlas covers the Be'er Sheva subdistrict only. Off-map houses are clipped to it (`scripts/clip_to_negev.py`); an earlier version wrongly counted 3,548 West Bank buildings (Masafer Yatta / Susiya) as unrecognized-village houses.
 
-Processing scripts are in `scripts/` (run with ArcGIS Pro Python): `lpkx_to_geojson.py`, `localities.py`, `buildings.py`, `gtfs_direct.py`, `transit_access.py`, `clip_to_negev.py`, `transit_pairs.py` (chapter 04 player: an unrecognized village beside a recognized town, both 3.2 km windows at the same scale).
+Processing scripts are in `scripts/` (run with ArcGIS Pro Python): `lpkx_to_geojson.py`, `localities.py`, `buildings.py`, `gtfs_direct.py`, `transit_access.py`, `clip_to_negev.py`, `transit_pairs.py`, `services_access.py`, `cbs_education.py` (chapter 04 player: an unrecognized village beside a recognized town, both 3.2 km windows at the same scale).
 
 Every chapter ends with a **gap card**: one Arab line vs one Jewish line in the same unit, and the ratio (×N) in red.

@@ -419,7 +419,10 @@ async function loadData(){
   // 04 — walking access: served stops + distance from every off-map house (scripts/transit_access.py)
   const [access, stops, gridD] = await Promise.all([get('transit_access.json').catch(()=>null), opt('transit_stops.geojson'), get('grid_stopdist.json').catch(()=>[])]);
   grid.features.forEach((f,i)=>{ if(gridD[i]!=null) f.properties.d=gridD[i]; });
-  return {access, stops, nat, routes,frames, israel, cbs, grid, bsum, transit, ind, indBld, istats, tprof, jew11, arab7, nafa, negevGeom, loc:{type:'FeatureCollection',features:loc}, rc:{type:'FeatureCollection',features:rc},
+  // 05 — schools / clinics (scripts/services_access.py) and bagrut (scripts/cbs_education.py)
+  const [svc, svcPts, gridS, bagrut] = await Promise.all([get('services_access.json').catch(()=>null), opt('services_points.geojson'), get('grid_svcdist.json').catch(()=>({})), get('bagrut.json').catch(()=>null)]);
+  grid.features.forEach((f,i)=>{ const a=(gridS.school||[])[i], c=(gridS.clinic||[])[i]; if(a!=null) f.properties.ds=a; if(c!=null) f.properties.dc=c; });
+  return {svc, svcPts, bagrut, access, stops, nat, routes,frames, israel, cbs, grid, bsum, transit, ind, indBld, istats, tprof, jew11, arab7, nafa, negevGeom, loc:{type:'FeatureCollection',features:loc}, rc:{type:'FeatureCollection',features:rc},
           unrec:{type:'FeatureCollection',features:unrec}, demo:{type:'FeatureCollection',features:demo}};
 }
 
@@ -460,7 +463,7 @@ const state = { // layer id -> visible
   basemap:true, sat:false, mask:true, labels:true,
   arab:true, jew:true, ind:true, rc:false,
   unrec:true, demo:true,
-  indJ:true, indA:true, arab7:false, grid:false, frames:false, nat:false, routes:false, mask2:false, cbs:false, transit:false, access:false, jew11:false, indBld:false,
+  indJ:true, indA:true, arab7:false, grid:false, frames:false, nat:false, routes:false, mask2:false, cbs:false, transit:false, access:false, svc:false, jew11:false, indBld:false,
   xplan:false, landuse:false, tmm:false, vatmal:false
 };
 try{ Object.assign(state, JSON.parse(localStorage.getItem('offmap-state')||'{}')); }catch(e){}
@@ -470,7 +473,7 @@ const LAYERMAP = {
   arab:['loc-arab-fill','loc-arab-line','loc-arab-lbl'], jew:['loc-jew-line','loc-jew-lbl'], ind:['loc-ind'], rc:['rc-line'],
   unrec:['un-cluster','un-count','un-pt','un-lbl'], demo:['demo-halo','demo-pt'],
   indJ:['ind-j-fill','ind-j-line'], indA:['ind-a-fill','ind-a-line'], arab7:['arab7-line'],
-  grid:['grid-fill'], frames:['frames-fill','frames-line','frames-line-e','frames-lbl','bld-u','bld-e','bld-e-line'], mask2:['mask2'], nat:['nat-arab','nat-arab-line','nat-jew','nat-new','nat-bt'], routes:['rt-line','rt-miss','rt-miss-lbl'], cbs:['cbs-pt','cbs-new'], transit:['tr-circ','tr-num','tr-name','tr-dest','tr-dest-lbl'], access:['acc-grid','acc-bld','acc-stop'],
+  grid:['grid-fill'], frames:['frames-fill','frames-line','frames-line-e','frames-lbl','bld-u','bld-e','bld-e-line'], mask2:['mask2'], nat:['nat-arab','nat-arab-line','nat-jew','nat-new','nat-bt'], routes:['rt-line','rt-miss','rt-miss-lbl'], cbs:['cbs-pt','cbs-new'], transit:['tr-circ','tr-num','tr-name','tr-dest','tr-dest-lbl'], access:['acc-grid','acc-bld','acc-stop'], svc:['svc-grid','svc-school','svc-clinic'],
   jew11:['jew11-line'], indBld:['indbld-fill'],
   xplan:['live-xplan'], landuse:['live-landuse'], tmm:['live-tmm'], vatmal:['live-vatmal']
 };
@@ -550,6 +553,16 @@ map.once('style.load', async ()=>{
     'circle-radius':['interpolate',['linear'],['zoom'],8.5,1.6,12,3.5,15,6]}});
   map.on('click','acc-grid',e=>{const p=e.features[0].properties;new maplibregl.Popup().setLngLat(e.lngLat).setHTML(`<div class="card"><div class="hd">${CHT('accCell')}</div><div class="bd"><b>${(+p.d).toLocaleString()} m</b>${CHT('accMedian')} · ${p.n} ${CHT('houses')}<div class="src">GTFS ${DATA.access?DATA.access.date:''} · Microsoft footprints · OSM</div></div></div>`).addTo(map);});
   map.on('click','acc-stop',e=>{const p=e.features[0].properties;new maplibregl.Popup().setLngLat(e.lngLat).setHTML(`<div class="card"><div class="hd grey">${p.nm}</div><div class="bd"><b>${p.t}</b>${CHT('stopTrips')}<div class="src">GTFS ${DATA.access?DATA.access.date:''}</div></div></div>`).addTo(map);});
+  // 05 — distance to the nearest elementary school (grid) + schools and clinics
+  map.addLayer({id:'svc-grid',type:'fill',source:'grid',filter:['has','ds'],layout:{visibility:'none'},paint:{'fill-color':['step',['get','ds'],'#8a8a86',500,'#6e2519',1000,'#b5361f',3000,'#ff5a3c'],'fill-opacity':.9}});
+  map.addSource('svc',{type:'geojson',data:DATA.svcPts});
+  map.addLayer({id:'svc-school',type:'circle',source:'svc',filter:['in',['get','k'],['literal',['e','h','o']]],layout:{visibility:'none'},paint:{'circle-color':['match',['get','k'],'e','#e9e6df','#000'],'circle-stroke-color':'#e9e6df','circle-stroke-width':1.5,
+    'circle-radius':['interpolate',['linear'],['zoom'],8,2.5,12,6]}});
+  map.addLayer({id:'svc-clinic',type:'symbol',source:'svc',filter:['==',['get','k'],'c'],layout:{visibility:'none','text-field':'+','text-font':['Noto Sans Bold'],'text-size':['interpolate',['linear'],['zoom'],8,14,12,22],'text-allow-overlap':true},paint:{'text-color':'#fff','text-halo-color':'#000','text-halo-width':2}});
+  map.on('click','svc-grid',e=>{const p=e.features[0].properties;new maplibregl.Popup().setLngLat(e.lngLat).setHTML(`<div class="card"><div class="hd">${CHT('svcCell')}</div><div class="bd"><b>${(+p.ds).toLocaleString()} m</b>${CHT('accMedian')} · ${p.n} ${CHT('houses')}${p.dc!=null?`<br>${CHT('svcClinic')}: ${(+p.dc).toLocaleString()} m*`:''}<div class="src">משרד החינוך · data.gov.il · OSM (*${CHT('svcOsm')})</div></div></div>`).addTo(map);});
+  map.on('click','svc-school',e=>{const p=e.features[0].properties;new maplibregl.Popup().setLngLat(e.lngLat).setHTML(`<div class="card"><div class="hd bone">${p.nm}</div><div class="bd">${p.loc}<div class="src">משרד החינוך · מוסדות חינוך (data.gov.il)</div></div></div>`).addTo(map);});
+  map.on('click','svc-clinic',e=>{const p=e.features[0].properties;new maplibregl.Popup().setLngLat(e.lngLat).setHTML(`<div class="card"><div class="hd grey">${p.nm||'—'}</div><div class="bd">${p.loc||''}<div class="src">OpenStreetMap</div></div></div>`).addTo(map);});
+  ['svc-grid','svc-school','svc-clinic'].forEach(id=>{map.on('mouseenter',id,()=>map.getCanvas().style.cursor='pointer');map.on('mouseleave',id,()=>map.getCanvas().style.cursor='');});
   ['acc-grid','acc-stop'].forEach(id=>{map.on('mouseenter',id,()=>map.getCanvas().style.cursor='pointer');map.on('mouseleave',id,()=>map.getCanvas().style.cursor='');});
   if(DATA.israel){ const hole=DATA.israel.geometry.coordinates.map(p=>p[0]);
     map.addSource('mask2',{type:'geojson',data:{type:'Feature',geometry:{type:'Polygon',coordinates:[[[-180,-85],[180,-85],[180,85],[-180,85],[-180,-85]],...hole]}}});
@@ -613,13 +626,13 @@ const DESTS={bs:{c:[34.7913,31.2520],en:"Be'er Sheva",he:'באר שבע',ar:'ب�
 const CH_T={
  ar:{grp_jewish:'بلدة يهودية',grp_arab:'بلدة عربية',grp_bedouin_town:'بلدة تركيز بدوية (تخطيط الدولة)',grp_tribe:'عشيرة مسجّلة بلا بلدة',grp_mixed:'مدينة مختلطة',founded:'سنة التأسيس',pre48:'قبل 1948',pop:'السكان',
   offmapCell:'مبانٍ خارج الخريطة',bldInCell:'مبنى في مربع 250م',trips:'رحلات مباشرة يومياً',fastest:'أسرع رحلة',none:'لا يوجد خط مباشر',lines:'الخطوط',
-  tlJ:'بلدة يهودية جديدة منذ 1948',tlA:'بلدة عربية جديدة (غير التركيز)',tlB:'بلدات تركيز بدوية',play:'تشغيل',accCell:'البُعد عن محطة باص',accMedian:'الوسيط لبيوت المربع',houses:'بيت',stopTrips:'رحلة تمرّ من المحطة يوم الثلاثاء',access:'البُعد عن محطة الباص'},
+  tlJ:'بلدة يهودية جديدة منذ 1948',tlA:'بلدة عربية جديدة (غير التركيز)',tlB:'بلدات تركيز بدوية',play:'تشغيل',accCell:'البُعد عن محطة باص',accMedian:'الوسيط لبيوت المربع',houses:'بيت',stopTrips:'رحلة تمرّ من المحطة يوم الثلاثاء',access:'البُعد عن محطة الباص',svcCell:'البُعد عن مدرسة ابتدائية',svcClinic:'أقرب عيادة',svcOsm:'عيادات OSM ناقصة',svc:'المدارس والعيادات'},
  he:{grp_jewish:'יישוב יהודי',grp_arab:'יישוב ערבי',grp_bedouin_town:'יישוב ריכוז בדואי (תכנון המדינה)',grp_tribe:'שבט רשום ללא יישוב',grp_mixed:'עיר מעורבת',founded:'שנת ייסוד',pre48:'לפני 1948',pop:'אוכלוסייה',
   offmapCell:'מבנים מחוץ למפה',bldInCell:'מבנים בריבוע 250 מ\'',trips:'נסיעות ישירות ביום',fastest:'הנסיעה המהירה',none:'אין קו ישיר',lines:'קווים',
-  tlJ:'יישובים יהודיים חדשים מאז 1948',tlA:'יישובים ערביים חדשים (לא ריכוז)',tlB:'יישובי ריכוז בדואיים',play:'הפעלה',accCell:'מרחק לתחנת אוטובוס',accMedian:'חציון לבתים בריבוע',houses:'בתים',stopTrips:'נסיעות שעוברות בתחנה ביום שלישי',access:'מרחק לתחנת אוטובוס'},
+  tlJ:'יישובים יהודיים חדשים מאז 1948',tlA:'יישובים ערביים חדשים (לא ריכוז)',tlB:'יישובי ריכוז בדואיים',play:'הפעלה',accCell:'מרחק לתחנת אוטובוס',accMedian:'חציון לבתים בריבוע',houses:'בתים',stopTrips:'נסיעות שעוברות בתחנה ביום שלישי',access:'מרחק לתחנת אוטובוס',svcCell:'מרחק לבית ספר יסודי',svcClinic:'מרפאה קרובה',svcOsm:'מרפאות OSM חלקיות',svc:'בתי ספר ומרפאות'},
  en:{grp_jewish:'Jewish locality',grp_arab:'Arab locality',grp_bedouin_town:'Bedouin concentration town (state-planned)',grp_tribe:'Registered tribe, no locality',grp_mixed:'Mixed city',founded:'Founded',pre48:'Before 1948',pop:'Population',
   offmapCell:'Off-map buildings',bldInCell:'buildings in a 250 m cell',trips:'direct trips / weekday',fastest:'fastest trip',none:'no direct line',lines:'Lines',
-  tlJ:'new Jewish localities since 1948',tlA:'new Arab localities (non-concentration)',tlB:'Bedouin concentration towns',play:'Play',accCell:'Distance to a bus stop',accMedian:'median for the houses in this cell',houses:'houses',stopTrips:'trips calling here on Tuesday',access:'Distance to a bus stop'}};
+  tlJ:'new Jewish localities since 1948',tlA:'new Arab localities (non-concentration)',tlB:'Bedouin concentration towns',play:'Play',accCell:'Distance to a bus stop',accMedian:'median for the houses in this cell',houses:'houses',stopTrips:'trips calling here on Tuesday',access:'Distance to a bus stop',svcCell:'Distance to an elementary school',svcClinic:'nearest clinic',svcOsm:'OSM clinics incomplete',svc:'Schools & clinics'}};
 // distance ramp (m): grey = within walking standard, then red getting brighter with distance
 const ACC_RAMP=v=>['step',v,'#8a8a86',400,'#6e2519',1000,'#b5361f',3000,'#ff5a3c'];
 const CHT=k=>(CH_T[L]||CH_T.en)[k]||CH_T.en[k]||k;
@@ -663,11 +676,12 @@ const CHAPTERS=[
  {no:'02',key:'housing',view:{center:[35.0,31.55],zoom:7.2},layers:{mask:false,mask2:true,arab:false,jew:false,unrec:false,demo:false,grid:false,indJ:false,indA:false,cbs:false,nat:true,transit:false},timeline:true},
  {no:'03',key:'economy',view:{center:[34.85,31.25],zoom:10},layers:{mask:true,arab:false,jew:false,unrec:false,demo:false,grid:false,indJ:true,indA:true,arab7:true,jew11:true,indBld:true,cbs:false,transit:false}},
  {no:'04',key:'transit',view:{center:[35.0,31.6],zoom:7.9},layers:{mask:false,routes:true,arab:false,jew:false,unrec:false,demo:false,grid:false,indJ:false,indA:false,arab7:false,jew11:false,indBld:false,cbs:false,transit:true,access:true}},
- {no:'05',key:'violence',view:{center:[34.85,31.25],zoom:9.6},layers:{mask:true,arab:true,jew:true,unrec:true,demo:false,grid:true,indJ:false,indA:false,cbs:false,transit:false}}
+ {no:'05',key:'services',view:{center:[34.86,31.22],zoom:9.8},layers:{mask:true,arab:true,jew:true,unrec:false,demo:false,grid:false,indJ:false,indA:false,arab7:false,jew11:false,indBld:false,cbs:false,transit:false,svc:true}},
+ {no:'06',key:'violence',view:{center:[34.85,31.25],zoom:9.6},layers:{mask:true,arab:true,jew:true,unrec:true,demo:false,grid:true,indJ:false,indA:false,cbs:false,transit:false}}
 ];
-const CH_TITLE={ar:{land:'الأرض والاعتراف',housing:'السكن والاستيطان',economy:'الاقتصاد والتشغيل',transit:'المواصلات',violence:'العنف والأمان'},
- he:{land:'קרקע והכרה',housing:'דיור והתיישבות',economy:'כלכלה ותעסוקה',transit:'תחבורה',violence:'אלימות וביטחון'},
- en:{land:'Land & recognition',housing:'Housing & settlement',economy:'Economy & employment',transit:'Mobility',violence:'Violence & safety'}};
+const CH_TITLE={ar:{land:'الأرض والاعتراف',housing:'السكن والاستيطان',economy:'الاقتصاد والتشغيل',transit:'المواصلات',services:'التعليم والخدمات',violence:'العنف والأمان'},
+ he:{land:'קרקע והכרה',housing:'דיור והתיישבות',economy:'כלכלה ותעסוקה',transit:'תחבורה',services:'חינוך ושירותים',violence:'אלימות וביטחון'},
+ en:{land:'Land & recognition',housing:'Housing & settlement',economy:'Economy & employment',transit:'Mobility',services:'Education & services',violence:'Violence & safety'}};
 function chapterCard(key){
   const S=DATA.bsum, f=n=>Math.round(n).toLocaleString();
   const big=(a)=>`<div class="big">${a.map(([v,l,r])=>`<div><b class="${r?'r':''}">${v}</b><span>${l}</span></div>`).join('')}</div>`;
@@ -800,10 +814,48 @@ function chapterCard(key){
      `<div class="src">משרד התחבורה · GTFS · ${DATA.transit?DATA.transit.date:''}. ${{ar:'تُحسب المحطات داخل حدود البلدة فقط؛ محطات على الشارع الرئيسي خارج الحدود غير محسوبة.',he:'נספרות תחנות בתוך גבול היישוב בלבד; תחנות בכביש הראשי מחוץ לגבול אינן נספרות.',en:'Only stops inside the locality limit are counted; stops on the highway outside the limit are not.'}[L]}</div>`+
      accessBlock();
   }
+  if(key==='services'){
+    const V=DATA.svc, B=DATA.bagrut; if(!V) return '';
+    const G=V.school.groups, nJ=G.jewish_towns.towns;
+    const SEG=[['lt500','#8a8a86','<500 m'],['m500_1k','#6e2519','0.5–1 km'],['k1_3','#b5361f','1–3 km'],['gt3k','#ff5a3c','>3 km']];
+    const stack=(lab,g)=>`<div class="sr"><span>${tr3(lab)} <small>(${g.n.toLocaleString()})</small></span><span class="sb">${SEG.map(([k,c])=>`<i style="width:${g['pct_'+k]}%;background:${c}">${g['pct_'+k]>=8?Math.round(g['pct_'+k])+'%':''}</i>`).join('')}</span></div>`;
+    T3.ar=`<p>كل مربّع ملوّن حسب بُعد بيوته عن أقرب <b>مدرسة ابتدائية</b>. طفل عمره 7 سنوات يمشي كيلومتراً في ربع ساعة تقريباً — في القرى غير المعترف بها أغلب البيوت أبعد من ذلك بكثير، والطريق ترابي بلا رصيف ولا إنارة.</p>`;
+    T3.he=`<p>כל ריבוע צבוע לפי המרחק של בתיו מ<b>בית הספר היסודי</b> הקרוב. ילד בן 7 הולך קילומטר בכרבע שעה — בכפרים הלא מוכרים רוב הבתים רחוקים הרבה יותר, בדרך עפר בלי מדרכה ובלי תאורה.</p>`;
+    T3.en=`<p>Each cell is coloured by how far its homes are from the nearest <b>elementary school</b>. A 7-year-old walks a kilometre in about a quarter of an hour — in the unrecognized villages most homes are much farther, on dirt tracks without sidewalks or lights.</p>`;
+    const TS=[...V.school.towns].filter(r=>r.in_totals).sort((a,b)=>b.pct_lt1k-a.pct_lt1k);
+    const wavg=(g,k)=>{const X=(B?B.rows:[]).filter(r=>r.grp===g&&r[k]!=null&&r.pop);const pp=X.reduce((s,r)=>s+r.pop,0);return pp?X.reduce((s,r)=>s+r[k]*r.pop,0)/pp:0;};
+    const uA=wavg('arab','bagrut_univ'), uJ=wavg('jewish','bagrut_univ'), bA=wavg('arab','bagrut'), bJ=wavg('jewish','bagrut');
+    const BR=B?[...B.rows].filter(r=>r.bagrut_univ!=null).sort((a,b)=>b.bagrut_univ-a.bagrut_univ):[];
+    const srcSchool=tr3({ar:`وزارة التربية — مؤسسات التعليم وإحداثياتها (data.gov.il): ${V.counts.schools_elementary} مدرسة ابتدائية فعّالة في لواء الجنوب · بصمات مباني Microsoft · OSM. مسافة هوائية؛ طريق المشي الحقيقي أطول. نفس تعريف البيوت والبلدات كما في فصل المواصلات. scripts/services_access.py`,
+      he:`משרד החינוך — מוסדות חינוך וקואורדינטות (data.gov.il): ${V.counts.schools_elementary} בתי ספר יסודיים פעילים במחוז דרום · טביעות מבנים Microsoft · OSM. מרחק אווירי; דרך ההליכה בפועל ארוכה יותר. אותה הגדרת בתים ויישובים כמו בפרק התחבורה. scripts/services_access.py`,
+      en:`Ministry of Education — institutions and coordinates (data.gov.il): ${V.counts.schools_elementary} active elementary schools in the South district · Microsoft building footprints · OSM. Straight-line distance; the real walk is longer. Same homes and town cores as the mobility chapter. scripts/services_access.py`});
+    const srcBag=B?tr3({ar:`الدائرة المركزية للإحصاء، «السلطات المحلية في إسرائيل 2023» (منشور 1987)، ملف كل سلطة؛ بيانات التعليم ${B.year} مصدرها وزارة التربية. المتوسطات موزونة بعدد السكان. scripts/cbs_education.py`,
+      he:`הלמ"ס, "הרשויות המקומיות בישראל 2023" (פרסום 1987), פרופיל לכל רשות; נתוני החינוך ${B.year} ממשרד החינוך. ממוצעים משוקללים באוכלוסייה. scripts/cbs_education.py`,
+      en:`CBS, "Local Authorities in Israel 2023" (publication 1987), one profile per authority; education data ${B.year} from the Ministry of Education. Averages weighted by population. scripts/cbs_education.py`}):'';
+    return leg([...SEG.map(([k,c,l])=>[`background:${c}`,{ar:l,he:l,en:l}]),['background:#e9e6df;border:1px solid #000;border-radius:50%',{ar:'مدرسة ابتدائية',he:'בי"ס יסודי',en:'elementary school'}],['background:#000;border:1px solid #e9e6df;border-radius:50%',{ar:'مدرسة ثانوية/أخرى',he:'תיכון/אחר',en:'secondary/other school'}],['border:1px dashed #000',{ar:'+ عيادة (OSM)',he:'+ מרפאה (OSM)',en:'+ clinic (OSM)'}]])+
+     T3[L]+
+     `<h4>${tr3({ar:'كم تبعد أقرب مدرسة ابتدائية عن البيت؟',he:'כמה רחוק בית הספר היסודי הקרוב?',en:'How far is the nearest elementary school?'})}</h4>`+
+     `<div class="stk">${stack({ar:'قرى غير معترف بها',he:'כפרים לא מוכרים',en:'Unrecognized villages'},G.unrec)}${stack({ar:'بيوت خارج الخط الأزرق',he:'בתים מחוץ לקו הכחול',en:'Beyond the blue line'},G.expansion)}${stack({ar:`${G.arab_towns.towns} بلدات عربية`,he:`${G.arab_towns.towns} יישובים ערביים`,en:`${G.arab_towns.towns} Arab towns`},G.arab_towns)}${stack({ar:`${nJ} بلدات يهودية`,he:`${nJ} יישובים יהודיים`,en:`${nJ} Jewish towns`},G.jewish_towns)}</div>`+
+     `<h4>${tr3({ar:'نسبة البيوت على بُعد أقل من 1 كم من مدرسة ابتدائية',he:'שיעור הבתים עד 1 ק"מ מבית ספר יסודי',en:'Share of homes within 1 km of an elementary school'})}</h4>`+
+     bars([{label:`<b>${tr3({ar:'قرى غير معترف بها',he:'כפרים לא מוכרים',en:'Unrecognized villages'})}</b>`,v:G.unrec.pct_lt1k,grp:'red'},...TS.map(r=>({label:r[L]||r.en,v:r.pct_lt1k,grp:r.grp}))],100,'%')+
+     `<div class="src">${srcSchool}</div>`+
+     `<div class="todo">${tr3({ar:`العيادات: في OSM ${V.counts.clinics} نقطة صحية فقط في المنطقة، وكثير من عيادات القرى وصناديق المرضى غير مرسوم. لذلك تظهر العيادات على الخريطة (+) لكننا لا نحسب منها فجوة. المطلوب: قائمة عيادات وزارة الصحة وصناديق المرضى مع عناوين.`,he:`מרפאות: ב-OSM יש רק ${V.counts.clinics} נקודות בריאות באזור, ומרפאות רבות בכפרים ובקופות לא ממופות. לכן המרפאות מוצגות במפה (+) אבל לא מחושב מהן פער. נדרש: רשימת מרפאות משרד הבריאות והקופות עם כתובות.`,en:`Clinics: OSM has only ${V.counts.clinics} health points in the area and many village and HMO clinics are unmapped, so clinics are shown on the map (+) but no gap is computed from them. Needed: Ministry of Health / HMO clinic list with addresses.`})}</div>`+
+     (B?`<h4>${tr3({ar:'البجروت: نسبة المستحقين الذين يستوفون شروط القبول في الجامعة، من طلاب الصف 12',he:'בגרות: זכאים העומדים בדרישות הסף של האוניברסיטאות, מתוך תלמידי יב',en:'Bagrut meeting university entrance thresholds, % of 12th graders'})} · ${B.year}</h4>`+
+       bars(BR.map(r=>({label:r[L]||r.en,v:r.bagrut_univ,grp:r.grp==='arab_council'?'red':r.grp,note:` <small>/ ${r.bagrut}</small>`})),100,tr3({ar:'الرقم الصغير = نسبة الاستحقاق للبجروت عامةً. الأحمر = المجلسان الإقليميان البدويان (مدارس القرى غير المعترف بها وقرى أبو بسمة).',he:'המספר הקטן = שיעור הזכאות לבגרות בכלל. אדום = שתי המועצות האזוריות הבדואיות (בתי הספר של הכפרים הלא מוכרים וכפרי אבו בסמה).',en:'Small number = general bagrut eligibility. Red = the two Bedouin regional councils (schools of the unrecognized and Abu Basma villages).'}))+
+       `<p class="note2">${tr3({ar:`في الاستحقاق العام الفجوة صغيرة نسبياً (${Math.round(bA)}% مقابل ${Math.round(bJ)}%). الفجوة الحقيقية في جودة الشهادة: من يستطيع بها دخول الجامعة.`,he:`בזכאות הכללית הפער קטן יחסית (${Math.round(bA)}% לעומת ${Math.round(bJ)}%). הפער האמיתי באיכות התעודה: מי שיכול להיכנס איתה לאוניברסיטה.`,en:`In general eligibility the gap is fairly small (${Math.round(bA)}% vs ${Math.round(bJ)}%). The real gap is in the quality of the certificate: who can enter university with it.`})}</p>`+
+       `<div class="src">${srcBag}</div>`:'')+
+     gapCard({q:{ar:'كم بيت من كل 100 على بُعد أقل من 1 كم من مدرسة ابتدائية؟',he:'כמה בתים מכל 100 נמצאים עד 1 ק"מ מבית ספר יסודי?',en:'How many homes in 100 are within 1 km of an elementary school?'},
+       a:{l:{ar:'القرى غير المعترف بها',he:'הכפרים הלא מוכרים',en:'Unrecognized villages'},v:G.unrec.pct_lt1k},j:{l:{ar:`${nJ} بلدات يهودية`,he:`${nJ} יישובים יהודיים`,en:`${nJ} Jewish towns`},v:G.jewish_towns.pct_lt1k},unit:'%',
+       x:ratio(G.jewish_towns.pct_lt1k,G.unrec.pct_lt1k),xl:{ar:`ضعف — وسيط المسافة ${G.unrec.median_m.toLocaleString()} م مقابل ${G.jewish_towns.median_m.toLocaleString()} م`,he:`פעמים — חציון המרחק ${G.unrec.median_m.toLocaleString()} מ׳ לעומת ${G.jewish_towns.median_m.toLocaleString()} מ׳`,en:`times — median distance ${G.unrec.median_m.toLocaleString()} m vs ${G.jewish_towns.median_m.toLocaleString()} m`},
+       src:tr3({ar:'وزارة التربية (data.gov.il) · Microsoft · OSM',he:'משרד החינוך (data.gov.il) · Microsoft · OSM',en:'Ministry of Education (data.gov.il) · Microsoft · OSM'})})+
+     (B?gapCard({q:{ar:'من كل 100 طالب صف 12، كم يحصل على بجروت تفتح باب الجامعة؟',he:'מכל 100 תלמידי יב, כמה מקבלים בגרות שפותחת את שערי האוניברסיטה?',en:'Of every 100 12th graders, how many get a bagrut that opens the university door?'},
+       a:{l:{ar:'7 بلدات عربية',he:'7 יישובים ערביים',en:'7 Arab towns'},v:Math.round(uA)},j:{l:{ar:'11 بلدة يهودية',he:'11 יישובים יהודיים',en:'11 Jewish towns'},v:Math.round(uJ)},unit:'%',
+       x:ratio(uJ,uA),xl:{ar:'ضعف',he:'פעמים',en:'times'},src:srcBag}):'');
+  }
   if(key==='violence'){
-    T3.ar=`<p>العنف ليس "ثقافة" — له جغرافيا: شوارع بلا إنارة، أحياء بلا عنوان، قرى بلا شرطة ولا خدمات، وشباب بلا عمل. هذا الفصل يربط الجريمة بالفجوات المكانية في الفصول 01–04.</p>`;
-    T3.he=`<p>אלימות איננה "תרבות" — יש לה גיאוגרפיה: רחובות בלי תאורה, שכונות בלי כתובת, כפרים בלי משטרה ושירותים, וצעירים בלי תעסוקה. הפרק מחבר את הפשיעה לפערים המרחביים בפרקים 01–04.</p>`;
-    T3.en=`<p>Violence is not "culture" — it has a geography: unlit streets, unaddressed neighbourhoods, villages without police or services, young people without jobs. This chapter links crime to the spatial gaps in chapters 01–04.</p>`;
+    T3.ar=`<p>العنف ليس "ثقافة" — له جغرافيا: شوارع بلا إنارة، أحياء بلا عنوان، قرى بلا شرطة ولا خدمات، وشباب بلا عمل. هذا الفصل يربط الجريمة بالفجوات المكانية في الفصول 01–05.</p>`;
+    T3.he=`<p>אלימות איננה "תרבות" — יש לה גיאוגרפיה: רחובות בלי תאורה, שכונות בלי כתובת, כפרים בלי משטרה ושירותים, וצעירים בלי תעסוקה. הפרק מחבר את הפשיעה לפערים המרחביים בפרקים 01–05.</p>`;
+    T3.en=`<p>Violence is not "culture" — it has a geography: unlit streets, unaddressed neighbourhoods, villages without police or services, young people without jobs. This chapter links crime to the spatial gaps in chapters 01–05.</p>`;
     return T3[L]+`<div class="todo">${{ar:'البيانات قيد الجمع مع سيكوي-أفق ومبادرات إبراهيم: ضحايا القتل حسب البلدة والسنة · بُعد أقرب مركز شرطة · تحليل صور الشوارع بالذكاء الاصطناعي (إنارة، أرصفة، شوارع معبّدة).',he:'הנתונים נאספים עם סיכוי-אופק ויוזמות אברהם: נרצחים לפי יישוב ושנה · מרחק לתחנת משטרה · ניתוח תמונות רחוב ב-AI (תאורה, מדרכות, כבישים סלולים).',en:'Data being collected with Sikkuy-Aufoq and the Abraham Initiatives: homicide victims by locality and year · distance to the nearest police station · AI street-image audit (lighting, sidewalks, paved roads).'}[L]}</div><div class="src">data.gov.il · שיוך ישובים לתחנות משטרה · Sikkuy-Aufoq · Abraham Initiatives</div>`;
   }
   return '';
@@ -820,7 +872,7 @@ function openChapter(key,keepView){
   const c=CHAPTERS.find(c=>c.key===key); document.body.classList.toggle('tl',!!(c&&c.timeline));
   if(!c){ stopPlayer(); resetHi(); document.getElementById('card').style.display='none'; return; }
   stopPlayer(); resetHi();
-  document.getElementById('card').style.display=''; Object.assign(state,{frames:false,nat:false,routes:false,mask2:false,access:false},c.layers); applyState(); renderPanel();
+  document.getElementById('card').style.display=''; Object.assign(state,{frames:false,nat:false,routes:false,mask2:false,access:false,svc:false},c.layers); applyState(); renderPanel();
   if(!keepView) map.flyTo({...c.view,duration:1600});
   document.getElementById('card').innerHTML=`<div class="hd"><span class="no">${c.no}</span><h2>${CH_TITLE[L][key]}</h2></div><div class="bd">${chapterCard(key)}</div>`;
   if(c.timeline) setYear(tlRange.value);
@@ -869,7 +921,7 @@ const FRAMES={
     {cap:`<b>01</b>${T4({ar:'بلا اعتراف',he:'ללא הכרה',en:'no recognition'})}`,apply:st({frames:true})},
     {cap:`<b>03</b>${T4({ar:'+ بلا صناعة',he:'+ ללא תעשייה',en:'+ no industry'})}`,apply:st({frames:true,indJ:true,indA:true})},
     {cap:`<b>04</b>${T4({ar:'+ بلا مواصلات',he:'+ ללא תחבורה',en:'+ no transit'})}`,apply:st({frames:true,indJ:true,indA:true,transit:true})},
-    {cap:`<b>05</b>${T4({ar:'= أرض خصبة للعنف · البيانات قيد الجمع',he:'= קרקע לאלימות · הנתונים בתהליך איסוף',en:'= ground for violence · data being collected'})}`,apply:st({frames:true,indJ:true,indA:true,transit:true})}]; }
+    {cap:`<b>06</b>${T4({ar:'= أرض خصبة للعنف · البيانات قيد الجمع',he:'= קרקע לאלימות · הנתונים בתהליך איסוף',en:'= ground for violence · data being collected'})}`,apply:st({frames:true,indJ:true,indA:true,transit:true})}]; }
 };
 /* ---- 04 pairs: two 3.2 km windows drawn at the same scale ---- */
 let PAIRS_DATA=null, PAIRS_LOADING=null;
@@ -926,7 +978,7 @@ function renderPanel(){
   document.getElementById('panel').innerHTML=
    `<h3>${t('base')}</h3>${row('basemap',t('basemap'))}${row('sat',t('sat'))}${row('mask',t('mask'))}${row('mask2',t('mask2'))}${row('labels',t('labels'))}
     <h3>${t('bounds')}</h3>${row('arab',t('arab'),sw('#e9e6df'))}${row('jew',t('jew'),`<span class="sw" style="border:2px solid #8a8a86"></span>`)}${row('ind',t('ind'),sw('#5a5a55'))}${row('rc',t('rc'),sw('#8a8a86',1))}
-    <h3>${t('red')}</h3>${row('unrec',t('unrec'),sw('#e8452c'))}${row('grid',CHT('offmapCell'),sw('#e8452c'))}${row('cbs',CH_TITLE[L].housing+' · 1870–2024',sw('#8a8a86'))}${row('transit',CH_TITLE[L].transit+' · GTFS',sw('#e8452c',1))}${row('access',CHT('access')+' · GTFS',sw('#ff5a3c'))}${row('demo',t('demo'),'<span class="sw" style="color:#e8452c;font-weight:800;text-align:center">✕</span>')}
+    <h3>${t('red')}</h3>${row('unrec',t('unrec'),sw('#e8452c'))}${row('grid',CHT('offmapCell'),sw('#e8452c'))}${row('cbs',CH_TITLE[L].housing+' · 1870–2024',sw('#8a8a86'))}${row('transit',CH_TITLE[L].transit+' · GTFS',sw('#e8452c',1))}${row('access',CHT('access')+' · GTFS',sw('#ff5a3c'))}${row('svc',CHT('svc'),sw('#e9e6df'))}${row('demo',t('demo'),'<span class="sw" style="color:#e8452c;font-weight:800;text-align:center">✕</span>')}
     <div class="note">${t('unrecNote')}</div>
     <h3>${t('econ')}</h3>${row('indA',t('indA'),'<span class="sw" style="background:#f2c230;outline:2px solid #000;outline-offset:-3px"></span>')}${row('indJ',t('indJ'),'<span class="sw" style="background:#f2c230;opacity:.55"></span>')}${row('arab7',t('arab7'),sw('#e9e6df',1))}
     <h3>${t('plan')}</h3>${row('xplan',t('xplan'),'',1)}${row('landuse',t('landuse'),'',1)}${row('tmm',t('tmm'),'',1)}${row('vatmal',t('vatmal'),'',1)}
@@ -1038,6 +1090,9 @@ function renderAbout(){
     <tr><td>Microsoft Global ML Building Footprints (2026)</td><td>258,871 Naqab buildings classified by recognition status (ch. 01, 02)</td></tr>
     <tr><td>Ministry of Transport — GTFS</td><td>Direct no-transfer trips to Be'er Sheva / Tel Aviv / Jerusalem (ch. 04)</td></tr>
     <tr><td>Ministry of Transport — GTFS (served stops only) · Microsoft footprints</td><td>Straight-line distance from every off-map house and every town building to the nearest bus stop with a weekday trip (ch. 04)</td></tr>
+    <tr><td>Ministry of Education — institutions + coordinates (data.gov.il)</td><td>Distance from every home to the nearest active elementary school (ch. 05)</td></tr>
+    <tr><td>CBS — Local Authorities in Israel 2023 (publ. 1987)</td><td>Bagrut 2022/23 per town and Bedouin regional council, source Ministry of Education (ch. 05)</td></tr>
+    <tr><td>OpenStreetMap — health facilities</td><td>Clinics on the map only; too incomplete for a gap figure (ch. 05)</td></tr>
     <tr><td>Team ArcGIS layers</td><td>Arab / Jewish industrial zones 2022 (ch. 03)</td></tr>
     <tr><td>Ministry of Interior — audited municipal financial reports 2024</td><td>Own revenue, business arnona, budget self-reliance per town (ch. 03)</td></tr>
     <tr><td>Sikkuy-Aufoq · RCUV · NCF (Dukium)</td><td>Partners / verification sources (to integrate)</td></tr></table></div>

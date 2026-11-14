@@ -168,6 +168,12 @@ body.pairs #pairs{display:block}
 #pairs .hund{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;aspect-ratio:1;background:#151514;padding:8px}
 #pairs .hund i{display:block;border:1px solid #444} #pairs .hund i.u{background:var(--bone);border-color:var(--bone)} #pairs .hund i.b{background:repeating-linear-gradient(45deg,#8a8a86 0 2px,transparent 2px 5px);border-color:#8a8a86}
 #pairs .pn.a .hund i.u{background:var(--red);border-color:var(--red)}
+#pairs .pitches{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;align-content:start;min-height:210px;background:#151514;padding:8px}
+#pairs .pitch{display:block;width:100%;height:auto}
+#pairs .coins{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;align-content:end;min-height:210px;background:#151514;padding:8px}
+#pairs .coins i{display:flex;align-items:center;justify-content:center;aspect-ratio:1;border-radius:50%;background:#e9e6df;color:#000;font-style:normal;font-weight:800;font-size:12px;border:2px solid #8a8a86}
+#pairs .pn.a .coins i{background:var(--red);border-color:#000} #pairs .coins i.pt{opacity:.45}
+#pairs .hund.home i,#pairs .hund.pupil i{border-radius:2px}
 #pairs .pn{border-inline-start:1px solid var(--line);padding:10px 12px 12px}
 #pairs .pn:first-child{border:0}
 #pairs .ph{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:6px}
@@ -943,26 +949,47 @@ const FRAMES={
  // 02: camera fixed on the country; grey polygons accumulate, hatched Arab localities stay frozen
  housing:()=>{ const ys=[]; for(let y=1948;y<=2024;y+=2) ys.push(y); if(ys[ys.length-1]!==2024) ys.push(2024);
    return ys.map(y=>({cap:()=>{const c=tlCounts(y);return `<b>${y}</b><span class="sq g"></span>${c.j} &nbsp; <span class="sq h"></span>${c.a} &nbsp; <span class="sq r"></span>${c.b}`;},apply:()=>setYear(y)})); },
- // 03: on the real map — an Arab town and its Jewish neighbour a few km away, each with a square whose AREA = industrial land per resident
- economy:()=>{ const R=(DATA.istats&&DATA.istats.rows)||[], g=k=>R.find(r=>r.key===k)||{}, nm=r=>r[L]||r.en||'', per=r=>r.ind_dunam*1000/r.pop;
-   const m2=f=>{const X=R.filter(f);return X.reduce((s,r)=>s+r.ind_dunam,0)*1000/X.reduce((s,r)=>s+r.pop,0);}, mA=m2(r=>r.grp==='arab'), mJ=m2(r=>r.grp==='jewish');
-   const P=(DATA.tprof&&DATA.tprof.rows)||[], wv=(gp,k)=>{const X=P.filter(r=>r.grp===gp&&r[k]!=null&&r.pop_cbs_2024);const pp=X.reduce((s,r)=>s+r.pop_cbs_2024,0);return pp?X.reduce((s,r)=>s+r[k]*r.pop_cbs_2024,0)/pp:0;};
-   const bA=wv('arab','biz_arnona_pc'), bJ=wv('jewish','biz_arnona_pc'), all=R.map(r=>r.key), xr=v=>v>=10?Math.round(v):v.toFixed(1);
-   const intro={hold:3,cap:`<b>m²</b>${T4({ar:'كل مربّع أصفر = أرض صناعية لكل ساكن في البلدة. المربّع الأكبر = أرض عمل وأرنونا أكثر.',he:'כל ריבוע צהוב = קרקע תעשייה לכל תושב ביישוב. ריבוע גדול יותר = יותר קרקע לתעסוקה ולארנונה.',en:'Each yellow square = industrial land per resident. A bigger square = more land for jobs and business tax.'})}`,
-     apply:()=>{ state.econ=true; applyState(); econShow([],[]); fly({center:[35.0,31.22],zoom:9.25}); }};
-   const shown=[];
-   const pf=ECON_NEIGH.map(([a,j])=>{ const sh=[...new Set([...shown,a,j])]; shown.push(a,j); const A=g(a), J=g(j), x=per(A)>0?per(J)/per(A):0;
-     return {hold:3,cap:`<b>×${xr(x)}</b>${nm(A)} ${Math.round(per(A))} m² <small>· ${T4({ar:'جارتها',he:'השכנה',en:'its neighbour'})} ·</small> ${nm(J)} ${Math.round(per(J))} m²`,apply:()=>econShow(sh,[a,j])}; });
-   return [intro,...pf,{hold:4,cap:`<b>×${(mJ/mA).toFixed(1)}</b>${T4({ar:`بالمجموع: ${Math.round(mA)} م² لكل ساكن في البلدات العربية مقابل ${Math.round(mJ)} م² في اليهودية — وأرنونا المصالح ${Math.round(bA)} ₪ مقابل ${Math.round(bJ).toLocaleString()} ₪ للساكن (×${xr(bJ/bA)})`,he:`בסך הכול: ${Math.round(mA)} מ״ר לתושב ביישובים הערביים לעומת ${Math.round(mJ)} ביהודיים — וארנונת עסקים ${Math.round(bA)} ₪ לעומת ${Math.round(bJ).toLocaleString()} ₪ לתושב (×${xr(bJ/bA)})`,en:`Overall: ${Math.round(mA)} m² per resident in Arab towns vs ${Math.round(mJ)} m² in Jewish towns — and business arnona ₪${Math.round(bA)} vs ₪${Math.round(bJ).toLocaleString()} per resident (×${xr(bJ/bA)})`})}`,
-     apply:()=>econShow(all,all)}]; },
- // 04: same-scale pairs - an unrecognized village beside a recognized town (3.2 km windows, scripts/transit_pairs.py),
- //     then the overall gap on the map
+ // FIRST-GLANCE GRAMMAR for 03-05: the camera never moves; one question; Arab side | Jewish side; identical units
+ // (football pitches, coins, homes, pupils) fill up together frame by frame - the Arab side stops early; the gap ×N in red at the end.
+ // 03: per 1,000 residents, how many football pitches of industrial land? then: business tax per resident in 100-₪ coins
+ economy:()=>{ const R=(DATA.istats&&DATA.istats.rows)||[], m2=f=>{const X=R.filter(f);return X.reduce((s,r)=>s+r.ind_dunam,0)*1000/X.reduce((s,r)=>s+r.pop,0);};
+   const PITCH=7140, pA=m2(r=>r.grp==='arab')*1000/PITCH, pJ=m2(r=>r.grp==='jewish')*1000/PITCH;
+   const P=(DATA.tprof&&DATA.tprof.rows)||[], wv=(g,k)=>{const X=P.filter(r=>r.grp===g&&r[k]!=null&&r.pop_cbs_2024);const pp=X.reduce((s,r)=>s+r.pop_cbs_2024,0);return pp?X.reduce((s,r)=>s+r[k]*r.pop_cbs_2024,0)/pp:0;};
+   const cA=wv('arab','biz_arnona_pc')/100, cJ=wv('jewish','biz_arnona_pc')/100;
+   const sides={a:{ar:'7 بلدات عربية',he:'7 יישובים ערביים',en:'7 Arab towns'},j:{ar:'11 بلدة يهودية',he:'11 יישובים יהודיים',en:'11 Jewish towns'}};
+   return [...fillFrames({kind:'pitch',a:pA,j:pJ,sides,steps:9,dec:1,
+       q:{ar:'لكل 1,000 ساكن — كم ملعب كرة قدم من الأرض الصناعية (مصانع، ورش، أماكن عمل)؟',he:'לכל 1,000 תושבים — כמה מגרשי כדורגל של קרקע תעשייה (מפעלים, סדנאות, מקומות עבודה)?',en:'For every 1,000 residents — how many football pitches of industrial land (factories, workshops, jobs)?'},
+       unit:{ar:'ملعب',he:'מגרשים',en:'pitches'},cap:{ar:'أرض صناعية لكل 1,000 ساكن',he:'קרקע תעשייה לכל 1,000 תושבים',en:'industrial land per 1,000 residents'},
+       src:{ar:'ملعب = 105×68 م (7,140 م²) · طبقات الفريق (ArcGIS): المناطق الصناعية ∩ حدود البلديات · سكان 2026',he:'מגרש = 105×68 מ׳ (7,140 מ״ר) · שכבות הצוות (ArcGIS): אזורי תעשייה ∩ גבולות שיפוט · אוכלוסייה 2026',en:'pitch = 105×68 m (7,140 m²) · team ArcGIS layers: industrial zones ∩ municipal limits · population 2026'}}),
+     ...fillFrames({kind:'coin',a:cA,j:cJ,sides,steps:6,dec:0,
+       q:{ar:'كم تدفع المصانع والمحلات للبلدية (أرنونا) عن كل ساكن في السنة؟ كل قطعة = 100 ₪',he:'כמה משלמים מפעלים ועסקים לרשות (ארנונה) על כל תושב בשנה? כל מטבע = 100 ₪',en:'How much do factories and shops pay the council (arnona) per resident per year? Each coin = ₪100'},
+       unit:{ar:'× 100 ₪',he:'× 100 ₪',en:'× ₪100'},cap:{ar:'أرنونا المصالح لكل ساكن',he:'ארנונת עסקים לתושב',en:'business arnona per resident'},
+       src:{ar:'وزارة الداخلية — تقارير مالية مدققة 2024 (data.gov.il)، موزون بسكان הלמ"ס 2024',he:'משרד הפנים — דוחות כספיים מבוקרים 2024 (data.gov.il), משוקלל באוכלוסיית הלמ"ס 2024',en:'Ministry of Interior — audited financial reports 2024 (data.gov.il), weighted by CBS 2024 population'}})]; },
+ // 04: same-scale village/town windows (camera still), then 100 homes per side
  transit:()=>{ const NP=3, nm=o=>o[L]||o.en, no=i=>String(i+1).padStart(2,'0');
    const pf=[...Array(NP).keys()].map(i=>({hold:4,cap:()=>{const P=PAIRS_DATA&&PAIRS_DATA.pairs[i];return P?`<b>${no(i)}</b>${nm(P.a.name)} <small>${T4({ar:'مقابل',he:'מול',en:'vs'})}</small> ${nm(P.j.name)}`:`<b>${no(i)}</b>…`;},
      apply:()=>showPair(i)}));
-   const A=DATA.access, g=A&&A.groups;
-   return [...pf, {hold:4,cap:g?`<b>×${Math.round(g.jewish_towns.pct_lt400/g.unrec.pct_lt400)}</b>${T4({ar:`${g.unrec.pct_lt400}% من بيوت القرى غير المعترف بها على بُعد مشي من محطة — مقابل ${g.jewish_towns.pct_lt400}% في البلدات اليهودية`,he:`${g.unrec.pct_lt400}% מבתי הכפרים הלא מוכרים במרחק הליכה מתחנה — לעומת ${g.jewish_towns.pct_lt400}% ביישובים היהודיים`,en:`${g.unrec.pct_lt400}% of unrecognized-village homes are within walking distance of a stop — vs ${g.jewish_towns.pct_lt400}% in Jewish towns`})}`:'',
-     apply:()=>{ Object.assign(state,{access:true,transit:false,routes:false}); applyState(); fly({center:[34.86,31.22],zoom:9.6}); }}]; },
+   const g=DATA.access&&DATA.access.groups; if(!g) return pf;
+   return [...pf,...fillFrames({kind:'home',a:g.unrec.pct_lt400,j:g.jewish_towns.pct_lt400,steps:10,dec:0,
+     sides:{a:{ar:'قرى غير معترف بها',he:'כפרים לא מוכרים',en:'Unrecognized villages'},j:{ar:`${g.jewish_towns.towns} بلدات يهودية`,he:`${g.jewish_towns.towns} יישובים יהודיים`,en:`${g.jewish_towns.towns} Jewish towns`}},
+     q:{ar:'من كل 100 بيت — كم بيت عنده محطة باص على بُعد مشي (أقل من 400 م)؟',he:'מכל 100 בתים — לכמה יש תחנת אוטובוס במרחק הליכה (עד 400 מ׳)?',en:'Of every 100 homes — how many have a bus stop within walking distance (400 m)?'},
+     unit:{ar:'من 100 بيت',he:'מתוך 100 בתים',en:'of 100 homes'},cap:{ar:'محطة باص على بُعد مشي',he:'תחנה במרחק הליכה',en:'bus stop within walking distance'},
+     src:{ar:`وزارة المواصلات GTFS ${DATA.access.date} (محطات فيها خدمة) · بصمات Microsoft · OSM`,he:`משרד התחבורה GTFS ${DATA.access.date} (תחנות עם שירות) · Microsoft · OSM`,en:`MoT GTFS ${DATA.access.date} (served stops) · Microsoft footprints · OSM`}})]; },
+ // 05: the same windows with schools, then 100 homes, then 100 twelfth-graders
+ services:()=>{ const nm=o=>o[L]||o.en; const V=DATA.svc&&DATA.svc.school.groups, B=DATA.bagrut;
+   const pf=[0,1].map(i=>({hold:4,cap:()=>{const P=PAIRS_DATA&&PAIRS_DATA.pairs[i];return P?`<b>${String(i+1).padStart(2,'0')}</b>${nm(P.a.name)} <small>${T4({ar:'مقابل',he:'מול',en:'vs'})}</small> ${nm(P.j.name)}`:`<b>${String(i+1).padStart(2,'0')}</b>…`;},apply:()=>showPair(i,'school')}));
+   const w=(g,k)=>{const X=(B?B.rows:[]).filter(r=>r.grp===g&&r[k]!=null&&r.pop);const pp=X.reduce((s,r)=>s+r.pop,0);return pp?X.reduce((s,r)=>s+r[k]*r.pop,0)/pp:0;};
+   return [...pf,
+     ...(V?fillFrames({kind:'home',a:V.unrec.pct_lt1k,j:V.jewish_towns.pct_lt1k,steps:10,dec:0,
+       sides:{a:{ar:'قرى غير معترف بها',he:'כפרים לא מוכרים',en:'Unrecognized villages'},j:{ar:`${V.jewish_towns.towns} بلدات يهودية`,he:`${V.jewish_towns.towns} יישובים יהודיים`,en:`${V.jewish_towns.towns} Jewish towns`}},
+       q:{ar:'من كل 100 بيت — كم بيت عنده مدرسة ابتدائية على بُعد أقل من 1 كم؟',he:'מכל 100 בתים — לכמה יש בית ספר יסודי עד 1 ק"מ?',en:'Of every 100 homes — how many have an elementary school within 1 km?'},
+       unit:{ar:'من 100 بيت',he:'מתוך 100 בתים',en:'of 100 homes'},cap:{ar:'مدرسة ابتدائية على بُعد 1 كم',he:'בי"ס יסודי עד 1 ק"מ',en:'elementary school within 1 km'},
+       src:{ar:'وزارة التربية — مؤسسات التعليم (data.gov.il) · بصمات Microsoft · OSM',he:'משרד החינוך — מוסדות חינוך (data.gov.il) · Microsoft · OSM',en:'Ministry of Education — institutions (data.gov.il) · Microsoft footprints · OSM'}}):[]),
+     ...(B?fillFrames({kind:'pupil',a:w('arab','bagrut_univ'),j:w('jewish','bagrut_univ'),a2:w('arab','bagrut'),j2:w('jewish','bagrut'),steps:10,dec:0,
+       sides:{a:{ar:'7 بلدات عربية',he:'7 יישובים ערביים',en:'7 Arab towns'},j:{ar:'11 بلدة يهودية',he:'11 יישובים יהודיים',en:'11 Jewish towns'}},
+       q:{ar:'من كل 100 طالب صف 12 — كم واحد يخرج ببجروت تكفي للجامعة؟',he:'מכל 100 תלמידי יב — כמה יוצאים עם בגרות שמספיקה לאוניברסיטה?',en:'Of every 100 twelfth-graders — how many leave with a bagrut good enough for university?'},
+       unit:{ar:'من 100 طالب',he:'מתוך 100 תלמידים',en:'of 100 pupils'},cap:{ar:'بجروت تكفي للجامعة',he:'בגרות לאוניברסיטה',en:'university-level bagrut'},
+       src:{ar:`الدائرة المركزية للإحصاء، السلطات المحلية 2023 · وزارة التربية ${B.year} · موزون بعدد السكان`,he:`הלמ"ס, הרשויות המקומיות 2023 · משרד החינוך ${B.year} · משוקלל באוכלוסייה`,en:`CBS, Local Authorities 2023 · Ministry of Education ${B.year} · population-weighted`}}):[])]; },
  // 05: camera fixed; disadvantage layers stack up
  violence:()=>{ const st=(o)=>()=>{Object.assign(state,{grid:false,frames:false,indJ:false,indA:false,transit:false,access:false,unrec:false},o);applyState();};
    return [
@@ -1007,36 +1034,34 @@ function showPair(i,mode='transit'){
   const src=`${T4({ar:'نفس المقياس: كل شبّاك 3.2 × 3.2 كم',he:'אותו קנה מידה: כל חלון 3.2 × 3.2 ק״מ',en:'same scale: each window 3.2 × 3.2 km'})} · ${mode==='school'?T4({ar:'وزارة التربية (data.gov.il)',he:'משרד החינוך (data.gov.il)',en:'Ministry of Education (data.gov.il)'}):`GTFS ${DATA.access?DATA.access.date:''}`} · Microsoft · OSM`;
   pairsShow(pq(q)+`<div class="pp">${panel(P.a,'a')}${panel(P.j,'j')}</div>`+pairFoot(x,xl,src,lg));
 }
-// economy: every town gets a yellow square ON THE MAP whose area = industrial land per resident (m²).
-// The GIF walks through neighbours — an Arab town and the Jewish town a few km away.
+// economy: every town gets a yellow square on the map whose AREA = industrial land per resident (m², static layer)
 const ECON_ID={'rahat':'Rahat','hura':'Hura','kseifa':'Kseyfe','lakia':'Lakiye','tel sheva':'Tel Sheva','shegev shalom':'Segev Shalom','arara negev':"Ar'ara Banegev",'netivot':'Netivot','ofakim':'Ofakim','dimona':'Dimona','arad':'Arad','eilat':'Eilat','omer':'Omer','yeruham':'Yeroham','lehavim':'Lehavim','meytar':'Meitar','mizpe ramon':'Mitspe Ramon','beer sheva':"Be'er Sheva"};
-const ECON_NEIGH=[['tel sheva','omer'],['arara negev','dimona'],['lakia','lehavim'],['hura','omer'],['kseifa','arad'],['rahat','lehavim'],['shegev shalom','beer sheva']];
-function econFC(){ const R=(DATA&&DATA.istats&&DATA.istats.rows)||[], pos={};
-  DATA.loc.features.forEach(f=>{ if(!pos[f.properties.en]) pos[f.properties.en]=centroid(f.geometry); });
-  return {type:'FeatureCollection',features:R.filter(r=>pos[ECON_ID[r.key]]).map(r=>({type:'Feature',geometry:{type:'Point',coordinates:pos[ECON_ID[r.key]]},
-    properties:{key:r.key,grp:r.grp,name:r[L]||r.en,v:Math.round(r.ind_dunam*1000/r.pop),pop:r.pop}}))}; }
-function econShow(shown,cur){ if(!map.getLayer('econ-sq')) return;
-  const op=['case',['in',['get','key'],['literal',cur]],1,['in',['get','key'],['literal',shown]],.4,0];
-  ['econ-sq'].forEach(id=>map.setPaintProperty(id,'icon-opacity',op)); ['econ-num','econ-name','econ-zero'].forEach(id=>map.setPaintProperty(id,'text-opacity',op));
-  const F=econFC().features, at=k=>(F.find(f=>f.properties.key===k)||{}).geometry;
-  const link=cur.length===2&&at(cur[0])&&at(cur[1])?[{type:'Feature',geometry:{type:'LineString',coordinates:[at(cur[0]).coordinates,at(cur[1]).coordinates]},
-    properties:{km:Math.round(Math.hypot((at(cur[0]).coordinates[0]-at(cur[1]).coordinates[0])*95.3,(at(cur[0]).coordinates[1]-at(cur[1]).coordinates[1])*111))}}]:[];
-  map.getSource('econlink').setData({type:'FeatureCollection',features:link}); }
-// bagrut: 100 twelfth-graders on each side
-function showBagrut(){
-  const B=DATA.bagrut; if(!B) return;
-  const w=(g,k)=>{const X=B.rows.filter(r=>r.grp===g&&r[k]!=null&&r.pop);const pp=X.reduce((s,r)=>s+r.pop,0);return pp?X.reduce((s,r)=>s+r[k]*r.pop,0)/pp:0;};
-  const side=(g,lab,cls)=>{const u=Math.round(w(g,'bagrut_univ')), b=Math.round(w(g,'bagrut'));
-    const cells=[...Array(100).keys()].map(k=>`<i class="${k<u?'u':k<b?'b':''}"></i>`).join('');
-    return `<div class="pn ${cls}"><div class="ph"><b>${T4(lab)}</b><small>${T4({ar:'100 طالب صف 12',he:'100 תלמידי יב',en:'100 twelfth-graders'})}</small></div><div class="hund">${cells}</div>`+
-      `<div class="pv"><b>${u}</b><span>${T4({ar:'يحصلون على بجروت تكفي للجامعة',he:'מקבלים בגרות שמספיקה לאוניברסיטה',en:'get a bagrut good enough for university'})}<br>${b} ${T4({ar:'يحصلون على بجروت عامةً',he:'זכאים לבגרות בכלל',en:'get any bagrut'})}</span></div></div>`;};
-  const uA=w('arab','bagrut_univ'), uJ=w('jewish','bagrut_univ');
-  const lg=`<span><i style="background:var(--bone)"></i>${T4({ar:'بجروت للجامعة',he:'בגרות לאוניברסיטה',en:'university-level bagrut'})}</span><span><i style="background:repeating-linear-gradient(45deg,#8a8a86 0 2px,transparent 2px 5px);outline:1px solid #8a8a86"></i>${T4({ar:'بجروت فقط',he:'בגרות בלבד',en:'bagrut only'})}</span><span><i style="border:1px solid #555"></i>${T4({ar:'بلا بجروت',he:'בלי בגרות',en:'no bagrut'})}</span>`;
-  pairsShow(pq({ar:'من كل 100 طالب صف 12 — من يخرج ومعه بجروت تفتح باب الجامعة؟',he:'מכל 100 תלמידי יב — מי יוצא עם בגרות שפותחת את שערי האוניברסיטה?',en:'Of every 100 twelfth-graders — who leaves with a bagrut that opens the university door?'})+
-    `<div class="pp">${side('arab',{ar:'7 بلدات عربية',he:'7 יישובים ערביים',en:'7 Arab towns'},'a')}${side('jewish',{ar:'11 بلدة يهودية',he:'11 יישובים יהודיים',en:'11 Jewish towns'},'j')}</div>`+
-    pairFoot(`×${(uJ/uA).toFixed(1)}`,T4({ar:'الفرق ليس في الاستحقاق العام بل في نوع الشهادة: من يستطيع بها دخول الجامعة.',he:'הפער אינו בזכאות הכללית אלא בסוג התעודה: מי יכול להיכנס איתה לאוניברסיטה.',en:'The gap is not in getting a bagrut at all but in its kind: who can enter university with it.'}),
-      `${T4({ar:'الدائرة المركزية للإحصاء، السلطات المحلية 2023 · وزارة التربية',he:'הלמ"ס, הרשויות המקומיות 2023 · משרד החינוך',en:'CBS, Local Authorities 2023 · Ministry of Education'})} ${B.year} · ${T4({ar:'موزون بعدد السكان',he:'משוקלל באוכלוסייה',en:'population-weighted'})}`,lg));
+// unit-fill frames: both sides fill with identical units; t goes 0 -> 1; the Arab side stops early
+function fillFrames(c){ const N=c.steps||10, out=[];
+  for(let k=0;k<=N;k++){ const t=k/N, fin=k===N;
+    out.push({hold:fin?5:1,cap:`<b>${fin?'×'+xN(c.j,c.a):Math.round(t*100)+'%'}</b>${T4(c.cap)}`,apply:()=>showFill(c,t,fin)}); }
+  return out; }
+const xN=(hi,lo)=>{ if(!lo) return '∞'; const r=hi/lo; return r>=10?Math.round(r):r.toFixed(1); };
+function unitsHTML(kind,v,v2,cls){
+  const full=Math.floor(v+1e-9), part=v-full;
+  if(kind==='pitch'){ const one=f=>`<svg viewBox="0 0 105 68" class="pitch"><rect x="0.8" y="0.8" width="103.4" height="66.4" fill="none" stroke="#5a5a55" stroke-width="1.6" stroke-dasharray="3 3"/>`+
+      `<svg x="0" y="0" width="${(105*f).toFixed(1)}" height="68"><rect x="0" y="0" width="105" height="68" fill="#f2c230"/><g fill="none" stroke="#000" stroke-width="1.6"><rect x="1" y="1" width="103" height="66"/><path d="M52.5 1v66"/><circle cx="52.5" cy="34" r="9"/></g></svg></svg>`;
+    return `<div class="pitches">${[...Array(full)].map(()=>one(1)).join('')}${part>.02?one(part):''}</div>`; }
+  if(kind==='coin') return `<div class="coins">${[...Array(full)].map(()=>'<i>₪</i>').join('')}${part>.15?'<i class="pt">₪</i>':''}</div>`;
+  // home / pupil: a 10×10 grid of identical units
+  const n=Math.round(v), n2=Math.round(v2||0);
+  return `<div class="hund ${kind}">${[...Array(100).keys()].map(k=>`<i class="${k<n?'u':k<n2?'b':''}"></i>`).join('')}</div>`;
 }
+function showFill(c,t,fin){
+  const top=Math.max(c.a,c.j), sv=v=>Math.min(v,t*top), d=v=>(+v).toFixed(c.dec||0);
+  const side=(k,cls)=>{ const v=c[k], s=fin?v:sv(v), s2=c[k+'2']!=null?(fin?c[k+'2']:Math.min(c[k+'2'],t*Math.max(c.a2||0,c.j2||0))):null;
+    return `<div class="pn ${cls}"><div class="ph"><b>${T4(c.sides[k])}</b></div>${unitsHTML(c.kind,s,s2,cls)}`+
+      `<div class="pv"><b>${d(s)}</b><span>${T4(c.unit)}${c.kind==='pupil'&&s2!=null?`<br>${Math.round(s2)} ${T4({ar:'معهم بجروت عامةً (المخطّط)',he:'עם בגרות כלשהי (מקווקו)',en:'with any bagrut (hatched)'})}`:''}</span></div></div>`; };
+  pairsShow(pq(c.q)+`<div class="pp">${side('a','a')}${side('j','j')}</div>`+
+    (fin?`<div class="pf"><span class="x">×${xN(c.j,c.a)}</span><span>${T4({ar:'الفرق بين الجهتين',he:'הפער בין שני הצדדים',en:'the gap between the two sides'})}</span></div>`:'')+
+    `<div class="pf" style="${fin?'border-top:0;padding-top:0;':''}font-size:11px;color:var(--concrete)">${T4(c.src)}</div>`);
+}
+
 function showFrame(){ const f=PL.frames[PL.i]; if(!f) return; document.body.classList.remove('pairs'); try{f.apply();}catch(e){}
   plCap.innerHTML=typeof f.cap==='function'?f.cap():f.cap; plCount.textContent=`${PL.i+1} / ${PL.frames.length}`;
   const bar=document.querySelector('#plBar i'); bar.style.transition='none'; bar.style.width=`${PL.i/PL.frames.length*100}%`;

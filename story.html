@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OFF—MAP · Tour</title>
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;700;800&family=Alexandria:wght@400;600;800&family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0e0e0e;--bone:#e9e6df;--red:#e8452c;--concrete:#8a8a86;--font:'Alexandria','Jost',sans-serif}
+html[lang=he]{--font:'Rubik','Jost',sans-serif} html[lang=en]{--font:'Jost',sans-serif}
+html,body{margin:0;height:100%;background:#151514;color:var(--bone);font-family:var(--font);overflow:hidden}
+#map{position:fixed;inset:0}
+/* the story column: one question, one number */
+#story{position:fixed;top:0;bottom:0;inset-inline-start:0;width:min(520px,42vw);padding:56px 48px 120px;box-sizing:border-box;
+  background:linear-gradient(to left,rgba(14,14,14,.96) 70%,rgba(14,14,14,0));z-index:5;display:flex;flex-direction:column;justify-content:center;gap:18px}
+html[dir=ltr] #story{background:linear-gradient(to right,rgba(14,14,14,.96) 70%,rgba(14,14,14,0))}
+#story .no,#splitTop .no{font-family:'Jost';font-weight:800;font-size:22px;color:var(--red);letter-spacing:.08em}
+#story .no span,#splitTop .no span{color:var(--concrete);font-weight:500;margin-inline-start:12px;font-family:var(--font);font-size:16px;letter-spacing:0}
+#story h1{margin:0;font-size:46px;line-height:1.15;font-weight:800;color:var(--red)}
+#story .big{font-family:'Jost';font-weight:800;font-size:120px;line-height:.9;color:var(--bone)}
+#story .big small{font-size:28px;font-weight:500;color:var(--concrete);display:block;margin-top:10px;font-family:var(--font);line-height:1.4}
+.leg{display:flex;flex-direction:column;gap:8px;font-size:16px}
+.leg i{display:inline-block;width:16px;height:16px;margin-inline-end:10px;vertical-align:-2px}
+#story .src{font-size:12px;color:var(--concrete);line-height:1.5;border-top:1px solid #333;padding-top:10px}
+#dots{position:fixed;bottom:28px;inset-inline-start:48px;display:flex;gap:10px;z-index:8;font-family:'Jost';font-weight:700}
+#dots a{color:var(--concrete);text-decoration:none;border:1px solid #444;padding:6px 10px;font-size:14px;background:rgba(10,10,10,.7)}
+#dots a.on{background:var(--red);border-color:var(--red);color:#fff}
+#tag{position:fixed;top:20px;inset-inline-end:24px;z-index:8;font-family:'Jost';font-weight:800;font-size:22px;letter-spacing:.04em;display:flex;gap:16px;align-items:center}
+#tag b{color:var(--red)} #tag a{color:var(--concrete);font-family:var(--font);font-weight:500;font-size:14px;text-decoration:none;border:1px solid #444;padding:5px 10px}
+#tag a:hover{color:var(--bone);border-color:var(--bone)}
+.maplibregl-ctrl-attrib{font-size:10px}
+/* split screen: two places, same scale, same camera */
+body.split .half{position:absolute;top:0;bottom:0;width:50%} body.split #h0{right:0} body.split #h1{left:0;border-right:3px solid #000}
+#splitTop{position:fixed;top:22px;left:0;right:0;text-align:center;z-index:6;pointer-events:none}
+#splitTop h1{margin:6px 0 0;font-size:40px;font-weight:800;color:var(--red);text-shadow:0 2px 12px #000}
+.sideLab{position:fixed;bottom:110px;z-index:6;width:30%;text-shadow:0 2px 10px #000} .sideLab.s0{right:4%;text-align:right} .sideLab.s1{left:4%;text-align:left}
+.sideLab .nm{font-size:30px;font-weight:800} .sideLab .nm span{display:block;font-size:16px;font-weight:400;color:var(--concrete)}
+.sideLab .v{font-family:'Jost';font-weight:800;font-size:140px;line-height:1} .sideLab.s1 .v{color:var(--red)} .sideLab .u{font-size:16px;color:var(--concrete)}
+#gapX{position:fixed;left:50%;top:50%;transform:translate(-50%,-30%);z-index:7;background:rgba(10,10,10,.92);border:2px solid var(--red);padding:18px 26px;text-align:center;width:300px}
+#gapX .x{font-family:'Jost';font-weight:800;font-size:96px;line-height:1;color:var(--red)} #gapX .u{font-size:14px;color:var(--bone);margin:6px 0 10px}
+#gapX .leg{gap:6px;font-size:13px;text-align:start} #gapX .leg i{width:13px;height:13px;margin-inline-end:8px}
+#gapX .src{font-size:10px;color:var(--concrete);margin-top:10px}
+@media (max-width:760px){#story{width:100%;padding:24px 20px 90px;justify-content:flex-end;background:linear-gradient(to top,rgba(14,14,14,.96) 55%,rgba(14,14,14,0))}
+  #story h1{font-size:28px} #story .big{font-size:64px} #story .big small{font-size:16px} .leg{font-size:13px}
+  #dots{inset-inline-start:20px;bottom:14px} #tag{font-size:16px;inset-inline-end:14px;top:12px}
+  #splitTop h1{font-size:22px} .sideLab .v{font-size:60px} .sideLab .nm{font-size:18px} #gapX{width:220px;padding:10px} #gapX .x{font-size:52px}}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="story"></div>
+<div id="dots"></div>
+<div id="tag"><span>OFF<b>—</b>MAP</span><a id="back" href="index.html"></a></div>
+<script>
+/* OFF—MAP tour: one question per screen, the data drawn as objects in 3D. Same data files as index.html.
+   ?s=01..07 picks the scene · ?lang=ar|he|en (else the atlas's saved language) · ?play=1 walks through all scenes (for recording) */
+const q=new URLSearchParams(location.search), KEYS=['01','02','03','04','05','06','07'];
+const S=KEYS.includes(q.get('s'))?q.get('s'):'01', PLAY=q.get('play')==='1', HOLD=+(q.get('hold')||10);
+let L=q.get('lang'); if(!['ar','he','en'].includes(L)){ try{L=localStorage.getItem('offmap-lang');}catch(e){} } if(!['ar','he','en'].includes(L)) L='ar';
+document.documentElement.lang=L; document.documentElement.dir=L==='en'?'ltr':'rtl';
+const T=o=>o[L]||o.en;
+const get=f=>fetch('data/'+f).then(r=>r.json());
+const C={bone:'#e9e6df',red:'#e8452c',yellow:'#f2c230'};
+function circle(c,r_m,n=40){const kx=111320*Math.cos(c[1]*Math.PI/180),ky=110540,ring=[];for(let i=0;i<=n;i++){const a=2*Math.PI*i/n;ring.push([c[0]+r_m*Math.cos(a)/kx,c[1]+r_m*Math.sin(a)/ky]);}return ring;}
+function square(c,side_m){const kx=111320*Math.cos(c[1]*Math.PI/180),ky=110540,h=side_m/2;return [[c[0]-h/kx,c[1]-h/ky],[c[0]+h/kx,c[1]-h/ky],[c[0]+h/kx,c[1]+h/ky],[c[0]-h/kx,c[1]+h/ky],[c[0]-h/kx,c[1]-h/ky]];}
+function centroid(g){let sx=0,sy=0,n=0;const walk=a=>{if(typeof a[0]==='number'){sx+=a[0];sy+=a[1];n++;}else a.forEach(walk);};walk(g.coordinates);return [sx/n,sy/n];}
+const FC=f=>({type:'FeatureCollection',features:f});
+async function offmap(){const a=await get('offmap_buildings.json'),d=await get('offmap_stopdist.json').catch(()=>[]);
+  return FC(a.map((r,k)=>{let x=r[2],y=r[3];const ring=[[x/1e5,y/1e5]];for(let i=4;i<r.length;i+=2){x+=r[i];y+=r[i+1];ring.push([x/1e5,y/1e5]);}ring.push(ring[0]);
+    return {type:'Feature',geometry:{type:'Polygon',coordinates:[ring]},properties:{d:d[k]!=null?d[k]:-1}};}));}
+function osmBuildings(m,color,op){m.addLayer({id:'osm-b',type:'fill-extrusion',source:'omt','source-layer':'building',minzoom:12,
+  paint:{'fill-extrusion-color':color,'fill-extrusion-height':['coalesce',['get','render_height'],6],'fill-extrusion-base':['coalesce',['get','render_min_height'],0],'fill-extrusion-opacity':op}});}
+
+const SCENES={
+'01':{t:{ar:'الأرض والاعتراف',he:'קרקע והכרה',en:'Land & recognition'},
+  q:{ar:'مين برّا الخطوط؟',he:'מי מחוץ לקווים?',en:'Who is outside the lines?'},big:'45,004',
+  sub:{ar:'بيت خارج كل حدّ معترف به في قضاء بئر السبع',he:'בתים מחוץ לכל גבול מוכר בנפת באר שבע',en:"homes outside every recognized limit in the Be'er Sheva subdistrict"},
+  leg:[[C.red,{ar:'عمود = مربع 250×250 م · ارتفاعه = عدد البيوت خارج الاعتراف',he:"עמודה = משבצת 250×250 מ' · גובהה = מספר הבתים מחוץ להכרה",en:'column = 250×250 m cell · height = homes outside recognition'}],
+       [C.bone,{ar:'خط أبيض = حدّ بلدة معترف بها',he:'קו לבן = גבול יישוב מוכר',en:'white line = recognized locality limit'}]],
+  src:{ar:'Microsoft ML Building Footprints · الحدود: מנהל התכנון (iplan)',he:'Microsoft ML Building Footprints · גבולות: מנהל התכנון (iplan)',en:'Microsoft ML Building Footprints · limits: Israel Planning Administration (iplan)'},
+  cam:{center:[34.86,31.19],zoom:10.7,pitch:62,bearing:-14},
+  async add(m){const [g,mu,va]=await Promise.all([get('bld_offmap_grid.geojson'),get('muni.geojson'),get('vaadim.geojson')]);
+    m.addSource('lim',{type:'geojson',data:FC(mu.features.concat(va.features))});
+    m.addLayer({id:'limf',type:'fill',source:'lim',paint:{'fill-color':'#262624','fill-opacity':.9}});
+    m.addLayer({id:'liml',type:'line',source:'lim',paint:{'line-color':C.bone,'line-width':1.6}});
+    m.addSource('g',{type:'geojson',data:g});
+    m.addLayer({id:'g',type:'fill-extrusion',source:'g',paint:{'fill-extrusion-color':C.red,'fill-extrusion-height':['*',['get','n'],14],'fill-extrusion-opacity':.95}});}},
+'02':{t:{ar:'السكن والاستيطان',he:'דיור והתיישבות',en:'Housing & settlement'},
+  q:{ar:'كم بلدة جديدة انبنت منذ 1948؟',he:'כמה יישובים חדשים הוקמו מאז 1948?',en:'How many new localities since 1948?'},big:'×44',
+  sub:{ar:'799 بلدة يهودية مقابل 18 بلدة بدوية مخطّطة',he:'799 יישובים יהודיים לעומת 18 יישובים בדואיים מתוכננים',en:'799 Jewish localities vs 18 planned Bedouin towns'},
+  leg:[[C.bone,{ar:'بلدة يهودية تأسست بعد 1948',he:'יישוב יהודי שהוקם אחרי 1948',en:'Jewish locality founded after 1948'}],[C.red,{ar:'بلدة بدوية مخطّطة تأسست بعد 1948',he:'יישוב בדואי מתוכנן שהוקם אחרי 1948',en:'planned Bedouin town founded after 1948'}]],
+  src:{ar:'الدائرة المركزية للإحصاء، ملف البلدات 2024',he:'הלמ"ס, קובץ היישובים 2024',en:'CBS localities file 2024'},
+  cam:{center:[34.95,31.45],zoom:7.35,pitch:52,bearing:-12},
+  async add(m){const d=await get('cbs_localities.geojson');
+    const f=d.features.filter(x=>x.properties.year>=1948&&(x.properties.grp==='jewish'||x.properties.grp==='bedouin_town')).map(x=>({type:'Feature',geometry:{type:'Polygon',coordinates:[circle(x.geometry.coordinates,900,16)]},properties:{a:x.properties.grp==='bedouin_town'?1:0}}));
+    m.addSource('loc',{type:'geojson',data:FC(f)});
+    m.addLayer({id:'loc',type:'fill-extrusion',source:'loc',paint:{'fill-extrusion-color':['case',['==',['get','a'],1],C.red,C.bone],'fill-extrusion-height':['case',['==',['get','a'],1],14000,9000],'fill-extrusion-opacity':.9}});}},
+'03':{t:{ar:'الاقتصاد والتشغيل',he:'כלכלה ותעסוקה',en:'Economy & employment'},
+  q:{ar:'كم أرض صناعية لكل ساكن؟',he:'כמה קרקע תעשייה לכל תושב?',en:'How much industrial land per resident?'},big:'×3.0',
+  sub:{ar:'المكعّب = متر² أرض صناعية لكل ساكن في البلدة',he:'הקובייה = מ"ר קרקע תעשייה לכל תושב ביישוב',en:'cube = m² of industrial land per resident'},
+  leg:[[C.yellow,{ar:'بلدة يهودية',he:'יישוב יהודי',en:'Jewish town'}],[C.red,{ar:'بلدة عربية',he:'יישוב ערבי',en:'Arab town'}]],
+  src:{ar:'طبقات الفريق (ArcGIS) · الحدود: מנהל התכנון · السكان',he:'שכבות הצוות (ArcGIS) · גבולות: מנהל התכנון · אוכלוסייה',en:'Team ArcGIS layers · limits: iplan · population'},
+  cam:{center:[34.86,31.2],zoom:10.15,pitch:58,bearing:-10},
+  async add(m){const [st,mu,va]=await Promise.all([get('industry_stats.json'),get('muni.geojson'),get('vaadim.geojson')]);
+    const ID={'rahat':'Rahat','hura':'Hura','kseifa':'Kseyfe','lakia':'Lakiye','tel sheva':'Tel Sheva','shegev shalom':'Segev Shalom','arara negev':"Ar'ara Banegev",'netivot':'Netivot','ofakim':'Ofakim','dimona':'Dimona','arad':'Arad','eilat':'Eilat','omer':'Omer','yeruham':'Yeroham','lehavim':'Lehavim','meytar':'Meitar','mizpe ramon':'Mitspe Ramon','beer sheva':"Be'er Sheva"};
+    const pos={};mu.features.forEach(f=>{pos[(f.properties.Muni_Eng||'').trim()]=centroid(f.geometry);});va.features.forEach(f=>{const e=(f.properties.Vaad_Eng||'').trim();if(!pos[e])pos[e]=centroid(f.geometry);});
+    const f=st.rows.filter(r=>pos[ID[r.key]]&&r.pop).map(r=>{const v=r.ind_dunam*1000/r.pop,s=Math.sqrt(v)*360;return {type:'Feature',geometry:{type:'Polygon',coordinates:[square(pos[ID[r.key]],s)]},properties:{h:s,a:r.grp==='jewish'?0:1}};});
+    m.addSource('ind',{type:'geojson',data:FC(f)});
+    m.addLayer({id:'ind',type:'fill-extrusion',source:'ind',paint:{'fill-extrusion-color':['case',['==',['get','a'],1],C.red,C.yellow],'fill-extrusion-height':['get','h'],'fill-extrusion-opacity':.92}});}},
+'04':{t:{ar:'المواصلات',he:'תחבורה',en:'Mobility'},
+  q:{ar:'كم بيت من كل 100 يوصل للباص مشياً؟',he:'כמה בתים מכל 100 מגיעים לאוטובוס ברגל?',en:'How many homes in 100 can walk to a bus?'},big:'×26',
+  sub:{ar:'المعدل في كل القرى غير المعترف بها 3.5 مقابل 90 في البلدات اليهودية',he:'הממוצע בכל הכפרים הלא מוכרים 3.5 לעומת 90 ביישובים היהודיים',en:'average: 3.5 in all unrecognized villages vs 90 in Jewish towns'},
+  src:{ar:'GTFS وزارة المواصلات 17.11.2026 · Microsoft · OSM · خط مستقيم ≤400 م من محطة فيها رحلة واحدة على الأقل',he:"GTFS משרד התחבורה 17.11.2026 · Microsoft · OSM · מרחק אווירי ≤400 מ' מתחנה עם נסיעה אחת לפחות",en:'MoT GTFS 17.11.2026 · Microsoft · OSM · straight line ≤400 m to a stop with ≥1 trip'},
+  split:[{name:{ar:'عومر',he:'עומר',en:'Omer'},kind:{ar:'بلدة يهودية',he:'יישוב יהודי',en:'Jewish town'},v:'96',cam:{center:[34.851,31.2655],zoom:13.7,pitch:58,bearing:-20}},
+         {name:{ar:'خشم زنة',he:"ח'שם זנה",en:'Khashm Zanna'},kind:{ar:'قرية غير معترف بها',he:'כפר לא מוכר',en:'unrecognized village'},v:'4.6',cam:{center:[34.8838,31.2018],zoom:13.7,pitch:58,bearing:-20}}],
+  unit:{ar:'بيت من كل 100 على بُعد 400 م من محطة',he:"בתים מכל 100 עד 400 מ' מתחנה",en:'homes in 100 within 400 m of a stop'},
+  leg:[['rgba(255,246,220,.55)',{ar:'ضوء = أرض على بُعد 400 م من محطة',he:"אור = קרקע עד 400 מ' מתחנה",en:'light = land within 400 m of a stop'}],[C.bone,{ar:'بيت قريب من محطة',he:'בית קרוב לתחנה',en:'home near a stop'}],[C.red,{ar:'بيت أبعد من 400 م',he:"בית רחוק מ-400 מ'",en:'home farther than 400 m'}]],
+  async add(m){const [st,off]=await Promise.all([get('transit_stops.geojson'),offmap()]);
+    m.addSource('ring',{type:'geojson',data:FC(st.features.map(f=>({type:'Feature',geometry:{type:'Polygon',coordinates:[circle(f.geometry.coordinates,400,48)]},properties:{}})))});
+    m.addLayer({id:'ring',type:'fill',source:'ring',paint:{'fill-color':'#fff6dc','fill-opacity':.13}});
+    osmBuildings(m,C.bone,1);
+    m.addSource('off',{type:'geojson',data:off});
+    m.addLayer({id:'off',type:'fill-extrusion',source:'off',paint:{'fill-extrusion-color':['case',['all',['>=',['get','d'],0],['<=',['get','d'],400]],C.bone,C.red],'fill-extrusion-height':5}});}},
+'05':{t:{ar:'التعليم والخدمات',he:'חינוך ושירותים',en:'Education & services'},
+  q:{ar:'كم بيت من كل 100 على بُعد كيلومتر من مدرسة ابتدائية؟',he:'כמה בתים מכל 100 נמצאים עד ק"מ מבית ספר יסודי?',en:'How many homes in 100 are within 1 km of an elementary school?'},big:'×5.6',
+  sub:{ar:'15 بيت في القرى غير المعترف بها مقابل 82 في البلدات اليهودية',he:'15 בתים בכפרים הלא מוכרים לעומת 82 ביישובים היהודיים',en:'15 in unrecognized villages vs 82 in Jewish towns'},
+  leg:[[C.bone,{ar:'مدرسة ابتدائية',he:'בית ספר יסודי',en:'elementary school'}],['rgba(233,230,223,.35)',{ar:'دائرة 1 كم',he:'מעגל 1 ק"מ',en:'1 km circle'}],[C.red,{ar:'بيت خارج كل حدّ معترف به',he:'בית מחוץ לכל גבול מוכר',en:'home outside every recognized limit'}]],
+  src:{ar:'وزارة التربية (data.gov.il) · Microsoft · خط مستقيم',he:'משרד החינוך (data.gov.il) · Microsoft · מרחק אווירי',en:'Ministry of Education (data.gov.il) · Microsoft · straight line'},
+  cam:{center:[34.82,31.17],zoom:12.2,pitch:62,bearing:-15},
+  async add(m){const [sv,off]=await Promise.all([get('services_points.geojson'),offmap()]);const e=sv.features.filter(f=>f.properties.k==='e');
+    m.addSource('ring',{type:'geojson',data:FC(e.map(f=>({type:'Feature',geometry:{type:'Polygon',coordinates:[circle(f.geometry.coordinates,1000,48)]},properties:{}})))});
+    m.addLayer({id:'ring',type:'fill',source:'ring',paint:{'fill-color':C.bone,'fill-opacity':.1}});
+    m.addLayer({id:'ringl',type:'line',source:'ring',paint:{'line-color':C.bone,'line-width':1,'line-opacity':.5}});
+    m.addSource('off',{type:'geojson',data:off});m.addLayer({id:'off',type:'fill-extrusion',source:'off',paint:{'fill-extrusion-color':C.red,'fill-extrusion-height':5}});
+    m.addSource('sch',{type:'geojson',data:FC(e.map(f=>({type:'Feature',geometry:{type:'Polygon',coordinates:[square(f.geometry.coordinates,90)]},properties:{}})))});
+    m.addLayer({id:'sch',type:'fill-extrusion',source:'sch',paint:{'fill-extrusion-color':C.bone,'fill-extrusion-height':260}});}},
+'06':{t:{ar:'العنف والأمان',he:'אלימות וביטחון',en:'Violence & safety'},
+  q:{ar:'كم ضحية قتل في كل بلدة؟',he:'כמה נרצחים בכל יישוב?',en:'How many homicide victims per locality?'},big:'—',
+  sub:{ar:'البيانات قيد الجمع',he:'הנתונים בתהליך איסוף',en:'data being collected'},leg:[],
+  src:{ar:'قيد الجمع: مبادرات إبراهيم · سيكوي-أفق · data.gov.il',he:'בתהליך איסוף: יוזמות אברהם · סיכוי-אופק · data.gov.il',en:'being collected: Abraham Initiatives · Sikkuy-Aufoq · data.gov.il'},
+  cam:{center:[34.85,31.2],zoom:9.2,pitch:45,bearing:0},async add(m){}},
+'07':{t:{ar:'الخطة مقابل الأرض · سعوة',he:'התכנית מול השטח · סעוה',en:"Plan vs ground · Sa'wa"},
+  q:{ar:'كم بيت برّا المخطط؟',he:'כמה בתים מחוץ לתכנית?',en:'How many homes are outside the plan?'},big:'45.6%',
+  sub:{ar:'من مباني سعوة خارج كل مخططات الأحياء المصدّقة (1,479 من 3,242)',he:'מהמבנים בסעוה מחוץ לכל תכניות השכונה המאושרות (1,479 מתוך 3,242)',en:"of Sa'wa's buildings lie outside every approved neighbourhood plan (1,479 of 3,242)"},
+  leg:[['rgba(217,212,199,.45)',{ar:'السجادة = أرض مخطّطة (5 مخططات أحياء مصدّقة)',he:'השטיח = קרקע מתוכננת (5 תכניות שכונה מאושרות)',en:'the carpet = planned land (5 approved neighbourhood plans)'}],[C.bone,{ar:'مبنى داخل المخطط',he:'מבנה בתוך התכנית',en:'building inside the plan'}],[C.red,{ar:'مبنى برّا المخطط',he:'מבנה מחוץ לתכנית',en:'building outside the plan'}]],
+  src:{ar:'מנהל התכנון (Xplan) · Microsoft ML Footprints 5/2024',he:'מנהל התכנון (Xplan) · Microsoft ML Footprints 5/2024',en:'Israel Planning Administration (Xplan) · Microsoft ML Footprints 5/2024'},
+  cam:{center:[34.9672,31.2575],zoom:14.6,pitch:60,bearing:28},
+  async add(m){const [lu,b]=await Promise.all([get('xplan_sawa_landuse.geojson'),get('sawa_bld_cat.geojson')]);
+    lu.features=lu.features.filter(f=>(f.properties.pl_name||'').includes('סעו')&&f.properties.station_desc==='אישור');
+    m.addSource('lu',{type:'geojson',data:lu});
+    m.addLayer({id:'lu',type:'fill',source:'lu',paint:{'fill-color':'#d9d4c7','fill-opacity':.28}});
+    m.addSource('b',{type:'geojson',data:b});
+    m.addLayer({id:'b',type:'fill-extrusion',source:'b',paint:{'fill-extrusion-color':['match',['get','k'],'o',C.red,C.bone],'fill-extrusion-height':7,'fill-extrusion-opacity':.97}});}}
+};
+
+const style={version:8,glyphs:'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',
+  sources:{omt:{type:'vector',url:'https://tiles.openfreemap.org/planet'}},
+  layers:[{id:'bg',type:'background',paint:{'background-color':'#151514'}},
+    {id:'landuse',type:'fill',source:'omt','source-layer':'landuse',paint:{'fill-color':'#1a1a19'}},
+    {id:'water',type:'fill',source:'omt','source-layer':'water',paint:{'fill-color':'#070707'}},
+    {id:'roads',type:'line',source:'omt','source-layer':'transportation',paint:{'line-color':'#3a3a37','line-width':['interpolate',['linear'],['zoom'],8,.4,14,2.2]}},
+    {id:'places',type:'symbol',source:'omt','source-layer':'place',filter:['in',['get','class'],['literal',['city','town']]],layout:{'text-field':['coalesce',['get','name:'+L],['get','name']],'text-font':['Noto Sans Regular'],'text-size':12},paint:{'text-color':'#8a8a86','text-halo-color':'#000','text-halo-width':1.2}}]};
+
+const sc=SCENES[S], link=k=>`?s=${k}&lang=${L}${PLAY?'&play=1&hold='+HOLD:''}`;
+document.getElementById('back').textContent=T({ar:'→ الأطلس',he:'→ האטלס',en:'← Atlas'});
+document.getElementById('dots').innerHTML=KEYS.map(k=>`<a href="${link(k)}" class="${k===S?'on':''}">${k}</a>`).join('');
+const legHTML=sc.leg&&sc.leg.length?`<div class="leg">${sc.leg.map(([c,l])=>`<div><i style="background:${c}"></i>${T(l)}</div>`).join('')}</div>`:'';
+const maps=[]; let pending=0;
+const done=()=>{ if(--pending) return; document.title='READY';
+  if(PLAY){ // slow turn while the scene holds, then the next scene
+    maps.forEach(m=>m.easeTo({bearing:m.getBearing()+18,duration:HOLD*1000,easing:t=>t}));
+    const nx=KEYS[(KEYS.indexOf(S)+1)%KEYS.length]; setTimeout(()=>{location.search=link(nx);},HOLD*1000); } };
+function mk(el,cam,add){pending++;const m=new maplibregl.Map({container:el,style,...cam,attributionControl:{compact:true},preserveDrawingBuffer:true,antialias:true});
+  maps.push(m); m.on('load',async()=>{await add(m);m.once('idle',done);});return m;}
+if(sc.split){
+  // two places, same scale, same camera: the gap is read before any number
+  document.getElementById('story').style.display='none'; document.body.classList.add('split');
+  document.getElementById('map').innerHTML=sc.split.map((h,i)=>`<div class="half" id="h${i}"></div>`).join('');
+  const top=document.createElement('div'); top.id='splitTop'; top.innerHTML=`<div class="no">${S}<span>${T(sc.t)}</span></div><h1>${T(sc.q)}</h1>`; document.body.appendChild(top);
+  sc.split.forEach((h,i)=>{const lab=document.createElement('div'); lab.className='sideLab s'+i; lab.innerHTML=`<div class="nm">${T(h.name)}<span>${T(h.kind)}</span></div><div class="v">${h.v}</div><div class="u">${T(sc.unit)}</div>`; document.body.appendChild(lab);});
+  const gap=document.createElement('div'); gap.id='gapX'; gap.innerHTML=`<div class="x">${sc.big}</div><div class="u">${T(sc.sub)}</div>${legHTML}<div class="src">${T(sc.src)}</div>`; document.body.appendChild(gap);
+  sc.split.forEach((h,i)=>mk('h'+i,h.cam,sc.add));
+}else{
+  document.getElementById('story').innerHTML=`<div class="no">${S}<span>${T(sc.t)}</span></div><h1>${T(sc.q)}</h1><div class="big">${sc.big}<small>${T(sc.sub)}</small></div>`+legHTML+`<div class="src">${T(sc.src)}</div>`;
+  const side=Math.min(560,innerWidth*.42); sc.cam.padding=innerWidth<=760?{bottom:innerHeight*.45,top:0,left:0,right:0}:(L==='en'?{left:side,right:0,top:0,bottom:0}:{right:side,left:0,top:0,bottom:0});
+  mk('map',sc.cam,sc.add);
+}
+document.addEventListener('keydown',e=>{const i=KEYS.indexOf(S),fw=L==='en'?'ArrowRight':'ArrowLeft',bk=L==='en'?'ArrowLeft':'ArrowRight';
+  if(e.key===fw&&i<KEYS.length-1) location.search=link(KEYS[i+1]); if(e.key===bk&&i>0) location.search=link(KEYS[i-1]);});
+</script>
+</body>
+</html>

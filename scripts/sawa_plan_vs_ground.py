@@ -76,3 +76,9 @@ out['per_plan'] = per
 out['sources'] = {'footprints': 'Microsoft GlobalML Building Footprints 2024-05-28 via VIDA/source.coop (imagery 2014-2023)',
                   'plans': 'iplan Xplan layer 1 & 4, downloaded 2026-11-19', 'limit': 'iplan gvulot_retzef/2 (vaadim) Sawa'}
 json.dump(out, open(os.path.join(D, 'sawa_planground.json'), 'w', encoding='utf8'), ensure_ascii=False, indent=1)
+
+# per-building category for the 3D view: o = outside every neighbourhood plan, c = conflict zone, a = agricultural, i = inside (residential/other)
+kk = np.where(~in_plan, 'o', np.where(conf, 'c', np.where(g == 'agri', 'a', 'i')))
+fc = {'type': 'FeatureCollection', 'features': [{'type': 'Feature', 'properties': {'k': str(k), 'a': b['properties']['a']}, 'geometry': b['geometry']} for b, k in zip(B, kk)]}
+json.dump(fc, open(os.path.join(D, 'sawa_bld_cat.geojson'), 'w', encoding='utf8'), separators=(',', ':'))
+print('wrote sawa_bld_cat.geojson', collections.Counter(kk.tolist()))

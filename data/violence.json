@@ -1,0 +1,305 @@
+{
+ "source": "Israel Police open crime data, data.gov.il dataset crime_records_data, files 2023-2025 (resources e311b6a1, 5fc13c50, 32aacfc9)",
+ "population": "CBS Local Authorities 2023 (as in bagrut.json)",
+ "years": [
+  "2023",
+  "2024",
+  "2025"
+ ],
+ "lethal_types": [
+  "הריגה",
+  "נסיון לרצח",
+  "רצח"
+ ],
+ "note": "files, not victims; a file is opened per reported or detected offense",
+ "arab_towns": {
+  "towns": 7,
+  "pop": 213711,
+  "lethal_3y": 80,
+  "lethal_per10k_yr": 1.25,
+  "body_per1k_yr": 7.3
+ },
+ "jewish_towns": {
+  "towns": 11,
+  "pop": 498747,
+  "lethal_3y": 50,
+  "lethal_per10k_yr": 0.33,
+  "body_per1k_yr": 11.3
+ },
+ "ratio_lethal": 3.8,
+ "ratio_body": 0.6,
+ "bedouin_stations_lethal": 102,
+ "bedouin_stations_lethal_no_locality": 22,
+ "rows": [
+  {
+   "he": "ערערה בנגב",
+   "ar": "عرعرة النقب",
+   "en": "Ar'ara BaNegev",
+   "grp": "arab",
+   "pop": 22936,
+   "lethal_3y": 15,
+   "lethal_per10k_yr": 2.18,
+   "body_per1k_yr": 10.1,
+   "lethal_by_year": {
+    "2023": 2,
+    "2024": 6,
+    "2025": 7
+   }
+  },
+  {
+   "he": "רהט",
+   "ar": "رهط",
+   "en": "Rahat",
+   "grp": "arab",
+   "pop": 83668,
+   "lethal_3y": 39,
+   "lethal_per10k_yr": 1.55,
+   "body_per1k_yr": 7.6,
+   "lethal_by_year": {
+    "2023": 15,
+    "2024": 14,
+    "2025": 10
+   }
+  },
+  {
+   "he": "תל שבע",
+   "ar": "تل السبع",
+   "en": "Tel Sheva",
+   "grp": "arab",
+   "pop": 25521,
+   "lethal_3y": 10,
+   "lethal_per10k_yr": 1.31,
+   "body_per1k_yr": 8.5,
+   "lethal_by_year": {
+    "2023": 3,
+    "2024": 4,
+    "2025": 3
+   }
+  },
+  {
+   "he": "שגב שלום",
+   "ar": "شقيب السلام",
+   "en": "Segev Shalom",
+   "grp": "arab",
+   "pop": 14313,
+   "lethal_3y": 4,
+   "lethal_per10k_yr": 0.93,
+   "body_per1k_yr": 7.4,
+   "lethal_by_year": {
+    "2023": 0,
+    "2024": 1,
+    "2025": 3
+   }
+  },
+  {
+   "he": "לקיה",
+   "ar": "اللقية",
+   "en": "Lakiya",
+   "grp": "arab",
+   "pop": 19593,
+   "lethal_3y": 5,
+   "lethal_per10k_yr": 0.85,
+   "body_per1k_yr": 4.0,
+   "lethal_by_year": {
+    "2023": 2,
+    "2024": 1,
+    "2025": 2
+   }
+  },
+  {
+   "he": "אילת",
+   "ar": "إيلات",
+   "en": "Eilat",
+   "grp": "jewish",
+   "pop": 58268,
+   "lethal_3y": 11,
+   "lethal_per10k_yr": 0.63,
+   "body_per1k_yr": 18.4,
+   "lethal_by_year": {
+    "2023": 4,
+    "2024": 2,
+    "2025": 5
+   }
+  },
+  {
+   "he": "כסייפה",
+   "ar": "كسيفة",
+   "en": "Kuseife",
+   "grp": "arab",
+   "pop": 23029,
+   "lethal_3y": 4,
+   "lethal_per10k_yr": 0.58,
+   "body_per1k_yr": 5.1,
+   "lethal_by_year": {
+    "2023": 1,
+    "2024": 0,
+    "2025": 3
+   }
+  },
+  {
+   "he": "באר שבע",
+   "ar": "بئر السبع",
+   "en": "Be'er Sheva",
+   "grp": "jewish",
+   "pop": 216413,
+   "lethal_3y": 27,
+   "lethal_per10k_yr": 0.42,
+   "body_per1k_yr": 14.4,
+   "lethal_by_year": {
+    "2023": 6,
+    "2024": 13,
+    "2025": 8
+   }
+  },
+  {
+   "he": "חורה",
+   "ar": "حورة",
+   "en": "Hura",
+   "grp": "arab",
+   "pop": 24651,
+   "lethal_3y": 3,
+   "lethal_per10k_yr": 0.41,
+   "body_per1k_yr": 6.9,
+   "lethal_by_year": {
+    "2023": 2,
+    "2024": 1,
+    "2025": 0
+   }
+  },
+  {
+   "he": "ערד",
+   "ar": "عراد",
+   "en": "Arad",
+   "grp": "jewish",
+   "pop": 33059,
+   "lethal_3y": 3,
+   "lethal_per10k_yr": 0.3,
+   "body_per1k_yr": 7.5,
+   "lethal_by_year": {
+    "2023": 0,
+    "2024": 3,
+    "2025": 0
+   }
+  },
+  {
+   "he": "אופקים",
+   "ar": "أوفاكيم",
+   "en": "Ofakim",
+   "grp": "jewish",
+   "pop": 43475,
+   "lethal_3y": 3,
+   "lethal_per10k_yr": 0.23,
+   "body_per1k_yr": 5.9,
+   "lethal_by_year": {
+    "2023": 1,
+    "2024": 1,
+    "2025": 1
+   }
+  },
+  {
+   "he": "נתיבות",
+   "ar": "نتيفوت",
+   "en": "Netivot",
+   "grp": "jewish",
+   "pop": 60206,
+   "lethal_3y": 4,
+   "lethal_per10k_yr": 0.22,
+   "body_per1k_yr": 5.4,
+   "lethal_by_year": {
+    "2023": 4,
+    "2024": 0,
+    "2025": 0
+   }
+  },
+  {
+   "he": "דימונה",
+   "ar": "ديمونا",
+   "en": "Dimona",
+   "grp": "jewish",
+   "pop": 41755,
+   "lethal_3y": 2,
+   "lethal_per10k_yr": 0.16,
+   "body_per1k_yr": 10.1,
+   "lethal_by_year": {
+    "2023": 0,
+    "2024": 1,
+    "2025": 1
+   }
+  },
+  {
+   "he": "ירוחם",
+   "ar": "يروحام",
+   "en": "Yeruham",
+   "grp": "jewish",
+   "pop": 12431,
+   "lethal_3y": 0,
+   "lethal_per10k_yr": 0.0,
+   "body_per1k_yr": 5.3,
+   "lethal_by_year": {
+    "2023": 0,
+    "2024": 0,
+    "2025": 0
+   }
+  },
+  {
+   "he": "להבים",
+   "ar": "لهافيم",
+   "en": "Lehavim",
+   "grp": "jewish",
+   "pop": 7299,
+   "lethal_3y": 0,
+   "lethal_per10k_yr": 0.0,
+   "body_per1k_yr": 1.5,
+   "lethal_by_year": {
+    "2023": 0,
+    "2024": 0,
+    "2025": 0
+   }
+  },
+  {
+   "he": "מיתר",
+   "ar": "ميتار",
+   "en": "Meitar",
+   "grp": "jewish",
+   "pop": 11800,
+   "lethal_3y": 0,
+   "lethal_per10k_yr": 0.0,
+   "body_per1k_yr": 2.4,
+   "lethal_by_year": {
+    "2023": 0,
+    "2024": 0,
+    "2025": 0
+   }
+  },
+  {
+   "he": "מצפה רמון",
+   "ar": "متسبيه رامون",
+   "en": "Mitzpe Ramon",
+   "grp": "jewish",
+   "pop": 5739,
+   "lethal_3y": 0,
+   "lethal_per10k_yr": 0.0,
+   "body_per1k_yr": 10.9,
+   "lethal_by_year": {
+    "2023": 0,
+    "2024": 0,
+    "2025": 0
+   }
+  },
+  {
+   "he": "עומר",
+   "ar": "عومر",
+   "en": "Omer",
+   "grp": "jewish",
+   "pop": 8302,
+   "lethal_3y": 0,
+   "lethal_per10k_yr": 0.0,
+   "body_per1k_yr": 3.7,
+   "lethal_by_year": {
+    "2023": 0,
+    "2024": 0,
+    "2025": 0
+   }
+  }
+ ]
+}

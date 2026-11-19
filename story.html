@@ -137,10 +137,17 @@ const SCENES={
     m.addSource('sch',{type:'geojson',data:FC(e.map(f=>({type:'Feature',geometry:{type:'Polygon',coordinates:[square(f.geometry.coordinates,90)]},properties:{}})))});
     m.addLayer({id:'sch',type:'fill-extrusion',source:'sch',paint:{'fill-extrusion-color':C.bone,'fill-extrusion-height':260}});}},
 '06':{t:{ar:'العنف والأمان',he:'אלימות וביטחון',en:'Violence & safety'},
-  q:{ar:'كم ضحية قتل في كل بلدة؟',he:'כמה נרצחים בכל יישוב?',en:'How many homicide victims per locality?'},big:'—',
-  sub:{ar:'البيانات قيد الجمع',he:'הנתונים בתהליך איסוף',en:'data being collected'},leg:[],
-  src:{ar:'قيد الجمع: مبادرات إبراهيم · سيكوي-أفق · data.gov.il',he:'בתהליך איסוף: יוזמות אברהם · סיכוי-אופק · data.gov.il',en:'being collected: Abraham Initiatives · Sikkuy-Aufoq · data.gov.il'},
-  cam:{center:[34.85,31.2],zoom:9.2,pitch:45,bearing:0},async add(m){}},
+  q:{ar:'كم ملف قتل أو محاولة قتل لكل 10,000 ساكن؟',he:'כמה תיקי רצח וניסיון לרצח לכל 10,000 תושבים?',en:'Murder and attempted-murder files per 10,000 residents?'},big:'×3.8',
+  sub:{ar:'1.25 في البلدات البدوية مقابل 0.33 في البلدات اليهودية، في السنة (2023–2025)',he:'1.25 ביישובים הבדואיים לעומת 0.33 ביישובים היהודיים, בשנה (2023–2025)',en:'1.25 in the Bedouin towns vs 0.33 in the Jewish towns, a year (2023–2025)'},
+  leg:[[C.red,{ar:'بلدة بدوية · الارتفاع = ملفات لكل 10,000 ساكن',he:'יישוב בדואי · הגובה = תיקים לכל 10,000 תושבים',en:'Bedouin town · height = files per 10,000 residents'}],[C.bone,{ar:'بلدة يهودية',he:'יישוב יהודי',en:'Jewish town'}]],
+  src:{ar:'شرطة إسرائيل، بيانات الجريمة المفتوحة (data.gov.il) 2023–2025 · ملفات لا ضحايا · السكان: הלמ"ס 2023',he:'משטרת ישראל, נתוני פשיעה פתוחים (data.gov.il) 2023–2025 · תיקים, לא נפגעים · אוכלוסייה: הלמ"ס 2023',en:'Israel Police open crime data (data.gov.il) 2023–2025 · files, not victims · population: CBS 2023'},
+  cam:{center:[34.86,31.2],zoom:9.75,pitch:58,bearing:-10},
+  async add(m){const [v,mu,va]=await Promise.all([get('violence.json'),get('muni.geojson'),get('vaadim.geojson')]);
+    const EN={'Kuseife':'Kseyfe','Lakiya':'Lakiye','Yeruham':'Yeroham',"Ar'ara BaNegev":"Ar'ara Banegev",'Mitzpe Ramon':'Mitspe Ramon'};
+    const pos={};mu.features.forEach(f=>{pos[(f.properties.Muni_Eng||'').trim()]=centroid(f.geometry);});va.features.forEach(f=>{const e=(f.properties.Vaad_Eng||'').trim();if(!pos[e])pos[e]=centroid(f.geometry);});
+    const f=v.rows.map(r=>({r,p:pos[EN[r.en]||r.en]})).filter(o=>o.p).map(({r,p})=>({type:'Feature',geometry:{type:'Polygon',coordinates:[circle(p,1100,24)]},properties:{h:Math.max(r.lethal_per10k_yr*9000,250),a:r.grp==='arab'?1:0}}));
+    m.addSource('v',{type:'geojson',data:FC(f)});
+    m.addLayer({id:'v',type:'fill-extrusion',source:'v',paint:{'fill-extrusion-color':['case',['==',['get','a'],1],C.red,C.bone],'fill-extrusion-height':['get','h'],'fill-extrusion-opacity':.93}});}},
 '07':{t:{ar:'الخطة مقابل الأرض · سعوة',he:'התכנית מול השטח · סעוה',en:"Plan vs ground · Sa'wa"},
   q:{ar:'كم بيت برّا المخطط؟',he:'כמה בתים מחוץ לתכנית?',en:'How many homes are outside the plan?'},big:'45.6%',
   sub:{ar:'من مباني سعوة خارج كل مخططات الأحياء المصدّقة (1,479 من 3,242)',he:'מהמבנים בסעוה מחוץ לכל תכניות השכונה המאושרות (1,479 מתוך 3,242)',en:"of Sa'wa's buildings lie outside every approved neighbourhood plan (1,479 of 3,242)"},

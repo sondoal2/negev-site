@@ -56,7 +56,7 @@ body.split .half{position:absolute;top:0;bottom:0;width:50%} body.split #h0{righ
 <script>
 /* OFF—MAP tour: one question per screen, the data drawn as objects in 3D. Same data files as index.html.
    ?s=01..07 picks the scene · ?lang=ar|he|en (else the atlas's saved language) · ?play=1 walks through all scenes (for recording) */
-const q=new URLSearchParams(location.search), KEYS=['01','02','03','04','05','06','07','07s'];
+const q=new URLSearchParams(location.search), KEYS=['01','02','03','04','05','06','07'];
 const S=KEYS.includes(q.get('s'))?q.get('s'):'01', PLAY=q.get('play')==='1', HOLD=+(q.get('hold')||10);
 let L=q.get('lang'); if(!['ar','he','en'].includes(L)){ try{L=localStorage.getItem('offmap-lang');}catch(e){} } if(!['ar','he','en'].includes(L)) L='ar';
 document.documentElement.lang=L; document.documentElement.dir=L==='en'?'ltr':'rtl';
@@ -158,19 +158,7 @@ const SCENES={
     const F=[];Object.values(np).forEach(a=>a.forEach(r=>F.push({type:'Feature',geometry:{type:'Point',coordinates:[r[0]/1e5,r[1]/1e5]},properties:{n:r[2]}})));
     off.forEach(r=>F.push({type:'Feature',geometry:{type:'Point',coordinates:[r[2]/1e5,r[3]/1e5]},properties:{n:1}}));
     m.addSource('np',{type:'geojson',data:FC(F)});
-    m.addLayer({id:'np',type:'circle',source:'np',paint:{'circle-color':['case',['==',['get','n'],1],C.red,C.bone],'circle-radius':['interpolate',['linear'],['zoom'],9,.9,12,2.2,15,5],'circle-opacity':.9}});}},
-'07s':{dot:{ar:'سعوة',he:'סעוה',en:"Sa'wa"},t:{ar:'الخطة مقابل الأرض · سعوة',he:'התכנית מול השטח · סעוה',en:"Plan vs ground · Sa'wa"},
-  q:{ar:'كم بيت برّا المخطط؟',he:'כמה בתים מחוץ לתכנית?',en:'How many homes are outside the plan?'},big:'45.6%',
-  sub:{ar:'من مباني سعوة خارج كل مخططات الأحياء المصدّقة (1,479 من 3,242)',he:'מהמבנים בסעוה מחוץ לכל תכניות השכונה המאושרות (1,479 מתוך 3,242)',en:"of Sa'wa's buildings lie outside every approved neighbourhood plan (1,479 of 3,242)"},
-  leg:[['rgba(217,212,199,.45)',{ar:'السجادة = أرض مخطّطة (5 مخططات أحياء مصدّقة)',he:'השטיח = קרקע מתוכננת (5 תכניות שכונה מאושרות)',en:'the carpet = planned land (5 approved neighbourhood plans)'}],[C.bone,{ar:'مبنى داخل المخطط',he:'מבנה בתוך התכנית',en:'building inside the plan'}],[C.red,{ar:'مبنى برّا المخطط',he:'מבנה מחוץ לתכנית',en:'building outside the plan'}]],
-  src:{ar:'מנהל התכנון (Xplan) · Microsoft ML Footprints 5/2024',he:'מנהל התכנון (Xplan) · Microsoft ML Footprints 5/2024',en:'Israel Planning Administration (Xplan) · Microsoft ML Footprints 5/2024'},
-  cam:{center:[34.9672,31.2575],zoom:14.6,pitch:60,bearing:28},
-  async add(m){const [lu,b]=await Promise.all([get('xplan_sawa_landuse.geojson'),get('sawa_bld_cat.geojson')]);
-    lu.features=lu.features.filter(f=>(f.properties.pl_name||'').includes('סעו')&&f.properties.station_desc==='אישור');
-    m.addSource('lu',{type:'geojson',data:lu});
-    m.addLayer({id:'lu',type:'fill',source:'lu',paint:{'fill-color':'#d9d4c7','fill-opacity':.28}});
-    m.addSource('b',{type:'geojson',data:b});
-    m.addLayer({id:'b',type:'fill-extrusion',source:'b',paint:{'fill-extrusion-color':['match',['get','k'],'o',C.red,C.bone],'fill-extrusion-height':7,'fill-extrusion-opacity':.97}});}}
+    m.addLayer({id:'np',type:'circle',source:'np',paint:{'circle-color':['case',['==',['get','n'],1],C.red,C.bone],'circle-radius':['interpolate',['linear'],['zoom'],9,.9,12,2.2,15,5],'circle-opacity':.9}});}}
 };
 
 const style={version:8,glyphs:'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',

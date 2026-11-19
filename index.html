@@ -496,7 +496,7 @@ const state = { // layer id -> visible
   arab:true, jew:true, ind:true, rc:false,
   unrec:true, demo:true,
   indJ:true, indA:true, arab7:false, grid:false, frames:false, nat:false, routes:false, mask2:false, cbs:false, transit:false, access:false, svc:false, econ:false, jew11:false, indBld:false,
-  xplan:false, landuse:false, tmm:false, vatmal:false, casePlan:false
+  xplan:false, landuse:false, tmm:false, vatmal:false, noplan:false
 };
 try{ Object.assign(state, JSON.parse(localStorage.getItem('offmap-state')||'{}')); }catch(e){}
 const BASE_IDS=['landuse','water','wadi','bld','rd-minor','rd-mid','rd-major','rail'];
@@ -508,7 +508,7 @@ const LAYERMAP = {
   grid:['grid-fill'], frames:['frames-fill','frames-line','frames-line-e','frames-lbl','bld-u','bld-e','bld-e-line'], mask2:['mask2'], nat:['nat-arab','nat-arab-line','nat-jew','nat-new','nat-bt'], routes:['rt-line','rt-miss','rt-miss-lbl'], cbs:['cbs-pt','cbs-new'], transit:['tr-circ','tr-num','tr-name','tr-dest','tr-dest-lbl'], access:['acc-grid','acc-bld','acc-stop'], svc:['svc-grid','svc-sport-l','svc-sport','svc-school','svc-clinic'], econ:['econ-link','econ-link-lbl','econ-sq','econ-zero','econ-num','econ-name'],
   jew11:['jew11-line'], indBld:['indbld-fill'],
   xplan:['live-xplan'], landuse:['live-landuse'], tmm:['live-tmm'], vatmal:['live-vatmal'],
-  casePlan:['case-line','case-stop','case-stop-n','case-school','case-school-n']
+  noplan:['np-pts']
 };
 
 let DATA;
@@ -671,18 +671,13 @@ map.once('style.load', async ()=>{
   ['tr-circ','cbs-pt','grid-fill'].forEach(id=>{map.on('mouseenter',id,()=>map.getCanvas().style.cursor='pointer');map.on('mouseleave',id,()=>map.getCanvas().style.cursor='');});
   map.on('click','grid-fill',e=>{const p=e.features[0].properties;new maplibregl.Popup().setLngLat(e.lngLat).setHTML(`<div class="card"><div class="hd">${CHT('offmapCell')}</div><div class="bd"><b>${p.n}</b>${CHT('bldInCell')} · ${(+p.m2).toLocaleString()} m²<div class="src">Microsoft ML Building Footprints 2026</div></div></div>`).addTo(map);});
 
-  // 07 case study (Sa'wa): recognized limit (dashed), bus stops inside it (number = trips that day, GTFS) and schools (MoE)
-  try{ const vd=await fetch('data/vaadim.geojson').then(r=>r.json()), sw=vd.features.find(f=>(f.properties.Vaad_Eng||'').trim()==='Sawa');
-    if(sw){ const W=['within',{type:'Feature',geometry:sw.geometry,properties:{}}], off={visibility:'none'};
-      map.addSource('case',{type:'geojson',data:sw});
-      map.addLayer({id:'case-line',type:'line',source:'case',layout:off,paint:{'line-color':'#e9e6df','line-width':2.5,'line-dasharray':[3,2]}});
-      if(map.getSource('stops')){
-        map.addLayer({id:'case-stop',type:'circle',source:'stops',filter:W,layout:off,paint:{'circle-color':'#e8452c','circle-stroke-color':'#000','circle-stroke-width':2,'circle-radius':['interpolate',['linear'],['get','t'],9,8,80,15]}});
-        map.addLayer({id:'case-stop-n',type:'symbol',source:'stops',filter:W,layout:{visibility:'none','text-field':['to-string',['get','t']],'text-size':11,'text-font':['Noto Sans Bold'],'text-allow-overlap':true},paint:{'text-color':'#000'}}); }
-      if(map.getSource('svc')){ const SF=['all',['in',['get','k'],['literal',['e','h']]],W];
-        map.addLayer({id:'case-school',type:'circle',source:'svc',filter:SF,layout:off,paint:{'circle-color':'#e9e6df','circle-stroke-color':'#000','circle-stroke-width':2,'circle-radius':7}});
-        map.addLayer({id:'case-school-n',type:'symbol',source:'svc',filter:SF,layout:{visibility:'none','text-field':['get','nm'],'text-size':12,'text-font':['Noto Sans Bold'],'text-offset':[0,1.3],'text-anchor':'top'},paint:{'text-color':'#e9e6df','text-halo-color':'#000','text-halo-width':1.6}}); }
-    } }catch(e){ console.warn('case study layers',e); }
+  // 07 plan vs ground: every Bedouin building as a dot, red = no approved plan over it (bedouin_noplan_pts.json + homes outside every recognized limit)
+  try{ const [np,offb]=await Promise.all([fetch('data/bedouin_noplan_pts.json').then(r=>r.json()),fetch('data/offmap_buildings.json').then(r=>r.json())]), P=[];
+    Object.values(np).forEach(a=>a.forEach(r=>P.push({type:'Feature',geometry:{type:'Point',coordinates:[r[0]/1e5,r[1]/1e5]},properties:{n:r[2]}})));
+    offb.forEach(r=>P.push({type:'Feature',geometry:{type:'Point',coordinates:[r[2]/1e5,r[3]/1e5]},properties:{n:1}}));
+    map.addSource('np',{type:'geojson',data:{type:'FeatureCollection',features:P}});
+    map.addLayer({id:'np-pts',type:'circle',source:'np',layout:{visibility:'none'},paint:{'circle-color':['case',['==',['get','n'],1],'#e8452c','#e9e6df'],'circle-radius':['interpolate',['linear'],['zoom'],9,.8,12,2,15,4.5],'circle-opacity':.9}});
+  }catch(e){ console.warn('no-plan layer',e); }
 
   applyState(); renderPanel(); renderStats(); bindPopups(); buildChapters();
 });
@@ -744,8 +739,8 @@ const CHAPTERS=[
  {no:'04',key:'transit',view:{center:[35.0,31.6],zoom:7.9},layers:{mask:false,routes:true,arab:false,jew:false,unrec:false,demo:false,grid:false,indJ:false,indA:false,arab7:false,jew11:false,indBld:false,cbs:false,transit:true,access:true}},
  {no:'05',key:'services',view:{center:[34.86,31.22],zoom:9.8},layers:{mask:true,arab:true,jew:true,unrec:false,demo:false,grid:false,indJ:false,indA:false,arab7:false,jew11:false,indBld:false,cbs:false,transit:false,svc:true}},
  {no:'06',key:'violence',view:{center:[34.85,31.25],zoom:9.6},layers:{mask:true,arab:true,jew:true,unrec:true,demo:false,grid:true,indJ:false,indA:false,cbs:false,transit:false}},
- // 07 case study: one recognized village (Sa'wa) seen as plan vs ground: aerial photo + live Xplan blue lines + its limit, bus stops and schools
- {no:'07',key:'plan',view:{center:[34.9685,31.2560],zoom:13.2},layers:{mask:false,sat:true,basemap:false,xplan:true,casePlan:true,arab:false,jew:false,unrec:false,demo:false,grid:false,indJ:false,indA:false,cbs:false,transit:false,landuse:false}}
+ // 07 plan vs ground: every Bedouin building as a dot, red = no approved plan over it
+ {no:'07',key:'plan',view:{center:[34.9,31.22],zoom:10.4},layers:{mask:true,sat:false,basemap:true,xplan:false,noplan:true,arab:false,jew:false,unrec:false,demo:false,grid:false,indJ:false,indA:false,cbs:false,transit:false,landuse:false}}
 ];
 const CH_TITLE={ar:{land:'الأرض والاعتراف',housing:'السكن والاستيطان',economy:'الاقتصاد والتشغيل',transit:'المواصلات',services:'التعليم والخدمات',violence:'العنف والأمان',plan:'الخطة مقابل الأرض'},
  he:{land:'קרקע והכרה',housing:'דיור והתיישבות',economy:'כלכלה ותעסוקה',transit:'תחבורה',services:'חינוך ושירותים',violence:'אלימות וביטחון',plan:'תכנית מול שטח'},
@@ -959,10 +954,10 @@ function chapterCard(key){
        x:ratio(uJ,uA),xl:{ar:'ضعف',he:'פעמים',en:'times'},src:srcBag}):'');
   }
   if(key==='plan'){
-    const date=(DATA.transit&&DATA.transit.date)||'', leg2=leg([['border-top:2px dashed #000;height:0;width:18px',{ar:'حدّ البلدة المعترف به',he:'גבול היישוב המוכר',en:'recognized limit'}],['background:#2b6cff;height:3px',{ar:'خطوط زرقاء: مخططات (Xplan، حيّ)',he:'קווים כחולים: תכניות (Xplan, חי)',en:'blue lines: plans (Xplan, live)'}],['background:#e8452c;border-radius:50%;outline:2px solid #000;outline-offset:-2px',{ar:'محطة باص · الرقم = رحلات في اليوم',he:'תחנת אוטובוס · המספר = נסיעות ביום',en:'bus stop · number = trips a day'}],['background:#e9e6df;border-radius:50%;outline:2px solid #000;outline-offset:-2px',{ar:'مدرسة',he:'בית ספר',en:'school'}]]);
-    T3.ar=`<p><b>سعوة (مولدة)</b> بلدة بدوية معترف بها منذ نحو 2004 (مجلس القسوم). السؤال هنا ليس «هل توجد خطة؟» بل: <b>ماذا وصل من الخطة إلى الأرض؟</b> الصورة الجوية تحت، والخطوط الزرقاء للمخططات فوقها.</p>`;
-    T3.he=`<p><b>סעוה (מולדה)</b> יישוב בדואי מוכר מאז 2004 בקירוב (מועצה אזורית אל-קסום). השאלה כאן איננה "האם יש תכנית?" אלא: <b>מה מהתכנית הגיע לשטח?</b> מתחת תצלום האוויר, ומעליו הקווים הכחולים של התכניות.</p>`;
-    T3.en=`<p><b>Sa'wa (Molada)</b> is a Bedouin locality recognized since about 2004 (al-Kasom regional council). The question here is not "is there a plan?" but: <b>how much of the plan has reached the ground?</b> The aerial photo is underneath, the plans' blue lines on top.</p>`;
+    const leg2=leg([['background:#e8452c;border-radius:50%',{ar:'مبنى بلا مخطط مصدّق فوقه',he:'מבנה ללא תכנית מאושרת',en:'building with no approved plan'}],['background:#e9e6df;border-radius:50%;outline:1px solid #000',{ar:'مبنى تحت مخطط مصدّق',he:'מבנה בתחום תכנית מאושרת',en:'building under an approved plan'}]]);
+    T3.ar=`<p>الاعتراف بقرية لا يعني أن بيوتها صارت داخل مخطط. السؤال هنا: <b>كم مبنى بدوي يقف على أرض لا يغطيها أي مخطط مصدّق؟</b> كل مبنى على الخريطة نقطة: الأحمر بلا مخطط، والأبيض تحت مخطط مصدّق.</p>`;
+    T3.he=`<p>הכרה בכפר אינה אומרת שבתיו נכנסו לתכנית. השאלה כאן: <b>כמה מבנים בדואיים עומדים על קרקע שאין עליה שום תכנית מאושרת?</b> כל מבנה במפה הוא נקודה: אדום ללא תכנית, לבן בתחום תכנית מאושרת.</p>`;
+    T3.en=`<p>Recognizing a village does not put its homes inside a plan. The question here: <b>how many Bedouin buildings stand on land with no approved plan at all?</b> Every building on the map is a dot: red with no plan, white under an approved plan.</p>`;
     const NP=DATA.noplan, npBlock=()=>{ if(!NP) return ''; const f=n=>n.toLocaleString();
       return `<h4>${tr3({ar:'كل البلدات والقرى البدوية المعترف بها',he:'כל היישובים והכפרים הבדואיים המוכרים',en:'All recognized Bedouin towns and villages'})}</h4>`+
         big([[NP.all_no_plan_pct+'%',tr3({ar:`من المباني البدوية في القضاء بلا مخطط مصدّق (${f(NP.all_no_plan)} من ${f(NP.all_bedouin)})`,he:`מהמבנים הבדואיים בנפה ללא תכנית מאושרת (${f(NP.all_no_plan)} מתוך ${f(NP.all_bedouin)})`,en:`of Bedouin buildings in the subdistrict have no approved plan (${f(NP.all_no_plan)} of ${f(NP.all_bedouin)})`})],
@@ -970,17 +965,9 @@ function chapterCard(key){
         bars(NP.rows.map(r=>({label:r[L]||r.en,v:r.no_plan_pct,grp:r.kind==='town'?'arab':'red',note:` <small>(${f(r.no_plan)})</small>`})),100,
           tr3({ar:'% من مباني كل بلدة أو قرية بلا مخطط مصدّق فوقها · بين القوسين: عدد المباني · الأحمر قرية، الرمادي بلدة',he:'% מהמבנים בכל יישוב או כפר ללא תכנית מאושרת · בסוגריים: מספר המבנים · אדום כפר, אפור עיירה',en:'% of each locality\'s buildings with no approved plan over them · in brackets: buildings · red = village, grey = town'}))+
         `<div class="todo">${tr3({ar:'حدود الداتا: المبنى «ضمن مخطط» إذا وقع مركزه داخل حدود مخطط مصدّق (ليس وثيقة سياسات وأصغر من 30 كم²، فلا تُحسب المخططات الإقليمية) أو داخل قسيمة مصدّقة. «ضمن مخطط» لا يعني أن البيت مرخّص ولا أن البنية التحتية وصلت. البيوت خارج كل حدّ معترف به (45,004) محسوبة كلها بلا مخطط. البصمات آلية (Microsoft 5/2024، صور حتى 2023). Xplan قد لا يحوي كل المخططات القديمة، ولم نراجع وثائق كل مخطط.',he:'מגבלות הנתונים: מבנה "בתוך תכנית" אם מרכזו בתוך גבול תכנית מאושרת (לא מסמך מדיניות וקטנה מ-30 קמ"ר, כך שתכניות אזוריות אינן נספרות) או בתוך מגרש מאושר. "בתוך תכנית" אינו אומר שהבית מורשה או שהתשתית הגיעה. הבתים מחוץ לכל גבול מוכר (45,004) נספרים כולם ללא תכנית. הטביעות אוטומטיות (Microsoft 5/2024, תצלומים עד 2023). ייתכן ש-Xplan אינו כולל את כל התכניות הישנות, ולא עיינו במסמכי כל תכנית.',en:'Data limits: a building is "inside a plan" if its centre lies within the boundary of an approved plan (not a policy document and under 30 km², so regional plans do not count) or within an approved plot. "Inside a plan" does not mean the house is licensed or that infrastructure has arrived. The homes outside every recognized limit (45,004) all count as having no plan. Footprints are machine-made (Microsoft 5/2024, imagery up to 2023). Xplan may not hold every older plan, and we did not read each plan\'s documents.'})}</div>`+
-        `<h4>${tr3({ar:'سعوة عن قرب',he:'סעוה מקרוב',en:"Sa'wa up close"})}</h4>`; };
-    return leg2+npBlock()+T3[L]+
-     big([['11,068',tr3({ar:'دونم داخل الحدّ',he:'דונם בתחום',en:'dunam inside the limit'})],['5,466',tr3({ar:'ساكن',he:'תושבים',en:'residents'})],['3,242',tr3({ar:'مبنى داخل الحدّ',he:'מבנים בתחום',en:'buildings inside'})]])+
-     `<h4>${tr3({ar:'المخطط مقابل الأرض',he:'התכנית מול השטח',en:'Plan vs ground'})}</h4><p>${tr3({ar:'خمسة مخططات أحياء مصدّقة تقسّم أرض سعوة إلى قسائم (שכונה א׳، ב׳، ג׳، 5–6، 7؛ نُشر إقرارها بين 2020 و2024). وضعنا فوقها بصمات المباني وسألنا ثلاثة أسئلة:',he:'חמש תכניות שכונה מאושרות מחלקות את אדמת סעוה למגרשים (שכונה א׳, ב׳, ג׳, 5–6, 7; אישורן פורסם בין 2020 ל-2024). הנחנו עליהן את טביעות המבנים ושאלנו שלוש שאלות:',en:'Five approved neighbourhood plans divide Sa\'wa\'s land into plots (Neighbourhoods A, B, C, 5–6, 7; approval published 2020–2024). We laid the building footprints over them and asked three questions:'})}</p>`+
-     big([['45.6%',tr3({ar:'من المباني خارج كل مخططات الأحياء (1,479 من 3,242)',he:'מהמבנים מחוץ לכל תכניות השכונה (1,479 מתוך 3,242)',en:'of buildings outside every neighbourhood plan (1,479 of 3,242)'})],['282',tr3({ar:'مبنى داخل المخططات على أرض مخصّصة لشارع أو ممر أو مساحة عامة أو وادٍ أو مبنى عام (16%)',he:'מבנים בתוך התכניות על קרקע שיועדה לדרך, שביל, שצ"פ, נחל או מבנה ציבור (16%)',en:'buildings inside the plans on land zoned road, path, open space, stream or public building (16%)'})],['42.7%',tr3({ar:'من قسائم السكن بلا مبنى (663 من 1,553)',he:'ממגרשי המגורים ללא מבנה (663 מתוך 1,553)',en:'of residential plots with no building (663 of 1,553)'})]])+
-     `<p class="note2">${tr3({ar:'هذا قياس تطابق بين خريطتين، لا حكم على أحد. المبنى على أرض «شارع» يعني أن المخطط رُسم فوق بيت قائم أو أن البيت بُني بعده؛ البصمات لا تفرّق بين الحالتين. بحساب المباني ≥40 م² فقط: 156 مبنى (12%). 127 مبنى آخر على أرض مصنّفة زراعية. القسائم الفارغة ليست بالضرورة «فشلاً»: المخطط يرسم قسائم للنمو، والصور التي استُخرجت منها البصمات (حتى 2023) سبقت أو رافقت إقرار المخططات.',he:'זוהי מדידת התאמה בין שתי מפות, לא שיפוט של איש. מבנה על קרקע "דרך" פירושו שהתכנית שורטטה מעל בית קיים או שהבית נבנה אחריה; טביעות המבנים אינן מבחינות בין השניים. בספירת מבנים ≥40 מ"ר בלבד: 156 מבנים (12%). עוד 127 מבנים על קרקע ביעוד חקלאי. מגרשים ריקים אינם בהכרח "כישלון": התכנית משרטטת מגרשים לגידול, והתצלומים שמהם הופקו הטביעות (עד 2023) קדמו לאישור התכניות או חפפו לו.',en:'This measures how two maps match; it judges no one. A building on land zoned "road" means the plan was drawn over an existing home or the home was built after it; footprints cannot tell which. Counting only buildings ≥40 m²: 156 (12%). Another 127 buildings sit on land zoned agricultural. Empty plots are not necessarily "failure": a plan draws plots for growth, and the imagery behind the footprints (up to 2023) came before or around the plans\' approval.'})}</p>`+
-     `<div class="todo">${tr3({ar:'حدود الداتا: البصمات مستخرجة آلياً (Microsoft، إصدار 5/2024، صور 2014–2023؛ تاريخ الصورة لسعوة تحديداً غير معروف) وقد تفوّت مباني أو تضيف. المبنى يُنسب للقسيمة حسب مركزه. تاريخ «نشر الإقرار» من حقل في Xplan لم نتحقق من معناه في وثائق المخطط. حالة بلدة واحدة، لا تعميم.',he:'מגבלות הנתונים: הטביעות הופקו אוטומטית (Microsoft, גרסה 5/2024, תצלומים 2014–2023; תאריך התצלום של סעוה עצמה לא ידוע) ועשויות להחסיר או להוסיף מבנים. מבנה משויך למגרש לפי מרכזו. תאריך "פרסום האישור" לקוח משדה ב-Xplan שמשמעותו לא אומתה מול מסמכי התכנית. מקרה של יישוב אחד, לא הכללה.',en:'Data limits: footprints are machine-extracted (Microsoft, 5/2024 release, imagery 2014–2023; the image date for Sa\'wa itself is unknown) and may miss or add buildings. A building is assigned to a plot by its centre. The "approval published" date comes from an Xplan field whose meaning we have not checked against the plan documents. One locality, not a generalization.'})}</div>`+
-     `<h4>${tr3({ar:'الباص',he:'אוטובוס',en:'Bus'})}</h4><p>${tr3({ar:'7 محطات داخل البلدة: 9 رحلات في اليوم لكل محطة (18 في «المركز»). على شارع 31 عند الطرف: 70–80 رحلة في اليوم.',he:'7 תחנות בתוך היישוב: 9 נסיעות ביום בכל תחנה (18 ב"מרכז"). על כביש 31 בשוליים: 70–80 נסיעות ביום.',en:'7 stops inside the locality: 9 trips a day at each (18 at "centre"). On road 31 at the edge: 70–80 trips a day.'})}</p>`+
-     `<h4>${tr3({ar:'مشاهدة ميدانية · 11/2026',he:'תצפית שטח · 11/2026',en:'Field observation · 11/2026'})}</h4><p>${tr3({ar:'الشارع المعبّد يصل إلى المدرسة عند المدخل فقط. لا إنارة في الشارع. المطبّات حادّة. الرصيف أُنشئ مؤخراً. (ملاحظة عضوة في الفريق تعرف المكان؛ ليست قياساً.)',he:'הכביש הסלול מגיע רק עד בית הספר שבכניסה. אין תאורת רחוב. פסי ההאטה חדים. המדרכה נבנתה לאחרונה. (תצפית של חברת צוות שמכירה את המקום; לא מדידה.)',en:'The paved road reaches only the school at the entrance. No street lighting. Sharp speed bumps. The sidewalk was built recently. (Observation by a team member who knows the place; not a measurement.)'})}</p>`+
-     `<div class="todo">${tr3({ar:'قيد التحقق: ملحق الماء والمجاري للمخطط 624-0601187 «שכונה 7 סעוה» (2020) يذكر، بحسب ما وصلنا، أن لا بنية تحتية للماء والمجاري وأن الماء موصول بمجمّع المدرسة فقط. لم نراجع الوثيقة مباشرة بعد.',he:'בבדיקה: נספח המים והביוב של תכנית 624-0601187 "שכונה 7 סעוה" (2020) מציין, לפי מה שהגיע אלינו, שאין תשתית מים וביוב ושהמים מחוברים רק למתחם בית הספר. טרם עיינו במסמך עצמו.',en:'Being verified: the water and sewage appendix of plan 624-0601187 "Neighbourhood 7 Sa\'wa" (2020) reportedly states there is no water or sewage infrastructure and that water is connected only to the school compound. We have not read the document itself yet.'})}</div>`+
-     `<div class="src">${tr3({ar:'الحدّ والمخططات: מנהל התכנון (iplan/Xplan، نُزّلت 19.11.2026) · السكان: الدائرة المركزية للإحصاء · المباني: Microsoft ML Footprints (5/2024، عبر VIDA/source.coop) ·المحطات: GTFS وزارة المواصلات '+date+' · المدارس: وزارة التربية · الصورة: Esri World Imagery.',he:'גבול ותכניות: מנהל התכנון (iplan/Xplan, הורד 19.11.2026) · אוכלוסייה: הלמ"ס · מבנים: Microsoft ML Footprints (5/2024, דרך VIDA/source.coop) ·תחנות: GTFS משרד התחבורה '+date+' · בתי ספר: משרד החינוך · תצלום: Esri World Imagery.',en:'Limit and plans: Israel Planning Administration (iplan/Xplan, downloaded 19.11.2026) · population: CBS · buildings: Microsoft ML Footprints (5/2024, via VIDA/source.coop) ·stops: MoT GTFS '+date+' · schools: Ministry of Education · imagery: Esri World Imagery.'})}</div>`;
+        ''; };
+    return leg2+T3[L]+npBlock()+
+     `<div class="src">${tr3({ar:'المخططات: מנהל התכנון (Xplan، نُزّلت 19.11.2026) · الحدود: iplan · المباني: Microsoft ML Footprints (5/2024، عبر VIDA/source.coop)',he:'תכניות: מנהל התכנון (Xplan, הורד 19.11.2026) · גבולות: iplan · מבנים: Microsoft ML Footprints (5/2024, דרך VIDA/source.coop)',en:'Plans: Israel Planning Administration (Xplan, downloaded 19.11.2026) · limits: iplan · buildings: Microsoft ML Footprints (5/2024, via VIDA/source.coop)'})}</div>`;
   }
   if(key==='violence'){
     T3.ar=`<p>العنف ليس "ثقافة" — له جغرافيا: شوارع بلا إنارة، أحياء بلا عنوان، قرى بلا شرطة ولا خدمات، وشباب بلا عمل. هذا الفصل يربط الجريمة بالفجوات المكانية في الفصول 01–05.</p>`;
@@ -1002,7 +989,7 @@ function chapterCard(key){
   }
   return '';
 }
-let curChapter=null, wasPlan=!!state.casePlan; // wasPlan: leaving the case study switches its aerial photo and blue lines off again
+let curChapter=null;
 function buildChapters(){
   document.getElementById('chapters').innerHTML=CHAPTERS.map(c=>`<button data-k="${c.key}"><span class="no">${c.no}</span>${CH_TITLE[L][c.key]}</button>`).join('');
   document.querySelectorAll('#chapters button').forEach(b=>b.onclick=()=>openChapter(b.dataset.k===curChapter?null:b.dataset.k));
@@ -1014,7 +1001,7 @@ function openChapter(key,keepView){
   const c=CHAPTERS.find(c=>c.key===key); document.body.classList.toggle('tl',!!(c&&c.timeline));
   if(!c){ stopPlayer(); resetHi(); document.getElementById('card').style.display='none'; return; }
   stopPlayer(); resetHi();
-  document.getElementById('card').style.display=''; Object.assign(state,{frames:false,nat:false,routes:false,mask2:false,access:false,svc:false,econ:false,casePlan:false},wasPlan?{sat:false,xplan:false,basemap:true}:{},c.layers); wasPlan=key==='plan'; applyState(); renderPanel();
+  document.getElementById('card').style.display=''; Object.assign(state,{frames:false,nat:false,routes:false,mask2:false,access:false,svc:false,econ:false,noplan:false},c.layers); applyState(); renderPanel();
   if(!keepView) map.flyTo({...c.view,duration:1600});
   document.getElementById('card').innerHTML=`<div class="hd"><span class="no">${c.no}</span><h2>${CH_TITLE[L][key]}</h2></div><div class="bd">${chapterCard(key)}</div>`;
   foldCard();
@@ -1214,7 +1201,7 @@ function renderPanel(){
   const row=(k,label,swatch='',live=false)=>`<label class="row"><input type="checkbox" data-k="${k}" ${state[k]?'checked':''}><span class="box"></span>${label}${live?'<span class="live">LIVE</span>':''}${swatch}</label>`;
   const all=`<h3>${t('base')}</h3>${row('basemap',t('basemap'))}${row('sat',t('sat'))}${row('mask',t('mask'))}${row('mask2',t('mask2'))}${row('labels',t('labels'))}
     <h3>${t('bounds')}</h3>${row('arab',t('arab'),sw('#e9e6df'))}${row('jew',t('jew'),`<span class="sw" style="border:2px solid #8a8a86"></span>`)}${row('ind',t('ind'),sw('#5a5a55'))}${row('rc',t('rc'),sw('#8a8a86',1))}
-    <h3>${t('red')}</h3>${row('unrec',t('unrec'),sw('#e8452c'))}${row('grid',CHT('offmapCell'),sw('#e8452c'))}${row('cbs',CH_TITLE[L].housing+' · 1870–2024',sw('#8a8a86'))}${row('transit',CH_TITLE[L].transit+' · GTFS',sw('#e8452c',1))}${row('access',CHT('access')+' · GTFS',sw('#ff5a3c'))}${row('svc',CHT('svc'),sw('#e9e6df'))}${row('demo',t('demo'),'<span class="sw" style="color:#e8452c;font-weight:800;text-align:center">✕</span>')}
+    <h3>${t('red')}</h3>${row('unrec',t('unrec'),sw('#e8452c'))}${row('grid',CHT('offmapCell'),sw('#e8452c'))}${row('cbs',CH_TITLE[L].housing+' · 1870–2024',sw('#8a8a86'))}${row('transit',CH_TITLE[L].transit+' · GTFS',sw('#e8452c',1))}${row('access',CHT('access')+' · GTFS',sw('#ff5a3c'))}${row('svc',CHT('svc'),sw('#e9e6df'))}${row('noplan',T4({ar:'مبانٍ بلا مخطط مصدّق',he:'מבנים ללא תכנית מאושרת',en:'buildings with no approved plan'}),sw('#e8452c'))}${row('demo',t('demo'),'<span class="sw" style="color:#e8452c;font-weight:800;text-align:center">✕</span>')}
     <div class="note">${t('unrecNote')}</div>
     <h3>${t('econ')}</h3>${row('econ',T4({ar:'أرض صناعية لكل ساكن (مربع)',he:'קרקע תעשייה לתושב (ריבוע)',en:'industrial land per resident (square)'}),'<span class="sw" style="background:#f2c230;outline:2px solid #000;outline-offset:-2px"></span>')}${row('indA',t('indA'),'<span class="sw" style="background:#f2c230;outline:2px solid #000;outline-offset:-3px"></span>')}${row('indJ',t('indJ'),'<span class="sw" style="background:#f2c230;opacity:.55"></span>')}${row('arab7',t('arab7'),sw('#e9e6df',1))}
     <h3>${t('plan')}</h3>${row('xplan',t('xplan'),'',1)}${row('landuse',t('landuse'),'',1)}${row('tmm',t('tmm'),'',1)}${row('vatmal',t('vatmal'),'',1)}

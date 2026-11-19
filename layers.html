@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OFF—MAP · Layer on layer</title>
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;700;800&family=Alexandria:wght@400;600;800&family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bone:#e9e6df;--red:#e8452c;--concrete:#8a8a86;--font:'Rubik','Jost',sans-serif}
+html[lang=ar]{--font:'Alexandria','Jost',sans-serif} html[lang=en]{--font:'Jost',sans-serif}
+html,body{margin:0;height:100%;background:#151514;color:var(--bone);font-family:var(--font);overflow:hidden}
+#map{position:fixed;inset:0}
+#side{position:fixed;top:0;bottom:0;inset-inline-start:0;width:40%;padding:34px 34px 26px;box-sizing:border-box;z-index:5;
+  background:linear-gradient(to left,rgba(14,14,14,.97) 78%,rgba(14,14,14,0));display:flex;flex-direction:column;gap:14px}
+html[dir=ltr] #side{background:linear-gradient(to right,rgba(14,14,14,.97) 78%,rgba(14,14,14,0))}
+.brand{font-family:'Jost';font-weight:800;font-size:22px;direction:ltr;text-align:start} .brand b{color:var(--red)}
+h1{margin:0;font-size:30px;line-height:1.2;color:var(--red);font-weight:800}
+#steps{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:9px}
+#steps li{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start;opacity:.22;transition:none}
+#steps li.on{opacity:1} #steps li.now .n{background:var(--red);border-color:var(--red);color:#fff}
+#steps .n{width:30px;height:30px;border:1.5px solid var(--bone);border-radius:50%;display:grid;place-items:center;font-family:'Jost';font-weight:800;font-size:13px}
+#steps b{display:block;font-size:17px} #steps span{display:block;font-size:12.5px;color:var(--concrete);line-height:1.35}
+#steps i{display:inline-block;width:11px;height:11px;margin-inline-end:6px;vertical-align:-1px}
+#end{margin-top:auto;font-size:15px;line-height:1.45;opacity:0} #end.on{opacity:1} #end b{color:var(--red);font-family:'Jost';font-size:20px}
+.maplibregl-ctrl-attrib{font-size:9px}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="side"><div class="brand">OFF<b>—</b>MAP</div><h1 id="q"></h1><ul id="steps"></ul><div id="end"></div></div>
+<script>
+/* One fixed camera over Omer and the Bedouin towns and villages around it; each step adds one data source.
+   ?lang=he|ar|en · ?step=0..6 (6 = all). window.setStep(n) for the GIF renderer. */
+const q=new URLSearchParams(location.search); let L=q.get('lang'); if(!['ar','he','en'].includes(L)) L='he';
+document.documentElement.lang=L; document.documentElement.dir=L==='en'?'ltr':'rtl'; const T=o=>o[L]||o.en;
+const get=f=>fetch('data/'+f).then(r=>r.json()), FC=f=>({type:'FeatureCollection',features:f});
+const C={bone:'#e9e6df',red:'#e8452c',yellow:'#f2c230'};
+function circle(c,r,n=36){const kx=111320*Math.cos(c[1]*Math.PI/180),ky=110540,a=[];for(let i=0;i<=n;i++){const t=2*Math.PI*i/n;a.push([c[0]+r*Math.cos(t)/kx,c[1]+r*Math.sin(t)/ky]);}return a;}
+function square(c,s){const kx=111320*Math.cos(c[1]*Math.PI/180),ky=110540,h=s/2;return [[c[0]-h/kx,c[1]-h/ky],[c[0]+h/kx,c[1]-h/ky],[c[0]+h/kx,c[1]+h/ky],[c[0]-h/kx,c[1]+h/ky],[c[0]-h/kx,c[1]-h/ky]];}
+function centroid(g){let x=0,y=0,n=0;const w=a=>{if(typeof a[0]==='number'){x+=a[0];y+=a[1];n++;}else a.forEach(w);};w(g.coordinates);return [x/n,y/n];}
+document.getElementById('q').textContent=T({he:'מה רואים כשמניחים שכבה על שכבה?',ar:'ماذا نرى حين نضع طبقة فوق طبقة؟',en:'What appears when you lay one layer on another?'});
+const STEPS=[
+ {n:{he:'גבולות',ar:'الحدود',en:'Limits'},s:{he:'יישובים מוכרים · מנהל התכנון',ar:'البلدات المعترف بها · מנהל התכנון',en:'recognized localities · Planning Administration'},sw:'border:1.5px solid #e9e6df',ids:['lim']},
+ {n:{he:'מבנים',ar:'المباني',en:'Buildings'},s:{he:'כל מבנה שנראה מהלוויין · Microsoft ML',ar:'كل مبنى يُرى من القمر الصناعي · Microsoft ML',en:'every building seen from orbit · Microsoft ML'},sw:'background:#8a8a86',ids:['b-all','osm']},
+ {n:{he:'תכנון',ar:'التخطيط',en:'Planning'},s:{he:'אדום = ללא תכנית מאושרת · Xplan',ar:'الأحمر = بلا مخطط مصدّق · Xplan',en:'red = no approved plan · Xplan'},sw:'background:#e8452c',ids:['b-plan']},
+ {n:{he:'תחבורה',ar:'المواصلات',en:'Transit'},s:{he:'אור = עד 400 מ\' מתחנה פעילה · GTFS',ar:'الضوء = حتى 400 م من محطة · GTFS',en:'light = within 400 m of a served stop · GTFS'},sw:'background:rgba(255,246,220,.6)',ids:['ring']},
+ {n:{he:'חינוך',ar:'التعليم',en:'Schools'},s:{he:'בית ספר יסודי ומעגל 1 ק"מ · משרד החינוך',ar:'مدرسة ابتدائية ودائرة 1 كم · وزارة التربية',en:'elementary school and 1 km ring · Ministry of Education'},sw:'background:#f2c230',ids:['sch','schr']},
+ {n:{he:'ביטחון',ar:'الأمان',en:'Safety'},s:{he:'עמודה = תיקי רצח וניסיון לרצח לתושב · משטרה',ar:'العمود = ملفات قتل ومحاولة قتل لكل ساكن · الشرطة',en:'column = murder & attempted-murder files per resident · Police'},sw:'background:linear-gradient(#e8452c,#e8452c) center/4px 100% no-repeat',ids:['vio']}];
+document.getElementById('steps').innerHTML=STEPS.map((s,i)=>`<li id="st${i}"><div class="n">${i+1}</div><div><b><i style="${s.sw}"></i>${T(s.n)}</b><span>${T(s.s)}</span></div></li>`).join('');
+document.getElementById('end').innerHTML=T({he:'<b>56%</b> מהמבנים הבדואיים ללא תכנית · <b>×26</b> תחבורה · <b>×5.6</b> בית ספר · <b>×3.8</b> אלימות קטלנית — העיר כמערכת: כל שכבה מסבירה את הבאה.',
+  ar:'<b>56%</b> من المباني البدوية بلا مخطط · <b>×26</b> مواصلات · <b>×5.6</b> مدرسة · <b>×3.8</b> عنف قاتل — المدينة كمنظومة: كل طبقة تفسّر التي بعدها.',
+  en:'<b>56%</b> of Bedouin buildings without a plan · <b>×26</b> transit · <b>×5.6</b> school · <b>×3.8</b> lethal violence — the city as a system: each layer explains the next.'});
+
+const style={version:8,glyphs:'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',sources:{omt:{type:'vector',url:'https://tiles.openfreemap.org/planet'}},
+  layers:[{id:'bg',type:'background',paint:{'background-color':'#151514'}},{id:'water',type:'fill',source:'omt','source-layer':'water',paint:{'fill-color':'#070707'}},
+    {id:'roads',type:'line',source:'omt','source-layer':'transportation',paint:{'line-color':'#2f2f2c','line-width':['interpolate',['linear'],['zoom'],9,.5,13,1.6]}}]};
+const map=new maplibregl.Map({container:'map',style,center:[34.893,31.276],zoom:11.55,pitch:52,bearing:-14,attributionControl:{compact:true},preserveDrawingBuffer:true,antialias:true,
+  padding:L==='en'?{left:innerWidth*.4,right:0,top:0,bottom:0}:{right:innerWidth*.4,left:0,top:0,bottom:0}});
+let current=-1;
+window.setStep=n=>{ current=n;
+  STEPS.forEach((s,i)=>{ s.ids.forEach(id=>map.getLayer(id)&&map.setLayoutProperty(id,'visibility',i<=n?'visible':'none'));
+    const li=document.getElementById('st'+i); li.classList.toggle('on',i<=n); li.classList.toggle('now',i===n&&n<STEPS.length-1||n>=STEPS.length&&false); });
+  if(map.getLayer('b-all')) map.setLayoutProperty('b-all','visibility',n>=1&&n<2?'visible':'none'); // grey buildings only until planning recolours them
+  if(map.getLayer('osm')) map.setPaintProperty('osm','fill-color',n>=2?C.bone:'#8a8a86');
+  document.getElementById('end').classList.toggle('on',n>=STEPS.length-1);
+  document.querySelectorAll('#steps li').forEach((li,i)=>li.classList.toggle('now',i===Math.min(n,STEPS.length-1)));
+  return new Promise(r=>map.once('idle',()=>r(true))); };
+map.on('load',async()=>{
+  const [mu,va,ra,np,off,st,sv,vi]=await Promise.all(['muni.geojson','vaadim.geojson','rahat.geojson','bedouin_noplan_pts.json','offmap_buildings.json','transit_stops.geojson','services_points.geojson','violence.json'].map(get));
+  const off_=layout=>({visibility:'none',...layout});
+  map.addSource('lim',{type:'geojson',data:FC(mu.features.concat(va.features,ra.features))});
+  map.addLayer({id:'lim',type:'line',source:'lim',layout:off_(),paint:{'line-color':C.bone,'line-width':1.4,'line-opacity':.85}});
+  map.addSource('ring',{type:'geojson',data:FC(st.features.map(f=>({type:'Feature',geometry:{type:'Polygon',coordinates:[circle(f.geometry.coordinates,400)]},properties:{}})))});
+  map.addLayer({id:'ring',type:'fill',source:'ring',layout:off_(),paint:{'fill-color':'#fff6dc','fill-opacity':.12}},'lim');
+  map.addLayer({id:'osm',type:'fill',source:'omt','source-layer':'building',layout:off_(),paint:{'fill-color':'#8a8a86'}});
+  const P=[];Object.values(np).forEach(a=>a.forEach(r=>P.push({type:'Feature',geometry:{type:'Point',coordinates:[r[0]/1e5,r[1]/1e5]},properties:{n:r[2]}})));
+  off.forEach(r=>P.push({type:'Feature',geometry:{type:'Point',coordinates:[r[2]/1e5,r[3]/1e5]},properties:{n:1}}));
+  map.addSource('b',{type:'geojson',data:FC(P)});
+  const rad=['interpolate',['linear'],['zoom'],10,1,12,1.9,14,3.5];
+  map.addLayer({id:'b-all',type:'circle',source:'b',layout:off_(),paint:{'circle-color':'#8a8a86','circle-radius':rad}});
+  map.addLayer({id:'b-plan',type:'circle',source:'b',layout:off_(),paint:{'circle-color':['case',['==',['get','n'],1],C.red,C.bone],'circle-radius':rad}});
+  const E=sv.features.filter(f=>f.properties.k==='e');
+  map.addSource('schr',{type:'geojson',data:FC(E.map(f=>({type:'Feature',geometry:{type:'Polygon',coordinates:[circle(f.geometry.coordinates,1000,48)]},properties:{}})))});
+  map.addLayer({id:'schr',type:'line',source:'schr',layout:off_(),paint:{'line-color':C.yellow,'line-width':1.2,'line-opacity':.75}});
+  map.addSource('sch',{type:'geojson',data:FC(E.map(f=>({type:'Feature',geometry:{type:'Polygon',coordinates:[square(f.geometry.coordinates,110)]},properties:{}})))});
+  map.addLayer({id:'sch',type:'fill-extrusion',source:'sch',layout:off_(),paint:{'fill-extrusion-color':C.yellow,'fill-extrusion-height':180}});
+  const EN={'Kuseife':'Kseyfe','Lakiya':'Lakiye','Yeruham':'Yeroham',"Ar'ara BaNegev":"Ar'ara Banegev",'Mitzpe Ramon':'Mitspe Ramon'}, pos={};
+  mu.features.forEach(f=>{pos[(f.properties.Muni_Eng||'').trim()]=centroid(f.geometry);}); ra.features.forEach(f=>{pos['Rahat']=centroid(f.geometry);});
+  const V=vi.rows.map(r=>({r,p:pos[EN[r.en]||r.en]})).filter(o=>o.p).map(({r,p})=>({type:'Feature',geometry:{type:'Polygon',coordinates:[circle(p,260,20)]},properties:{h:Math.max(r.lethal_per10k_yr*2600,60),a:r.grp==='arab'?1:0}}));
+  map.addSource('vio',{type:'geojson',data:FC(V)});
+  map.addLayer({id:'vio',type:'fill-extrusion',source:'vio',layout:off_(),paint:{'fill-extrusion-color':['case',['==',['get','a'],1],C.red,C.bone],'fill-extrusion-height':['get','h'],'fill-extrusion-opacity':.95}});
+  await window.setStep(+(q.get('step')||5)); document.title='READY';
+});
+</script>
+</body>
+</html>

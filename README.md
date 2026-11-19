@@ -49,6 +49,7 @@ the two sides in identical units, the gap ×N and the source.
 
 | file | story |
 |---|---|
+| `00-layer-on-layer` | one fixed camera over Omer and the Bedouin towns around it; six sources added one per frame (limits, buildings, approved plans, bus catchments, schools, lethal-violence files) — drawn by `layers.html`, exported by `scripts/make_layers_gif.py` |
 | `01-homes-off-the-map` | homes outside every recognized limit |
 | `02-new-localities-since-1948` | new localities founded since 1948, Jewish vs Arab |
 | `03-industrial-land` | football pitches of industrial land per 1,000 residents |

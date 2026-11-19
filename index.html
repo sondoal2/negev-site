@@ -1126,6 +1126,11 @@ function showPair(i,mode='transit'){
 }
 // economy: every town gets a yellow square on the map whose AREA = industrial land per resident (m², static layer)
 const ECON_ID={'rahat':'Rahat','hura':'Hura','kseifa':'Kseyfe','lakia':'Lakiye','tel sheva':'Tel Sheva','shegev shalom':'Segev Shalom','arara negev':"Ar'ara Banegev",'netivot':'Netivot','ofakim':'Ofakim','dimona':'Dimona','arad':'Arad','eilat':'Eilat','omer':'Omer','yeruham':'Yeroham','lehavim':'Lehavim','meytar':'Meitar','mizpe ramon':'Mitspe Ramon','beer sheva':"Be'er Sheva"};
+// restored: removed in 9b04a37 while still used by the econ layer (load step threw ReferenceError)
+function econFC(){ const R=(DATA&&DATA.istats&&DATA.istats.rows)||[], pos={};
+  DATA.loc.features.forEach(f=>{ if(!pos[f.properties.en]) pos[f.properties.en]=centroid(f.geometry); });
+  return {type:'FeatureCollection',features:R.filter(r=>pos[ECON_ID[r.key]]).map(r=>({type:'Feature',geometry:{type:'Point',coordinates:pos[ECON_ID[r.key]]},
+    properties:{key:r.key,grp:r.grp,name:r[L]||r.en,v:Math.round(r.ind_dunam*1000/r.pop),pop:r.pop}}))}; }
 // unit-fill frames: both sides fill with identical units; t goes 0 -> 1; the Arab side stops early
 function fillFrames(c){ const N=c.steps||10, out=[];
   for(let k=0;k<=N;k++){ const t=k/N, fin=k===N;

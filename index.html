@@ -58,7 +58,18 @@ body.nograin .grain{display:none}
 .sw{width:22px;height:12px;flex:none;margin-inline-start:auto}
 .live{font-size:10px;font-weight:700;letter-spacing:.1em;background:var(--red);color:#000;padding:1px 4px;margin-inline-start:4px}
 .note{font-size:11px;color:var(--concrete);padding:0 14px 10px;line-height:1.4}
-#panelToggle{display:none}
+#panel{display:none} body.panel #panel{display:block;z-index:13}
+body.panel #panelToggle{background:var(--bone);color:#000}
+#panel details>summary{list-style:none;cursor:pointer;padding:11px 14px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--concrete);font-weight:600;border-top:1px solid var(--line)}
+#panel details>summary::-webkit-details-marker{display:none}
+#panel details>summary::before{content:'+';display:inline-block;width:16px;font-weight:800;color:var(--bone)} #panel details[open]>summary::before{content:'–'}
+#panel h3.mine{color:var(--bone)} #panel h3.mine b{font-family:"Jost";font-weight:800;color:var(--red);margin-inline-end:8px;font-size:15px}
+#card .bd>.gap:first-child{margin-top:0}
+#card details.more{margin-top:12px;border-top:2px solid #000}
+#card details.more>summary{list-style:none;cursor:pointer;padding:9px 0 2px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+#card details.more>summary::-webkit-details-marker{display:none}
+#card details.more>summary::before{content:'+';display:inline-block;width:16px;font-weight:800;color:var(--red-deep)} #card details.more[open]>summary::before{content:'–'}
+#card details.more[open]>summary{margin-bottom:8px}
 
 /* ---------- stats (SOS counter logic) ---------- */
 #stats{position:absolute;bottom:18px;inset-inline-start:16px;z-index:10;display:flex;gap:0;background:#000;border:1px solid var(--line)}
@@ -248,8 +259,7 @@ body.chap #stats{display:none}
   header{height:56px;padding:0 8px} #stage,#about{top:56px}
   .section{display:none} .brand{font-size:20px}
   .nav button{width:38px}
-  #panel{display:none;width:calc(100% - 32px)} body.panel #panel{display:block}
-  #panelToggle{display:grid!important}
+  #panel{width:calc(100% - 32px)}
   #stats{inset-inline:16px auto;bottom:12px} .stat .n{font-size:20px} .stat{padding:8px 10px}
   #about .wrap{grid-template-columns:1fr}
   #yearL{left:8px} #yearR{right:60px}
@@ -948,8 +958,17 @@ function openChapter(key,keepView){
   document.getElementById('card').style.display=''; Object.assign(state,{frames:false,nat:false,routes:false,mask2:false,access:false,svc:false,econ:false},c.layers); applyState(); renderPanel();
   if(!keepView) map.flyTo({...c.view,duration:1600});
   document.getElementById('card').innerHTML=`<div class="hd"><span class="no">${c.no}</span><h2>${CH_TITLE[L][key]}</h2></div><div class="bd">${chapterCard(key)}</div>`;
+  foldCard();
   if(c.timeline) setYear(tlRange.value);
   setTimeout(()=>{ if(curChapter===key) startPlayer(key); }, keepView?300:1700);
+}
+
+// the card opens on the gap (one question, two sides, xN); legend stays; the text, bars and tables fold under one line
+function foldCard(){
+  const bd=document.querySelector('#card .bd'); if(!bd) return; const gaps=[...bd.children].filter(e=>e.classList.contains('gap')); if(!gaps.length) return;
+  const more=document.createElement('details'); more.className='more'; more.open=cardMore; more.innerHTML=`<summary>${T4({ar:'الشرح والأرقام الكاملة',he:'הסבר ונתונים מלאים',en:'Explanation and full data'})}</summary>`;
+  [...bd.childNodes].forEach(n=>{ if(!(n.nodeType===1&&(n.classList.contains('gap')||n.classList.contains('leg')))) more.appendChild(n); });
+  if(more.childNodes.length>1){ bd.appendChild(more); more.ontoggle=()=>{cardMore=more.open;}; }
 }
 
 /* ======================= GIF PLAYER ======================= */
@@ -1124,18 +1143,23 @@ function applyState(){
 }
 
 /* ---------------- panel ---------------- */
+let panelAll=false, cardMore=false;
 function renderPanel(){
   const sw=(c,dash)=>`<span class="sw" style="${dash?`border-top:2px dashed ${c}`:`background:${c}`}"></span>`;
   const row=(k,label,swatch='',live=false)=>`<label class="row"><input type="checkbox" data-k="${k}" ${state[k]?'checked':''}><span class="box"></span>${label}${live?'<span class="live">LIVE</span>':''}${swatch}</label>`;
-  document.getElementById('panel').innerHTML=
-   `<h3>${t('base')}</h3>${row('basemap',t('basemap'))}${row('sat',t('sat'))}${row('mask',t('mask'))}${row('mask2',t('mask2'))}${row('labels',t('labels'))}
+  const all=`<h3>${t('base')}</h3>${row('basemap',t('basemap'))}${row('sat',t('sat'))}${row('mask',t('mask'))}${row('mask2',t('mask2'))}${row('labels',t('labels'))}
     <h3>${t('bounds')}</h3>${row('arab',t('arab'),sw('#e9e6df'))}${row('jew',t('jew'),`<span class="sw" style="border:2px solid #8a8a86"></span>`)}${row('ind',t('ind'),sw('#5a5a55'))}${row('rc',t('rc'),sw('#8a8a86',1))}
     <h3>${t('red')}</h3>${row('unrec',t('unrec'),sw('#e8452c'))}${row('grid',CHT('offmapCell'),sw('#e8452c'))}${row('cbs',CH_TITLE[L].housing+' · 1870–2024',sw('#8a8a86'))}${row('transit',CH_TITLE[L].transit+' · GTFS',sw('#e8452c',1))}${row('access',CHT('access')+' · GTFS',sw('#ff5a3c'))}${row('svc',CHT('svc'),sw('#e9e6df'))}${row('demo',t('demo'),'<span class="sw" style="color:#e8452c;font-weight:800;text-align:center">✕</span>')}
     <div class="note">${t('unrecNote')}</div>
     <h3>${t('econ')}</h3>${row('econ',T4({ar:'أرض صناعية لكل ساكن (مربع)',he:'קרקע תעשייה לתושב (ריבוע)',en:'industrial land per resident (square)'}),'<span class="sw" style="background:#f2c230;outline:2px solid #000;outline-offset:-2px"></span>')}${row('indA',t('indA'),'<span class="sw" style="background:#f2c230;outline:2px solid #000;outline-offset:-3px"></span>')}${row('indJ',t('indJ'),'<span class="sw" style="background:#f2c230;opacity:.55"></span>')}${row('arab7',t('arab7'),sw('#e9e6df',1))}
     <h3>${t('plan')}</h3>${row('xplan',t('xplan'),'',1)}${row('landuse',t('landuse'),'',1)}${row('tmm',t('tmm'),'',1)}${row('vatmal',t('vatmal'),'',1)}
     <div class="note">${t('liveNote')}</div>`;
-  document.querySelectorAll('#panel input').forEach(i=>i.onchange=()=>{state[i.dataset.k]=i.checked;applyState();});
+  const c=CHAPTERS.find(c=>c.key===curChapter), tmp=document.createElement('div'); tmp.innerHTML=all;
+  // rows that belong to the open chapter (its own layers, minus the dimming masks)
+  const mine=c?[...tmp.querySelectorAll('label.row')].filter(r=>{const k=r.querySelector('input').dataset.k;return c.layers[k]&&k!=='mask'&&k!=='mask2';}).map(r=>r.outerHTML).join(''):'';
+  document.getElementById('panel').innerHTML=mine?`<h3 class="mine"><b>${c.no}</b>${CH_TITLE[L][c.key]}</h3>${mine}<details class="all" ${panelAll?'open':''}><summary>${T4({ar:'كل الطبقات',he:'כל השכבות',en:'All layers'})}</summary>${all}</details>`:all;
+  const d=document.querySelector('#panel details.all'); if(d) d.ontoggle=()=>{panelAll=d.open;};
+  document.querySelectorAll('#panel input').forEach(i=>i.onchange=()=>{state[i.dataset.k]=i.checked;applyState();document.querySelectorAll(`#panel input[data-k="${i.dataset.k}"]`).forEach(o=>o.checked=i.checked);});
 }
 function renderStats(){
   if(!DATA) return;
@@ -1284,6 +1308,8 @@ fsBtn.onclick=()=>document.fullscreenElement?document.exitFullscreen():document.
 homeBtn.onclick=()=>map.flyTo(NEGEV_VIEW);
 grainBtn.onclick=()=>{document.body.classList.toggle('nograin');grainBtn.classList.toggle('on');};
 panelToggle.onclick=()=>document.body.classList.toggle('panel');
+try{ if(localStorage.getItem('offmap-panel')==='1') document.body.classList.add('panel'); }catch(e){}
+panelToggle.addEventListener('click',()=>{try{localStorage.setItem('offmap-panel',document.body.classList.contains('panel')?'1':'0');}catch(e){}});
 setLang(L);
 </script>
 </body>

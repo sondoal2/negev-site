@@ -1,0 +1,73 @@
+{
+ "buildings": 3242,
+ "in_neigh_plan": 1763,
+ "outside_neigh_plan": 1479,
+ "conflict": 282,
+ "conflict_by": {
+  "road": 175,
+  "open": 54,
+  "stream": 13,
+  "public": 40,
+  "agri": 127,
+  "res": 1338,
+  "other": 16
+ },
+ "conflict_pct": 16.0,
+ "res_plots": 1553,
+ "res_plots_empty": 663,
+ "res_empty_pct_count": 42.7,
+ "res_empty_pct_area": 39.1,
+ "res_dunam": 1222.5,
+ "per_plan": [
+  {
+   "plan": "624-0531657",
+   "name": "שכונה א' - סעווה",
+   "approved": "2017-11",
+   "plots": 352,
+   "empty_pct": 42.9,
+   "buildings": 413,
+   "conflict": 45
+  },
+  {
+   "plan": "624-0531699",
+   "name": "שכונה ב'- סעווה",
+   "approved": "2017-11",
+   "plots": 113,
+   "empty_pct": 38.9,
+   "buildings": 110,
+   "conflict": 19
+  },
+  {
+   "plan": "624-0531707",
+   "name": "שכונה ג' - סעווה",
+   "approved": "2017-11",
+   "plots": 231,
+   "empty_pct": 39.0,
+   "buildings": 292,
+   "conflict": 22
+  },
+  {
+   "plan": "624-0601187",
+   "name": "שכונה 7 סעווה",
+   "approved": "2018-08",
+   "plots": 290,
+   "empty_pct": 39.7,
+   "buildings": 349,
+   "conflict": 74
+  },
+  {
+   "plan": "624-0708636",
+   "name": "שכונה 5-6 סעווה",
+   "approved": "2023-07",
+   "plots": 567,
+   "empty_pct": 46.4,
+   "buildings": 599,
+   "conflict": 122
+  }
+ ],
+ "sources": {
+  "footprints": "Microsoft GlobalML Building Footprints 2024-05-28 via VIDA/source.coop (imagery 2014-2023)",
+  "plans": "iplan Xplan layer 1 & 4, downloaded 2026-11-19",
+  "limit": "iplan gvulot_retzef/2 (vaadim) Sawa"
+ }
+}

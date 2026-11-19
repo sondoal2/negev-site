@@ -59,7 +59,10 @@ body.nograin .grain{display:none}
 .live{font-size:10px;font-weight:700;letter-spacing:.1em;background:var(--red);color:#000;padding:1px 4px;margin-inline-start:4px}
 .note{font-size:11px;color:var(--concrete);padding:0 14px 10px;line-height:1.4}
 #panel{display:none} body.panel #panel{display:block;z-index:13}
-body.panel #panelToggle{background:var(--bone);color:#000}
+body.panel #panelToggle{background:var(--red);color:#fff;border-color:var(--red)}
+/* layers button: labelled, light, and below the chapter strip (#chapters covers the top 42px of the map) */
+#tools{top:58px!important;align-items:flex-end} #panel{top:58px!important;max-height:calc(100% - 74px)!important}
+#tools #panelToggle{width:auto;padding:0 14px 0 10px;display:flex;align-items:center;gap:8px;background:var(--bone);color:#000;font-size:14px;font-weight:800}
 #panel details>summary{list-style:none;cursor:pointer;padding:11px 14px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--concrete);font-weight:600;border-top:1px solid var(--line)}
 #panel details>summary::-webkit-details-marker{display:none}
 #panel details>summary::before{content:'+';display:inline-block;width:16px;font-weight:800;color:var(--bone)} #panel details[open]>summary::before{content:'–'}
@@ -297,7 +300,7 @@ body.chap #stats{display:none}
   <aside id="panel"></aside>
 
   <div id="tools">
-    <button id="panelToggle" title="Layers"><svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg></button>
+    <button id="panelToggle" title="Layers"><svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg><span class="lbl">Layers</span></button>
     <button id="fsBtn" title="Fullscreen"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
     <button id="homeBtn" title="Negev"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg></button>
     <button id="grainBtn" class="on" title="Grain">G</button>
@@ -1177,6 +1180,7 @@ function applyState(){
 /* ---------------- panel ---------------- */
 let panelAll=false, cardMore=false;
 function renderPanel(){
+  { const lb=document.querySelector('#panelToggle .lbl'); if(lb) lb.textContent=T4({ar:'الطبقات',he:'שכבות',en:'Layers'}); }
   const sw=(c,dash)=>`<span class="sw" style="${dash?`border-top:2px dashed ${c}`:`background:${c}`}"></span>`;
   const row=(k,label,swatch='',live=false)=>`<label class="row"><input type="checkbox" data-k="${k}" ${state[k]?'checked':''}><span class="box"></span>${label}${live?'<span class="live">LIVE</span>':''}${swatch}</label>`;
   const all=`<h3>${t('base')}</h3>${row('basemap',t('basemap'))}${row('sat',t('sat'))}${row('mask',t('mask'))}${row('mask2',t('mask2'))}${row('labels',t('labels'))}

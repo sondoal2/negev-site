@@ -1,0 +1,217 @@
+{
+ "source": {
+  "footprints": "Microsoft GlobalML Building Footprints 2024-05-28 via VIDA/source.coop (imagery 2014-2023)",
+  "plans": "iplan Xplan layer 1 (plan boundaries) and layer 4 (land use), downloaded 2026-11-19",
+  "limits": "iplan gvulot_retzef"
+ },
+ "rule": "a building is covered if its centroid lies inside the boundary of an APPROVED plan (not a policy document, under 30 km2, so regional umbrella plans do not count) or inside an approved land-use plot",
+ "recognized": {
+  "buildings": 70810,
+  "no_plan": 20052
+ },
+ "recognized_no_plan_pct": 28.3,
+ "offmap_homes": 45004,
+ "all_bedouin": 115814,
+ "all_no_plan": 65056,
+ "all_no_plan_pct": 56.2,
+ "rows": [
+  {
+   "key": "BIR HADAJ",
+   "ar": "بير هداج",
+   "he": "ביר הדאג'",
+   "en": "Bir Hadaj",
+   "kind": "village",
+   "buildings": 2703,
+   "no_plan": 2698,
+   "no_plan_pct": 99.8,
+   "no_plan_ge40": 1683
+  },
+  {
+   "key": "TARABIN A-SANA",
+   "ar": "ترابين الصانع",
+   "he": "תראבין א-צאנע",
+   "en": "Tarabin al-Sana",
+   "kind": "village",
+   "buildings": 1007,
+   "no_plan": 901,
+   "no_plan_pct": 89.5,
+   "no_plan_ge40": 752
+  },
+  {
+   "key": "DERIJAT",
+   "ar": "دريجات",
+   "he": "דריג'את",
+   "en": "Drijat",
+   "kind": "village",
+   "buildings": 232,
+   "no_plan": 201,
+   "no_plan_pct": 86.6,
+   "no_plan_ge40": 145
+  },
+  {
+   "key": "AL SAYID",
+   "ar": "السيد",
+   "he": "אל סייד",
+   "en": "al-Sayyid",
+   "kind": "village",
+   "buildings": 2081,
+   "no_plan": 1758,
+   "no_plan_pct": 84.5,
+   "no_plan_ge40": 1375
+  },
+  {
+   "key": "KOHLE",
+   "ar": "كحلة",
+   "he": "כחלה",
+   "en": "Kohle",
+   "kind": "village",
+   "buildings": 186,
+   "no_plan": 148,
+   "no_plan_pct": 79.6,
+   "no_plan_ge40": 105
+  },
+  {
+   "key": "ABU TLUL",
+   "ar": "أبو تلول",
+   "he": "אבו תלול",
+   "en": "Abu Tlul",
+   "kind": "village",
+   "buildings": 3064,
+   "no_plan": 2185,
+   "no_plan_pct": 71.3,
+   "no_plan_ge40": 1469
+  },
+  {
+   "key": "Lakiye",
+   "ar": "اللقية",
+   "he": "לקיה",
+   "en": "Lakiya",
+   "kind": "town",
+   "buildings": 3910,
+   "no_plan": 2642,
+   "no_plan_pct": 67.6,
+   "no_plan_ge40": 2035
+  },
+  {
+   "key": "MAHUL",
+   "ar": "مكحول",
+   "he": "מכחול",
+   "en": "Makhul",
+   "kind": "village",
+   "buildings": 684,
+   "no_plan": 449,
+   "no_plan_pct": 65.6,
+   "no_plan_ge40": 314
+  },
+  {
+   "key": "ABU KUREINAT",
+   "ar": "أبو قرينات",
+   "he": "אבו קורינאת",
+   "en": "Abu Qrinat",
+   "kind": "village",
+   "buildings": 1268,
+   "no_plan": 728,
+   "no_plan_pct": 57.4,
+   "no_plan_ge40": 473
+  },
+  {
+   "key": "Sawa",
+   "ar": "سعوة",
+   "he": "סעוה",
+   "en": "Sa'wa",
+   "kind": "village",
+   "buildings": 3242,
+   "no_plan": 1471,
+   "no_plan_pct": 45.4,
+   "no_plan_ge40": 1082
+  },
+  {
+   "key": "Kseyfe",
+   "ar": "كسيفة",
+   "he": "כסייפה",
+   "en": "Kuseife",
+   "kind": "town",
+   "buildings": 5143,
+   "no_plan": 1902,
+   "no_plan_pct": 37.0,
+   "no_plan_ge40": 1298
+  },
+  {
+   "key": "Ar'ara Banegev",
+   "ar": "عرعرة النقب",
+   "he": "ערערה בנגב",
+   "en": "Ar'ara BaNegev",
+   "kind": "town",
+   "buildings": 4537,
+   "no_plan": 759,
+   "no_plan_pct": 16.7,
+   "no_plan_ge40": 490
+  },
+  {
+   "key": "Rahat",
+   "ar": "رهط",
+   "he": "רהט",
+   "en": "Rahat",
+   "kind": "town",
+   "buildings": 17776,
+   "no_plan": 2593,
+   "no_plan_pct": 14.6,
+   "no_plan_ge40": 2024
+  },
+  {
+   "key": "Segev Shalom",
+   "ar": "شقيب السلام",
+   "he": "שגב שלום",
+   "en": "Segev Shalom",
+   "kind": "town",
+   "buildings": 5654,
+   "no_plan": 753,
+   "no_plan_pct": 13.3,
+   "no_plan_ge40": 494
+  },
+  {
+   "key": "Hura",
+   "ar": "حورة",
+   "he": "חורה",
+   "en": "Hura",
+   "kind": "town",
+   "buildings": 6808,
+   "no_plan": 455,
+   "no_plan_pct": 6.7,
+   "no_plan_ge40": 339
+  },
+  {
+   "key": "KASR A-SIR",
+   "ar": "قصر السر",
+   "he": "קצר א-סר",
+   "en": "Qasr al-Sir",
+   "kind": "village",
+   "buildings": 1819,
+   "no_plan": 77,
+   "no_plan_pct": 4.2,
+   "no_plan_ge40": 43
+  },
+  {
+   "key": "Tel Sheva",
+   "ar": "تل السبع",
+   "he": "תל שבע",
+   "en": "Tel Sheva",
+   "kind": "town",
+   "buildings": 7508,
+   "no_plan": 284,
+   "no_plan_pct": 3.8,
+   "no_plan_ge40": 192
+  },
+  {
+   "key": "UM BATIN",
+   "ar": "أم بطين",
+   "he": "אום בטין",
+   "en": "Umm Batin",
+   "kind": "village",
+   "buildings": 3188,
+   "no_plan": 48,
+   "no_plan_pct": 1.5,
+   "no_plan_ge40": 32
+  }
+ ]
+}

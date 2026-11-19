@@ -56,7 +56,7 @@ body.split .half{position:absolute;top:0;bottom:0;width:50%} body.split #h0{righ
 <script>
 /* OFF—MAP tour: one question per screen, the data drawn as objects in 3D. Same data files as index.html.
    ?s=01..07 picks the scene · ?lang=ar|he|en (else the atlas's saved language) · ?play=1 walks through all scenes (for recording) */
-const q=new URLSearchParams(location.search), KEYS=['01','02','03','04','05','06','07'];
+const q=new URLSearchParams(location.search), KEYS=['01','02','03','04','05','06','07','07s'];
 const S=KEYS.includes(q.get('s'))?q.get('s'):'01', PLAY=q.get('play')==='1', HOLD=+(q.get('hold')||10);
 let L=q.get('lang'); if(!['ar','he','en'].includes(L)){ try{L=localStorage.getItem('offmap-lang');}catch(e){} } if(!['ar','he','en'].includes(L)) L='ar';
 document.documentElement.lang=L; document.documentElement.dir=L==='en'?'ltr':'rtl';
@@ -148,7 +148,18 @@ const SCENES={
     const f=v.rows.map(r=>({r,p:pos[EN[r.en]||r.en]})).filter(o=>o.p).map(({r,p})=>({type:'Feature',geometry:{type:'Polygon',coordinates:[circle(p,1100,24)]},properties:{h:Math.max(r.lethal_per10k_yr*9000,250),a:r.grp==='arab'?1:0}}));
     m.addSource('v',{type:'geojson',data:FC(f)});
     m.addLayer({id:'v',type:'fill-extrusion',source:'v',paint:{'fill-extrusion-color':['case',['==',['get','a'],1],C.red,C.bone],'fill-extrusion-height':['get','h'],'fill-extrusion-opacity':.93}});}},
-'07':{t:{ar:'الخطة مقابل الأرض · سعوة',he:'התכנית מול השטח · סעוה',en:"Plan vs ground · Sa'wa"},
+'07':{t:{ar:'الخطة مقابل الأرض',he:'התכנית מול השטח',en:'Plan vs ground'},
+  q:{ar:'كم مبنى بدوي بلا مخطط مصدّق؟',he:'כמה מבנים בדואיים ללא תכנית מאושרת?',en:'How many Bedouin buildings have no approved plan?'},big:'56%',
+  sub:{ar:'من المباني البدوية في القضاء (65,056 من 115,814) · حتى داخل البلدات والقرى المعترف بها: 28%',he:'מהמבנים הבדואיים בנפה (65,056 מתוך 115,814) · גם בתוך היישובים והכפרים המוכרים: 28%',en:'of Bedouin buildings in the subdistrict (65,056 of 115,814) · even inside the recognized towns and villages: 28%'},
+  leg:[[C.red,{ar:'مبنى بلا مخطط مصدّق فوقه',he:'מבנה ללא תכנית מאושרת',en:'building with no approved plan'}],[C.bone,{ar:'مبنى تحت مخطط مصدّق',he:'מבנה בתחום תכנית מאושרת',en:'building under an approved plan'}]],
+  src:{ar:'מנהל התכנון (Xplan) · Microsoft ML Footprints 5/2024 · 18 بلدة وقرية معترف بها + كل البيوت خارج الحدود المعترف بها',he:'מנהל התכנון (Xplan) · Microsoft ML Footprints 5/2024 · 18 יישובים וכפרים מוכרים + כל הבתים מחוץ לגבולות המוכרים',en:'Israel Planning Administration (Xplan) · Microsoft ML Footprints 5/2024 · 18 recognized localities + every home outside the recognized limits'},
+  cam:{center:[34.9,31.22],zoom:10.5,pitch:48,bearing:-12},
+  async add(m){const [np,off]=await Promise.all([get('bedouin_noplan_pts.json'),get('offmap_buildings.json')]);
+    const F=[];Object.values(np).forEach(a=>a.forEach(r=>F.push({type:'Feature',geometry:{type:'Point',coordinates:[r[0]/1e5,r[1]/1e5]},properties:{n:r[2]}})));
+    off.forEach(r=>F.push({type:'Feature',geometry:{type:'Point',coordinates:[r[2]/1e5,r[3]/1e5]},properties:{n:1}}));
+    m.addSource('np',{type:'geojson',data:FC(F)});
+    m.addLayer({id:'np',type:'circle',source:'np',paint:{'circle-color':['case',['==',['get','n'],1],C.red,C.bone],'circle-radius':['interpolate',['linear'],['zoom'],9,.9,12,2.2,15,5],'circle-opacity':.9}});}},
+'07s':{dot:{ar:'سعوة',he:'סעוה',en:"Sa'wa"},t:{ar:'الخطة مقابل الأرض · سعوة',he:'התכנית מול השטח · סעוה',en:"Plan vs ground · Sa'wa"},
   q:{ar:'كم بيت برّا المخطط؟',he:'כמה בתים מחוץ לתכנית?',en:'How many homes are outside the plan?'},big:'45.6%',
   sub:{ar:'من مباني سعوة خارج كل مخططات الأحياء المصدّقة (1,479 من 3,242)',he:'מהמבנים בסעוה מחוץ לכל תכניות השכונה המאושרות (1,479 מתוך 3,242)',en:"of Sa'wa's buildings lie outside every approved neighbourhood plan (1,479 of 3,242)"},
   leg:[['rgba(217,212,199,.45)',{ar:'السجادة = أرض مخطّطة (5 مخططات أحياء مصدّقة)',he:'השטיח = קרקע מתוכננת (5 תכניות שכונה מאושרות)',en:'the carpet = planned land (5 approved neighbourhood plans)'}],[C.bone,{ar:'مبنى داخل المخطط',he:'מבנה בתוך התכנית',en:'building inside the plan'}],[C.red,{ar:'مبنى برّا المخطط',he:'מבנה מחוץ לתכנית',en:'building outside the plan'}]],
@@ -172,7 +183,7 @@ const style={version:8,glyphs:'https://tiles.openfreemap.org/fonts/{fontstack}/{
 
 const sc=SCENES[S], link=k=>`?s=${k}&lang=${L}${PLAY?'&play=1&hold='+HOLD:''}`;
 document.getElementById('back').textContent=T({ar:'→ الأطلس',he:'→ האטלס',en:'← Atlas'});
-document.getElementById('dots').innerHTML=KEYS.map(k=>`<a href="${link(k)}" class="${k===S?'on':''}">${k}</a>`).join('');
+document.getElementById('dots').innerHTML=KEYS.map(k=>`<a href="${link(k)}" class="${k===S?'on':''}">${SCENES[k].dot?T(SCENES[k].dot):k}</a>`).join('');
 const legHTML=sc.leg&&sc.leg.length?`<div class="leg">${sc.leg.map(([c,l])=>`<div><i style="background:${c}"></i>${T(l)}</div>`).join('')}</div>`:'';
 const maps=[]; let pending=0;
 const done=()=>{ if(--pending) return; document.title='READY';
@@ -185,12 +196,12 @@ if(sc.split){
   // two places, same scale, same camera: the gap is read before any number
   document.getElementById('story').style.display='none'; document.body.classList.add('split');
   document.getElementById('map').innerHTML=sc.split.map((h,i)=>`<div class="half" id="h${i}"></div>`).join('');
-  const top=document.createElement('div'); top.id='splitTop'; top.innerHTML=`<div class="no">${S}<span>${T(sc.t)}</span></div><h1>${T(sc.q)}</h1>`; document.body.appendChild(top);
+  const top=document.createElement('div'); top.id='splitTop'; top.innerHTML=`<div class="no">${S.slice(0,2)}<span>${T(sc.t)}</span></div><h1>${T(sc.q)}</h1>`; document.body.appendChild(top);
   sc.split.forEach((h,i)=>{const lab=document.createElement('div'); lab.className='sideLab s'+i; lab.innerHTML=`<div class="nm">${T(h.name)}<span>${T(h.kind)}</span></div><div class="v">${h.v}</div><div class="u">${T(sc.unit)}</div>`; document.body.appendChild(lab);});
   const gap=document.createElement('div'); gap.id='gapX'; gap.innerHTML=`<div class="x">${sc.big}</div><div class="u">${T(sc.sub)}</div>${legHTML}<div class="src">${T(sc.src)}</div>`; document.body.appendChild(gap);
   sc.split.forEach((h,i)=>mk('h'+i,h.cam,sc.add));
 }else{
-  document.getElementById('story').innerHTML=`<div class="no">${S}<span>${T(sc.t)}</span></div><h1>${T(sc.q)}</h1><div class="big">${sc.big}<small>${T(sc.sub)}</small></div>`+legHTML+`<div class="src">${T(sc.src)}</div>`;
+  document.getElementById('story').innerHTML=`<div class="no">${S.slice(0,2)}<span>${T(sc.t)}</span></div><h1>${T(sc.q)}</h1><div class="big">${sc.big}<small>${T(sc.sub)}</small></div>`+legHTML+`<div class="src">${T(sc.src)}</div>`;
   const side=Math.min(560,innerWidth*.42); sc.cam.padding=innerWidth<=760?{bottom:innerHeight*.45,top:0,left:0,right:0}:(L==='en'?{left:side,right:0,top:0,bottom:0}:{right:side,left:0,top:0,bottom:0});
   mk('map',sc.cam,sc.add);
 }

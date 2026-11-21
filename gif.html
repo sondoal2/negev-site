@@ -5,7 +5,8 @@
 <title>OFF—MAP · GIF stage</title>
 <!-- GIF stage: one story per GIF. Left = the map (camera never moves), right = topic, one question, the two sides in identical units, the gap ×N, the source.
      gif.html?g=<id>&lang=ar|he|en            plays live
-     gif.html?g=<id>&lang=ar&f=all            stacks every frame vertically (used by scripts/make_gifs.py to export the .gif files)
+     gif.html?g=<id>&lang=ar&f=all            stacks every frame vertically
+     gif.html?g=<id>&lang=ar&f=3              one frame only (used by scripts/make_gifs.py to export the .gif files)
      ids: homes, localities, industry, arnona, bus, school, bagrut, sport, sportdist -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;700;800&family=Alexandria:wght@400;600;800&family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
@@ -106,10 +107,13 @@ let seed=7; const rnd=()=>{seed=(seed*1664525+1013904223)%4294967296;return seed
 const D={};
 async function load(){
   const need={homes:['nafa','muni','vaadim','bld','bsum'],localities:['israel','cbs'],industry:['nafa','muni','indJ','indA','istats'],arnona:['nafa','muni','tprof'],
-    bus:['nafa','muni','bld','stopdist','stops','access'],school:['nafa','muni','bld','svcpts','svc'],bagrut:['nafa','muni','bagrut'],sport:['nafa','muni','sportf','sport'],sportdist:['nafa','muni','bld','sportf','svc']}[G];
+    bus:['nafa','muni','bld','stopdist','stops','access'],school:['nafa','muni','bld','svcpts','svc'],bagrut:['nafa','muni','bagrut'],sport:['nafa','muni','sportf','sport'],sportdist:['nafa','muni','bld','sportf','svc'],
+    parks:['nafa','muni','parks','pkgrid','pkplan','pkact'],police:['nafa','muni','safety','sfpts','pgrid'],lethal:['nafa','muni','violence'],noplan:['nafa','muni','bld','noplan','nppts']}[G];
   const F={nafa:'negev_nafa.geojson',muni:'muni.geojson',vaadim:'vaadim.geojson',bld:'offmap_buildings.json',bsum:'buildings_summary.json',israel:'israel_outline.geojson',cbs:'cbs_localities.geojson',
     indJ:'jewishh_industrial.geojson',indA:'arabb_industrial.geojson',istats:'industry_stats.json',tprof:'town_profile.json',stopdist:'offmap_stopdist.json',stops:'transit_stops.geojson',access:'transit_access.json',
-    svcpts:'services_points.geojson',svc:'services_access.json',bagrut:'bagrut.json',sportf:'sport_facilities.geojson',sport:'sport_stats.json'};
+    svcpts:'services_points.geojson',svc:'services_access.json',bagrut:'bagrut.json',sportf:'sport_facilities.geojson',sport:'sport_stats.json',
+    parks:'parks_stats.json',pkgrid:'parks_grid.geojson',pkplan:'parks_planned.geojson',pkact:'parks_actual.geojson',safety:'safety_stats.json',sfpts:'safety_points.geojson',pgrid:'police_grid.geojson',
+    violence:'violence.json',noplan:'bedouin_noplan.json',nppts:'bedouin_noplan_pts.json'};
   await Promise.all(need.map(k=>get(F[k]).then(d=>{D[k]=d;})));
   if(D.muni){ const r=await get('rahat.geojson').catch(()=>null); if(r) geomOf(r).forEach(g=>D.muni.features.push({type:'Feature',geometry:g,properties:{Muni_Eng:'Rahat'}})); }
   if(D.nafa){ const g=D.nafa.features[0].geometry; D.negev=polys(g); D.inNegev=(x,y)=>!(y>31.345&&x>=34.95&&x<=35.30)&&D.negev.some(p=>inRing(x,y,p[0])); }
@@ -161,7 +165,7 @@ function panelFill(c,t,fin){
     return `<div class="sd ${k}"><div class="sh">${T(c.sides[k])}</div>${unitsHTML(c.kind,s*(c.mul||1),s2,c.cells||100)}<div class="pv"><b>${c.pre||''}${d(s*(c.show||1))}</b><span>${T(c.unit)}</span></div></div>`; };
   const tiny=c.a<0.5&&c.zero;
   return head(c)+`<div class="pp" dir="${DIR}">${side('a')}${side('j')}</div>`+
-    `<div class="gap" dir="${DIR}">${fin?(tiny?`<span class="x">0</span><span>${T(c.zero)}</span>`:`<span class="x">×${xN(c.j,c.a)}</span><span>${T(c.gap||{ar:'الفرق بين الجهتين',he:'הפער בין שני הצדדים',en:'the gap between the two sides'})}</span>`):''}</div>`+
+    `<div class="gap" dir="${DIR}">${fin?(tiny?`<span class="x">0</span><span>${T(c.zero)}</span>`:`<span class="x">×${c.inv?xN(c.a,c.j):xN(c.j,c.a)}</span><span>${T(c.gap||{ar:'الفرق بين الجهتين',he:'הפער בין שני הצדדים',en:'the gap between the two sides'})}</span>`):''}</div>`+
     `<div class="src" dir="${DIR}">${T(c.src)}</div>`; }
 const S7={ar:'7 بلدات عربية معترف بها',he:'7 יישובים ערביים מוכרים',en:'7 recognized Arab towns'}, S11={ar:'11 بلدة يهودية',he:'11 יישובים יהודיים',en:'11 Jewish towns'};
 const SU={ar:'قرى غير معترف بها',he:'כפרים לא מוכרים',en:'Unrecognized villages'};
@@ -256,7 +260,56 @@ const GIFS={
      src:{ar:'وزارة الثقافة والرياضة — سجل المنشآت الرياضية (data.gov.il، 2021)، بعد التنظيف: قاعات وملاعب وبرك فعّالة فقط · بصمات المباني Microsoft + OSM · مسافة خط مستقيم · نتيفوت وإيلات خارج المجموع',he:'משרד התרבות והספורט — מאגר מתקני הספורט (data.gov.il, 2021), לאחר ניקוי: אולמות, מגרשים ובריכות פעילים בלבד · טביעות מבנים Microsoft + OSM · מרחק אווירי · נתיבות ואילת מחוץ לסיכום',en:'Ministry of Culture & Sport facilities register (data.gov.il, 2021), cleaned: active halls, pitches and pools only · Microsoft + OSM footprints · straight-line distance · Netivot and Eilat left out of the total'}};
    return {frames:fillSeq(),map:(ctx,el,f)=>{ base(ctx); ctx.fillStyle='rgba(255,255,255,.07)'; S.forEach(([x,y])=>{const [a,b]=px(x,y);ctx.beginPath();ctx.arc(a,b,PJ.s,0,6.2832);ctx.fill();});
        homesByDist(ctx,dist,1000,f.t); dots(ctx,S,'#fff',1.8);
-       labels(el); legend(el,HOMES_L({pt:{ar:'قاعة / ملعب / بركة + دائرة 1 كم',he:'אולם / מגרש / בריכה + עיגול 1 ק"מ',en:'hall / pitch / pool + 1 km circle'},near:{ar:'بيت في قرية غير معترف بها — منشأة أقرب من 1 كم',he:'בית בכפר לא מוכר — מתקן עד 1 ק"מ',en:'home in an unrecognized village — facility within 1 km'},far:{ar:'بيت أبعد من 1 كم عن أي قاعة أو ملعب',he:'בית במרחק מעל 1 ק"מ מכל אולם או מגרש',en:'home more than 1 km from any hall or pitch'}})); },panel:f=>panelFill(c,f.t,f.fin)}; }
+       labels(el); legend(el,HOMES_L({pt:{ar:'قاعة / ملعب / بركة + دائرة 1 كم',he:'אולם / מגרש / בריכה + עיגול 1 ק"מ',en:'hall / pitch / pool + 1 km circle'},near:{ar:'بيت في قرية غير معترف بها — منشأة أقرب من 1 كم',he:'בית בכפר לא מוכר — מתקן עד 1 ק"מ',en:'home in an unrecognized village — facility within 1 km'},far:{ar:'بيت أبعد من 1 كم عن أي قاعة أو ملعب',he:'בית במרחק מעל 1 ק"מ מכל אולם או מגרש',en:'home more than 1 km from any hall or pitch'}})); },panel:f=>panelFill(c,f.t,f.fin)}; },
+ parks:()=>{ const A=D.parks.access500, rk=D.pkact.features.map(()=>rnd());
+   const c={no:'05+',title:{ar:'الحدائق العامة',he:'גנים ציבוריים',en:'Public parks'},kind:'home',a:A.arab.ground_pct,j:A.jewish.ground_pct,a2:A.arab.paper_pct,j2:A.jewish.paper_pct,
+     sides:{a:{ar:'بلدات وقرى عربية معترف بها',he:'יישובים וכפרים ערביים מוכרים',en:'Recognized Arab towns and villages'},j:{ar:'بلدات يهودية',he:'יישובים יהודיים',en:'Jewish towns'}},
+     q:{ar:'من كل 100 بيت — كم بيت عنده حديقة عامة على بُعد 500 م (7 دقائق مشي)؟',he:'מכל 100 בתים — לכמה יש גן ציבורי במרחק 500 מ׳ (7 דקות הליכה)?',en:'Of every 100 homes — how many have a public park within 500 m (a 7-minute walk)?'},
+     unit:{ar:'حديقة على الأرض · المخطّط = موجودة على الورق فقط',he:'גן בשטח · מקווקו = קיים רק על הנייר',en:'park on the ground · hatched = on paper only'},
+     gap:{ar:`ضعف على الأرض — وعلى الورق تقريباً متساوون (${Math.round(A.arab.paper_pct)} مقابل ${Math.round(A.jewish.paper_pct)})`,he:`פעמים בשטח — ועל הנייר כמעט שווים (${Math.round(A.arab.paper_pct)} מול ${Math.round(A.jewish.paper_pct)})`,en:`times on the ground — and on paper almost equal (${Math.round(A.arab.paper_pct)} vs ${Math.round(A.jewish.paper_pct)})`},
+     src:{ar:'מנהל התכנון، מדריך הקצאות לצרכי ציבור 2016 (500 م من البيت) · على الورق: Xplan קוד 670، مخططات مصدّقة · على الأرض: OpenStreetMap 11.2026 (قيد التحقق في البلدات العربية) · تحليل: عضوة في الفريق',he:'מנהל התכנון, מדריך הקצאות לצרכי ציבור 2016 (500 מ׳ מהבית) · על הנייר: Xplan קוד 670, תכניות מאושרות · בשטח: OpenStreetMap 11.2026 (בבדיקה ביישובים הערביים) · ניתוח: חברת צוות',en:'Planning Administration, public-needs guide 2016 (500 m from home) · on paper: Xplan code 670, approved plans · on the ground: OpenStreetMap 11.2026 (under verification in Arab towns) · analysis: a team member'}};
+   return {frames:fillSeq(),map:(ctx,el,f)=>{ base(ctx);
+       D.pkgrid.features.forEach(q=>{const d=q.properties.d; path(ctx,q.geometry); ctx.fillStyle=d<=500?'rgba(138,138,134,.55)':d<=3000?'rgba(181,54,31,.75)':'rgba(255,90,60,.85)'; ctx.fill();});
+       D.pkplan.features.forEach(q=>{path(ctx,q.geometry); ctx.strokeStyle='#7fbf6a'; ctx.lineWidth=.8; ctx.stroke();});
+       D.pkact.features.forEach((q,i)=>{ if(rk[i]>f.t&&!f.fin) return; path(ctx,q.geometry); ctx.fillStyle='#7fbf6a'; ctx.fill(); ctx.strokeStyle='#7fbf6a'; ctx.lineWidth=1.4; ctx.stroke();});
+       labels(el); legend(el,[['border:1.5px solid #7fbf6a',{ar:'حديقة على الورق (مخطط مصدّق)',he:'גן על הנייר (תכנית מאושרת)',en:'park on paper (approved plan)'}],['background:#7fbf6a',{ar:'حديقة على الأرض',he:'גן בשטח',en:'park on the ground'}],
+         [`background:${RAMP[0]}`,{ar:'بيوت: حديقة أقرب من 500 م',he:'בתים: גן עד 500 מ׳',en:'homes: park within 500 m'}],[`background:${RAMP[1]}`,{ar:'بيوت: 0.5–3 كم',he:'בתים: 0.5–3 ק"מ',en:'homes: 0.5–3 km'}],[`background:${RAMP[2]}`,{ar:'بيوت: أبعد من 3 كم',he:'בתים: מעל 3 ק"מ',en:'homes: more than 3 km'}]]); },panel:f=>panelFill(c,f.t,f.fin)}; },
+ police:()=>{ const G=D.safety.groups, U=G.unrecognized, BA=G.arab_town, S=D.sfpts.features.filter(q=>q.properties.k==='st').map(q=>q.geometry.coordinates), rk=D.pgrid.features.map(()=>rnd());
+   const c={no:'06',title:{ar:'الأمان · الشرطة',he:'ביטחון · משטרה',en:'Safety · police'},kind:'home',a:U.station_pct_le2km,j:BA.station_pct_le2km,sides:{a:SU,j:S7},
+     q:{ar:'من كل 100 مبنى — كم مبنى على بُعد أقل من 2 كم من مركز شرطة؟',he:'מכל 100 מבנים — כמה נמצאים עד 2 ק"מ מתחנת משטרה?',en:'Of every 100 buildings — how many are within 2 km of a police station?'},
+     unit:{ar:'من كل 100 مبنى',he:'מכל 100 מבנים',en:'of every 100 buildings'},
+     gap:{ar:`ضعف — السفر بالسيارة لأقرب محطة: 15.6 دقيقة من القرى مقابل 7.7 من البلدات (البلدات اليهودية: ${G.jewish_town.station_pct_le2km})`,he:`פעמים — נסיעה לתחנה הקרובה: 15.6 דק׳ מהכפרים מול 7.7 מהיישובים (היישובים היהודיים: ${G.jewish_town.station_pct_le2km})`,en:`times — driving to the nearest station: 15.6 min from the villages vs 7.7 from the towns (Jewish towns: ${G.jewish_town.station_pct_le2km})`},
+     src:{ar:'شرطة إسرائيل — وحدات استقبال الجمهور وجدول البلدات حسب المحطة (data.gov.il، 2026) · بصمات المباني Microsoft · مسافة خط مستقيم؛ السفر OSRM بلا ازدحام، ليس زمن استجابة · تحليل: عضوة في الفريق',he:'משטרת ישראל — יחידות מקבלות קהל וטבלת שיוך יישובים לתחנות (data.gov.il, 2026) · טביעות מבנים Microsoft · מרחק אווירי; נסיעה OSRM ללא פקקים, לא זמן תגובה · ניתוח: חברת צוות',en:'Israel Police — public reception units and locality-to-station table (data.gov.il, 2026) · Microsoft footprints · straight line; drive time OSRM without traffic, not response time · analysis: a team member'}};
+   return {frames:fillSeq(),map:(ctx,el,f)=>{ base(ctx);
+       ctx.fillStyle='rgba(255,255,255,.09)'; S.forEach(([x,y])=>{const [a,b]=px(x,y);ctx.beginPath();ctx.arc(a,b,2*PJ.s,0,6.2832);ctx.fill();});
+       D.pgrid.features.forEach((q,i)=>{ if(rk[i]>f.t&&!f.fin) return; const d=q.properties.d; path(ctx,q.geometry); ctx.fillStyle=d<=2000?RAMP[0]:d<=5000?'#6e2519':d<=10000?RAMP[1]:RAMP[2]; ctx.fill();});
+       S.forEach(([x,y])=>{const [a,b]=px(x,y);ctx.beginPath();ctx.arc(a,b,4.5,0,6.2832);ctx.fillStyle='#fff';ctx.fill();ctx.strokeStyle='#000';ctx.lineWidth=1.5;ctx.stroke();});
+       labels(el); legend(el,[['background:#fff;border:1px solid #000',{ar:'مركز شرطة + دائرة 2 كم',he:'תחנת משטרה + עיגול 2 ק"מ',en:'police station + 2 km circle'},'c'],[`background:${RAMP[0]}`,{ar:'مبانٍ أقرب من 2 كم',he:'מבנים עד 2 ק"מ',en:'buildings within 2 km'}],['background:#6e2519',{ar:'2–5 كم',he:'2–5 ק"מ',en:'2–5 km'}],[`background:${RAMP[1]}`,{ar:'5–10 كم',he:'5–10 ק"מ',en:'5–10 km'}],[`background:${RAMP[2]}`,{ar:'أبعد من 10 كم',he:'מעל 10 ק"מ',en:'more than 10 km'}]]); },panel:f=>panelFill(c,f.t,f.fin)}; },
+ lethal:()=>{ const V=D.violence, A=V.arab_towns, J=V.jewish_towns, by={}; V.rows.forEach(r=>{const k=Object.keys(TOWNS).find(k=>TOWNS[k].he===r.he); if(k) by[k]=r;});
+   const mx=Math.max(...Object.values(by).map(r=>r.lethal_per10k_yr));
+   const c={no:'06',title:{ar:'الأمان · العنف',he:'ביטחון · אלימות',en:'Safety · violence'},kind:'home',cells:20,dec:1,inv:1,a:A.lethal_per10k_yr*10,j:J.lethal_per10k_yr*10,sides:{a:S7,j:S11},
+     q:{ar:'لكل 100,000 ساكن — كم ملف قتل أو محاولة قتل يُفتح في السنة؟',he:'לכל 100,000 תושבים — כמה תיקי רצח או ניסיון לרצח נפתחים בשנה?',en:'Per 100,000 residents — how many murder or attempted-murder files are opened a year?'},
+     unit:{ar:'ملف في السنة',he:'תיקים בשנה',en:'files a year'},
+     gap:{ar:`ضعف — ${A.lethal_3y} ملفاً مقابل ${J.lethal_3y} في 2023–2025، مع أن سكان البلدات اليهودية أكثر بمرّتين. و${V.bedouin_stations_lethal_no_locality} ملفاً بلا بلدة أصلاً`,he:`פעמים — ${A.lethal_3y} תיקים מול ${J.lethal_3y} ב-2023–2025, אף שביישובים היהודיים פי שניים תושבים. ו-${V.bedouin_stations_lethal_no_locality} תיקים בלי יישוב בכלל`,en:`times — ${A.lethal_3y} files vs ${J.lethal_3y} in 2023–2025, though the Jewish towns have twice the population. And ${V.bedouin_stations_lethal_no_locality} files with no locality at all`},
+     src:{ar:'شرطة إسرائيل، بيانات الجريمة المفتوحة (data.gov.il · crime_records_data) 2023–2025 · ملفات لا ضحايا · السكان: הלמ"ס 2023 · مساحة الدائرة = المعدّل',he:'משטרת ישראל, נתוני פשיעה פתוחים (data.gov.il · crime_records_data) 2023–2025 · תיקים, לא נפגעים · אוכלוסייה: הלמ"ס 2023 · שטח העיגול = השיעור',en:'Israel Police open crime data (data.gov.il · crime_records_data) 2023–2025 · files, not victims · population: CBS 2023 · circle area = rate'}};
+   return {frames:fillSeq(8),map:(ctx,el,f)=>{ base(ctx); southBox(ctx); const tt=f.fin?1:f.t, RM=34, rad=k=>Math.max(Math.sqrt(Math.min(by[k].lethal_per10k_yr,tt*mx)/mx)*RM,by[k].lethal_per10k_yr?1.5:0);
+       Object.keys(TOWNS).sort((a,b)=>(by[b]?.lethal_per10k_yr||0)-(by[a]?.lethal_per10k_yr||0)).forEach(k=>{ if(!by[k]) return; const [x,y]=tpx(k,1), r=rad(k); if(!r) return;
+         ctx.beginPath();ctx.arc(x,y,r,0,6.2832);ctx.fillStyle=TOWNS[k].g==='a'?'rgba(232,69,44,.92)':'rgba(233,230,223,.80)';ctx.fill();ctx.strokeStyle='#000';ctx.lineWidth=1;ctx.stroke();});
+       labels(el,{south:1,rad:k=>by[k]?rad(k):0,val:f.fin?k=>by[k]&&by[k].lethal_per10k_yr?(by[k].lethal_per10k_yr*10).toFixed(1):null:null});
+       legend(el,[['background:#e9e6df',{ar:'بلدة يهودية — مساحة الدائرة = ملفات لكل 100,000 في السنة',he:'יישוב יהודי — שטח העיגול = תיקים ל-100,000 בשנה',en:'Jewish town — circle area = files per 100,000 a year'},'c'],['background:#e8452c',{ar:'بلدة بدوية — نفس المقياس',he:'יישוב בדואי — אותו קנה מידה',en:'Bedouin town — same scale'},'c']]); },panel:f=>panelFill(c,f.t,f.fin)}; },
+ noplan:()=>{ const N=D.noplan, P=[]; Object.values(D.nppts).forEach(arr=>arr.forEach(([x,y,n])=>P.push([x/1e5,y/1e5,n]))); const rkP=P.map(()=>rnd()), sh=N.all_no_plan_pct;
+   const c={no:'07',title:{ar:'الخطة مقابل الأرض',he:'תכנית מול שטח',en:'Plan vs ground'},q:{ar:'كم مبنى بدوي في النقب يقف على أرض لا يغطيها أي مخطط مصدّق؟',he:'כמה מבנים בדואים בנגב עומדים על קרקע שאין עליה שום תכנית מאושרת?',en:'How many Bedouin buildings in the Naqab stand on land with no approved plan?'}};
+   return {frames:[{t:0,first:1},...fillSeq().slice(1)],
+     map:(ctx,el,f)=>{ base(ctx);
+       P.forEach(([x,y,n],i)=>{ if(rkP[i]>f.t||n) return; const [a,b]=px(x,y); ctx.fillStyle='#8a8a86'; ctx.fillRect(a-.7,b-.7,1.4,1.4); });
+       ctx.fillStyle='#ff5a3c'; P.forEach(([x,y,n],i)=>{ if(rkP[i]>f.t||!n) return; const [a,b]=px(x,y); ctx.fillRect(a-.9,b-.9,1.8,1.8); });
+       D.H.concat(D.E).forEach(([x,y],i)=>{ if((D.rk[i]??D.rkE[i-D.H.length])>f.t) return; const [a,b]=px(x,y); ctx.fillRect(a-.9,b-.9,1.8,1.8); });
+       labels(el); legend(el,[['background:#ff5a3c',{ar:'مبنى بلا مخطط مصدّق',he:'מבנה ללא תכנית מאושרת',en:'building with no approved plan'}],['background:#8a8a86',{ar:'مبنى تحت مخطط مصدّق',he:'מבנה בתחום תכנית מאושרת',en:'building under an approved plan'}],LA,LJ]); },
+     panel:f=>{ const n=f.fin?N.all_no_plan:Math.round(N.all_no_plan*f.t), r=f.fin?sh:Math.min(sh,f.t*sh);
+       return head(c)+`<div dir="${DIR}"><div class="cnt">${fmt(n)}</div><div>${T({ar:'مبنى بدوي بلا مخطط مصدّق',he:'מבנים בדואים ללא תכנית מאושרת',en:'Bedouin buildings with no approved plan'})}</div></div>`+
+        `<div class="one" dir="${DIR}"><div class="sd a">${unitsHTML('home',r,100)}</div><div class="tx">${T({ar:'من كل <b>100</b> مبنى بدوي في النقب',he:'מכל <b>100</b> מבנים בדואים בנגב',en:'Of every <b>100</b> Bedouin buildings in the Naqab'})}<br><b style="color:var(--red);font-size:40px">${Math.round(r)}</b> ${T({ar:'بلا مخطط مصدّق فوقه',he:'ללא תכנית מאושרת',en:'have no approved plan over them'})}`+
+        (f.fin?`<br><br>${T({ar:`وحتى داخل البلدات والقرى المعترف بها: ${N.recognized_no_plan_pct}%`,he:`וגם בתוך היישובים והכפרים המוכרים: ${N.recognized_no_plan_pct}%`,en:`and even inside the recognized towns and villages: ${N.recognized_no_plan_pct}%`})}`:'')+`</div></div>`+
+        `<div class="src" dir="${DIR}">${T({ar:'المخططات: מנהל התכנון (Xplan، 19.11.2026) · المباني: Microsoft ML Footprints (5/2024) · مبنى «تحت مخطط» إذا وقع مركزه داخل حدود مخطط مصدّق أو قسيمة مصدّقة',he:'תכניות: מנהל התכנון (Xplan, 19.11.2026) · מבנים: Microsoft ML Footprints (5/2024) · מבנה "בתוך תכנית" אם מרכזו בתוך גבול תכנית מאושרת או מגרש מאושר',en:'Plans: Israel Planning Administration (Xplan, 19.11.2026) · buildings: Microsoft ML Footprints (5/2024) · a building is "under a plan" if its centre lies inside an approved plan boundary or plot'})}</div>`; }}; }
 };
 /* ---------- render ---------- */
 function frameEl(g,f,i,n){ const fr=document.createElement('div'); fr.className='fr';
@@ -265,6 +318,7 @@ function frameEl(g,f,i,n){ const fr=document.createElement('div'); fr.className=
 (async()=>{ await load(); try{ const fam=L==='ar'?'Alexandria':L==='he'?'Rubik':'Jost', tx='أبجد אבג Abc 123 ₪×'; await Promise.all(['400','600','800'].map(w=>document.fonts.load(`${w} 20px "${fam}"`,tx)).concat(['500','700','800'].map(w=>document.fonts.load(`${w} 20px "Jost"`,tx)))); await document.fonts.ready; }catch(e){}
   const g=GIFS[G](); if(g.view) PJ=VIEW[g.view]; const st=document.getElementById('stage'), n=g.frames.length;
   if(FQ==='all'){ g.frames.forEach((f,i)=>st.appendChild(frameEl(g,f,i,n))); document.title='ready '+n; return; }
+  if(FQ!=null&&/^\d+$/.test(FQ)){ const i=+FQ; st.appendChild(frameEl(g,g.frames[i],i,n)); document.title='ready '+n; return; } // one frame (exporter)
   let i=0; const show=()=>{ st.innerHTML=''; st.appendChild(frameEl(g,g.frames[i],i,n)); const f=g.frames[i]; setTimeout(()=>{i=(i+1)%n;show();},f.fin?4500:i===0?1400:420); }; show();
 })();
 </script>

@@ -62,7 +62,7 @@ let L=q.get('lang'); if(!['ar','he','en'].includes(L)){ try{L=localStorage.getIt
 document.documentElement.lang=L; document.documentElement.dir=L==='en'?'ltr':'rtl';
 const T=o=>o[L]||o.en;
 const get=f=>fetch('data/'+f).then(r=>r.json());
-const C={bone:'#e9e6df',red:'#e8452c',yellow:'#f2c230'};
+const C={bone:'#e9e6df',red:'#e8452c',yellow:'#f2c230',A:'#e39a2d',J:'#6f93bd'}; // villages red · recognized Arab/Bedouin towns amber · Jewish towns blue (same as the atlas)
 function circle(c,r_m,n=40){const kx=111320*Math.cos(c[1]*Math.PI/180),ky=110540,ring=[];for(let i=0;i<=n;i++){const a=2*Math.PI*i/n;ring.push([c[0]+r_m*Math.cos(a)/kx,c[1]+r_m*Math.sin(a)/ky]);}return ring;}
 function square(c,side_m){const kx=111320*Math.cos(c[1]*Math.PI/180),ky=110540,h=side_m/2;return [[c[0]-h/kx,c[1]-h/ky],[c[0]+h/kx,c[1]-h/ky],[c[0]+h/kx,c[1]+h/ky],[c[0]-h/kx,c[1]+h/ky],[c[0]-h/kx,c[1]-h/ky]];}
 function centroid(g){let sx=0,sy=0,n=0;const walk=a=>{if(typeof a[0]==='number'){sx+=a[0];sy+=a[1];n++;}else a.forEach(walk);};walk(g.coordinates);return [sx/n,sy/n];}
@@ -90,17 +90,17 @@ const SCENES={
 '02':{t:{ar:'السكن والاستيطان',he:'דיור והתיישבות',en:'Housing & settlement'},
   q:{ar:'كم بلدة جديدة انبنت منذ 1948؟',he:'כמה יישובים חדשים הוקמו מאז 1948?',en:'How many new localities since 1948?'},big:'×44',
   sub:{ar:'799 بلدة يهودية مقابل 18 بلدة بدوية مخطّطة',he:'799 יישובים יהודיים לעומת 18 יישובים בדואיים מתוכננים',en:'799 Jewish localities vs 18 planned Bedouin towns'},
-  leg:[[C.bone,{ar:'بلدة يهودية تأسست بعد 1948',he:'יישוב יהודי שהוקם אחרי 1948',en:'Jewish locality founded after 1948'}],[C.red,{ar:'بلدة بدوية مخطّطة تأسست بعد 1948',he:'יישוב בדואי מתוכנן שהוקם אחרי 1948',en:'planned Bedouin town founded after 1948'}]],
+  leg:[[C.J,{ar:'بلدة يهودية تأسست بعد 1948',he:'יישוב יהודי שהוקם אחרי 1948',en:'Jewish locality founded after 1948'}],[C.A,{ar:'بلدة بدوية مخطّطة تأسست بعد 1948',he:'יישוב בדואי מתוכנן שהוקם אחרי 1948',en:'planned Bedouin town founded after 1948'}]],
   src:{ar:'الدائرة المركزية للإحصاء، ملف البلدات 2024',he:'הלמ"ס, קובץ היישובים 2024',en:'CBS localities file 2024'},
   cam:{center:[34.95,31.45],zoom:7.35,pitch:52,bearing:-12},
   async add(m){const d=await get('cbs_localities.geojson');
     const f=d.features.filter(x=>x.properties.year>=1948&&(x.properties.grp==='jewish'||x.properties.grp==='bedouin_town')).map(x=>({type:'Feature',geometry:{type:'Polygon',coordinates:[circle(x.geometry.coordinates,900,16)]},properties:{a:x.properties.grp==='bedouin_town'?1:0}}));
     m.addSource('loc',{type:'geojson',data:FC(f)});
-    m.addLayer({id:'loc',type:'fill-extrusion',source:'loc',paint:{'fill-extrusion-color':['case',['==',['get','a'],1],C.red,C.bone],'fill-extrusion-height':['case',['==',['get','a'],1],14000,9000],'fill-extrusion-opacity':.9}});}},
+    m.addLayer({id:'loc',type:'fill-extrusion',source:'loc',paint:{'fill-extrusion-color':['case',['==',['get','a'],1],C.A,C.J],'fill-extrusion-height':['case',['==',['get','a'],1],14000,9000],'fill-extrusion-opacity':.9}});}},
 '03':{t:{ar:'الاقتصاد والتشغيل',he:'כלכלה ותעסוקה',en:'Economy & employment'},
-  q:{ar:'كم أرض صناعية لكل ساكن؟',he:'כמה קרקע תעשייה לכל תושב?',en:'How much industrial land per resident?'},big:'×3.0',
+  q:{ar:'كم أرض صناعية لكل ساكن؟',he:'כמה קרקע תעשייה לכל תושב?',en:'How much industrial land per resident?'},big:'×3.7',
   sub:{ar:'المكعّب = متر² أرض صناعية لكل ساكن في البلدة',he:'הקובייה = מ"ר קרקע תעשייה לכל תושב ביישוב',en:'cube = m² of industrial land per resident'},
-  leg:[[C.yellow,{ar:'بلدة يهودية',he:'יישוב יהודי',en:'Jewish town'}],[C.red,{ar:'بلدة عربية',he:'יישוב ערבי',en:'Arab town'}]],
+  leg:[[C.J,{ar:'بلدة يهودية',he:'יישוב יהודי',en:'Jewish town'}],[C.A,{ar:'بلدة عربية',he:'יישוב ערבי',en:'Arab town'}]],
   src:{ar:'طبقات الفريق (ArcGIS) · الحدود: מנהל התכנון · السكان',he:'שכבות הצוות (ArcGIS) · גבולות: מנהל התכנון · אוכלוסייה',en:'Team ArcGIS layers · limits: iplan · population'},
   cam:{center:[34.86,31.2],zoom:10.15,pitch:58,bearing:-10},
   async add(m){const [st,mu,va]=await Promise.all([get('industry_stats.json'),get('muni.geojson'),get('vaadim.geojson')]);
@@ -108,7 +108,7 @@ const SCENES={
     const pos={};mu.features.forEach(f=>{pos[(f.properties.Muni_Eng||'').trim()]=centroid(f.geometry);});va.features.forEach(f=>{const e=(f.properties.Vaad_Eng||'').trim();if(!pos[e])pos[e]=centroid(f.geometry);});
     const f=st.rows.filter(r=>pos[ID[r.key]]&&r.pop).map(r=>{const v=r.ind_dunam*1000/r.pop,s=Math.sqrt(v)*360;return {type:'Feature',geometry:{type:'Polygon',coordinates:[square(pos[ID[r.key]],s)]},properties:{h:s,a:r.grp==='jewish'?0:1}};});
     m.addSource('ind',{type:'geojson',data:FC(f)});
-    m.addLayer({id:'ind',type:'fill-extrusion',source:'ind',paint:{'fill-extrusion-color':['case',['==',['get','a'],1],C.red,C.yellow],'fill-extrusion-height':['get','h'],'fill-extrusion-opacity':.92}});}},
+    m.addLayer({id:'ind',type:'fill-extrusion',source:'ind',paint:{'fill-extrusion-color':['case',['==',['get','a'],1],C.A,C.J],'fill-extrusion-height':['get','h'],'fill-extrusion-opacity':.92}});}},
 '04':{t:{ar:'المواصلات',he:'תחבורה',en:'Mobility'},
   q:{ar:'كم بيت من كل 100 يوصل للباص مشياً؟',he:'כמה בתים מכל 100 מגיעים לאוטובוס ברגל?',en:'How many homes in 100 can walk to a bus?'},big:'×26',
   sub:{ar:'المعدل في كل القرى غير المعترف بها 3.5 مقابل 90 في البلدات اليهودية',he:'הממוצע בכל הכפרים הלא מוכרים 3.5 לעומת 90 ביישובים היהודיים',en:'average: 3.5 in all unrecognized villages vs 90 in Jewish towns'},
@@ -139,7 +139,7 @@ const SCENES={
 '06':{t:{ar:'العنف والأمان',he:'אלימות וביטחון',en:'Violence & safety'},
   q:{ar:'كم ملف قتل أو محاولة قتل لكل 10,000 ساكن؟',he:'כמה תיקי רצח וניסיון לרצח לכל 10,000 תושבים?',en:'Murder and attempted-murder files per 10,000 residents?'},big:'×3.8',
   sub:{ar:'1.25 في البلدات البدوية مقابل 0.33 في البلدات اليهودية، في السنة (2023–2025)',he:'1.25 ביישובים הבדואיים לעומת 0.33 ביישובים היהודיים, בשנה (2023–2025)',en:'1.25 in the Bedouin towns vs 0.33 in the Jewish towns, a year (2023–2025)'},
-  leg:[[C.red,{ar:'بلدة بدوية · الارتفاع = ملفات لكل 10,000 ساكن',he:'יישוב בדואי · הגובה = תיקים לכל 10,000 תושבים',en:'Bedouin town · height = files per 10,000 residents'}],[C.bone,{ar:'بلدة يهودية',he:'יישוב יהודי',en:'Jewish town'}]],
+  leg:[[C.A,{ar:'بلدة بدوية · الارتفاع = ملفات لكل 10,000 ساكن',he:'יישוב בדואי · הגובה = תיקים לכל 10,000 תושבים',en:'Bedouin town · height = files per 10,000 residents'}],[C.J,{ar:'بلدة يهودية',he:'יישוב יהודי',en:'Jewish town'}]],
   src:{ar:'شرطة إسرائيل، بيانات الجريمة المفتوحة (data.gov.il) 2023–2025 · ملفات لا ضحايا · السكان: הלמ"ס 2023',he:'משטרת ישראל, נתוני פשיעה פתוחים (data.gov.il) 2023–2025 · תיקים, לא נפגעים · אוכלוסייה: הלמ"ס 2023',en:'Israel Police open crime data (data.gov.il) 2023–2025 · files, not victims · population: CBS 2023'},
   cam:{center:[34.86,31.2],zoom:9.75,pitch:58,bearing:-10},
   async add(m){const [v,mu,va]=await Promise.all([get('violence.json'),get('muni.geojson'),get('vaadim.geojson')]);
@@ -147,7 +147,7 @@ const SCENES={
     const pos={};mu.features.forEach(f=>{pos[(f.properties.Muni_Eng||'').trim()]=centroid(f.geometry);});va.features.forEach(f=>{const e=(f.properties.Vaad_Eng||'').trim();if(!pos[e])pos[e]=centroid(f.geometry);});
     const f=v.rows.map(r=>({r,p:pos[EN[r.en]||r.en]})).filter(o=>o.p).map(({r,p})=>({type:'Feature',geometry:{type:'Polygon',coordinates:[circle(p,1100,24)]},properties:{h:Math.max(r.lethal_per10k_yr*9000,250),a:r.grp==='arab'?1:0}}));
     m.addSource('v',{type:'geojson',data:FC(f)});
-    m.addLayer({id:'v',type:'fill-extrusion',source:'v',paint:{'fill-extrusion-color':['case',['==',['get','a'],1],C.red,C.bone],'fill-extrusion-height':['get','h'],'fill-extrusion-opacity':.93}});}},
+    m.addLayer({id:'v',type:'fill-extrusion',source:'v',paint:{'fill-extrusion-color':['case',['==',['get','a'],1],C.A,C.J],'fill-extrusion-height':['get','h'],'fill-extrusion-opacity':.93}});}},
 '07':{t:{ar:'الخطة مقابل الأرض',he:'התכנית מול השטח',en:'Plan vs ground'},
   q:{ar:'كم مبنى بدوي بلا مخطط مصدّق؟',he:'כמה מבנים בדואיים ללא תכנית מאושרת?',en:'How many Bedouin buildings have no approved plan?'},big:'56%',
   sub:{ar:'من المباني البدوية في القضاء (65,056 من 115,814) · حتى داخل البلدات والقرى المعترف بها: 28%',he:'מהמבנים הבדואיים בנפה (65,056 מתוך 115,814) · גם בתוך היישובים והכפרים המוכרים: 28%',en:'of Bedouin buildings in the subdistrict (65,056 of 115,814) · even inside the recognized towns and villages: 28%'},

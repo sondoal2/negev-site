@@ -1,5 +1,5 @@
 {
- "source": "Team ArcGIS analysis (industrial zones ∩ municipal limits), population 2026",
+ "source": "Team ArcGIS analysis (industrial zones ∩ municipal limits; duplicate polygons removed; Idan HaNegev split 44/56, partners' share outside the 18 towns not counted), population as in the team table; out-commuting: CBS census 2022 (team layer Negev_18_OutCommuting_2022)",
  "rows": [
   {
    "key": "arad",
@@ -11,7 +11,8 @@
    "ind_dunam": 4899.05,
    "ind_pct": 3.9,
    "pop": 33059,
-   "ind_per1000": 148.19
+   "ind_per1000": 148.19,
+   "out_pct": 34.0
   },
   {
    "key": "beer sheva",
@@ -20,10 +21,11 @@
    "ar": "بئر السبع",
    "en": "Be'er Sheva",
    "total_dunam": 117400.39,
-   "ind_dunam": 9767.92,
-   "ind_pct": 8.32,
+   "ind_dunam": 9556.32,
+   "ind_pct": 8.14,
    "pop": 216413,
-   "ind_per1000": 45.14
+   "ind_per1000": 44.16,
+   "out_pct": 26.3
   },
   {
    "key": "dimona",
@@ -35,7 +37,8 @@
    "ind_dunam": 2951.21,
    "ind_pct": 1.69,
    "pop": 41755,
-   "ind_per1000": 70.68
+   "ind_per1000": 70.68,
+   "out_pct": 42.7
   },
   {
    "key": "eilat",
@@ -47,7 +50,8 @@
    "ind_dunam": 2632.98,
    "ind_pct": 2.59,
    "pop": 58268,
-   "ind_per1000": 45.19
+   "ind_per1000": 45.19,
+   "out_pct": 5.0
   },
   {
    "key": "lehavim",
@@ -59,7 +63,8 @@
    "ind_dunam": 717.1,
    "ind_pct": 6.43,
    "pop": 7299,
-   "ind_per1000": 98.25
+   "ind_per1000": 98.25,
+   "out_pct": 83.2
   },
   {
    "key": "meytar",
@@ -68,10 +73,11 @@
    "ar": "ميتار",
    "en": "Meitar",
    "total_dunam": 24230.28,
-   "ind_dunam": 0.0,
+   "ind_dunam": 0,
    "ind_pct": 0.0,
    "pop": 11800,
-   "ind_per1000": 0.0
+   "ind_per1000": 0.0,
+   "out_pct": 82.0
   },
   {
    "key": "mizpe ramon",
@@ -83,7 +89,8 @@
    "ind_dunam": 1892.15,
    "ind_pct": 2.49,
    "pop": 5739,
-   "ind_per1000": 329.7
+   "ind_per1000": 329.7,
+   "out_pct": 16.6
   },
   {
    "key": "netivot",
@@ -92,10 +99,11 @@
    "ar": "نتيفوت",
    "en": "Netivot",
    "total_dunam": 16218.6,
-   "ind_dunam": 1940.81,
+   "ind_dunam": 1940.7,
    "ind_pct": 11.97,
    "pop": 60206,
-   "ind_per1000": 32.24
+   "ind_per1000": 32.23,
+   "out_pct": 42.6
   },
   {
    "key": "ofakim",
@@ -107,7 +115,8 @@
    "ind_dunam": 2528.96,
    "ind_pct": 15.47,
    "pop": 43475,
-   "ind_per1000": 58.17
+   "ind_per1000": 58.17,
+   "out_pct": 52.5
   },
   {
    "key": "omer",
@@ -119,7 +128,8 @@
    "ind_dunam": 838.4,
    "ind_pct": 4.6,
    "pop": 8302,
-   "ind_per1000": 100.99
+   "ind_per1000": 100.99,
+   "out_pct": 76.3
   },
   {
    "key": "yeruham",
@@ -131,7 +141,8 @@
    "ind_dunam": 2132.97,
    "ind_pct": 3.64,
    "pop": 12431,
-   "ind_per1000": 171.58
+   "ind_per1000": 171.58,
+   "out_pct": 45.5
   },
   {
    "key": "arara negev",
@@ -143,7 +154,8 @@
    "ind_dunam": 81.26,
    "ind_pct": 0.58,
    "pop": 22936,
-   "ind_per1000": 3.54
+   "ind_per1000": 3.54,
+   "out_pct": 47.3
   },
   {
    "key": "hura",
@@ -155,7 +167,8 @@
    "ind_dunam": 143.28,
    "ind_pct": 1.64,
    "pop": 24651,
-   "ind_per1000": 5.81
+   "ind_per1000": 5.81,
+   "out_pct": 55.2
   },
   {
    "key": "kseifa",
@@ -167,7 +180,8 @@
    "ind_dunam": 183.67,
    "ind_pct": 1.36,
    "pop": 23029,
-   "ind_per1000": 7.98
+   "ind_per1000": 7.98,
+   "out_pct": 63.9
   },
   {
    "key": "lakia",
@@ -179,7 +193,8 @@
    "ind_dunam": 173.58,
    "ind_pct": 2.53,
    "pop": 19593,
-   "ind_per1000": 8.86
+   "ind_per1000": 8.86,
+   "out_pct": 55.7
   },
   {
    "key": "rahat",
@@ -188,10 +203,11 @@
    "ar": "رهط",
    "en": "Rahat",
    "total_dunam": 33491.52,
-   "ind_dunam": 2900.43,
-   "ind_pct": 8.66,
+   "ind_dunam": 2012.87,
+   "ind_pct": 6.01,
    "pop": 83668,
-   "ind_per1000": 34.67
+   "ind_per1000": 24.06,
+   "out_pct": 52.3
   },
   {
    "key": "shegev shalom",
@@ -203,7 +219,8 @@
    "ind_dunam": 502.15,
    "ind_pct": 3.71,
    "pop": 14313,
-   "ind_per1000": 35.08
+   "ind_per1000": 35.08,
+   "out_pct": 43.2
   },
   {
    "key": "tel sheva",
@@ -215,7 +232,8 @@
    "ind_dunam": 403.56,
    "ind_pct": 4.28,
    "pop": 25521,
-   "ind_per1000": 15.81
+   "ind_per1000": 15.81,
+   "out_pct": 58.7
   }
  ]
 }

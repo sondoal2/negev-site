@@ -44,6 +44,8 @@ html[lang=he]{--font:"Rubik","Jost","Segoe UI",sans-serif} html[lang=en]{--font:
 .sd.a .hund i.u{background:var(--red);border-color:var(--red)}
 .pitches{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;align-content:start;height:214px;background:#151514;padding:8px}
 .pitch{display:block;width:100%;height:auto}
+.blk{height:214px;background:#151514;display:flex;align-items:flex-end;justify-content:center;padding:14px 14px 18px}
+.blk i{display:block;background:#f2c230;box-shadow:10px -10px 0 #a8861f}
 .coins{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;align-content:end;height:214px;background:#151514;padding:8px}
 .coins i{display:flex;align-items:center;justify-content:center;aspect-ratio:1;border-radius:50%;background:var(--bone);color:#000;font-style:normal;font-weight:800;font-size:12px;border:2px solid #8a8a86}
 .sd.a .coins i{background:var(--red);border-color:#000} .coins i.pt{opacity:.45}
@@ -152,7 +154,9 @@ function homesByDist(ctx,dist,thr,t){ // far homes on top
   [[d=>d<=thr,RAMP[0]],[d=>d>thr&&d<=3000,RAMP[1]],[d=>d>3000,RAMP[2]]].forEach(([f,c])=>{ctx.fillStyle=c; D.H.forEach(([x,y],i)=>{ if(D.rk[i]<=t&&f(dist[i])){const [a,b]=px(x,y);ctx.fillRect(a-.9,b-.9,1.8,1.8);} });}); }
 /* ---------- side panel ---------- */
 const xN=(hi,lo)=>{const r=hi/lo;return r>=10?Math.round(r):r.toFixed(1);};
+let BLK_MAX=1;
 function unitsHTML(kind,v,v2,cells=100){ const full=Math.floor(v+1e-9), part=v-full;
+  if(kind==='block'){ const sz=Math.sqrt(Math.max(v,0)/BLK_MAX)*180; return `<div class="blk"><i style="width:${sz.toFixed(0)}px;height:${sz.toFixed(0)}px"></i></div>`; }
   if(kind==='pitch'){ const one=f=>`<svg viewBox="0 0 105 68" class="pitch"><rect x="0.8" y="0.8" width="103.4" height="66.4" fill="none" stroke="#5a5a55" stroke-width="1.6" stroke-dasharray="3 3"/><svg x="0" y="0" width="${(105*f).toFixed(1)}" height="68"><rect width="105" height="68" fill="#f2c230"/><g fill="none" stroke="#000" stroke-width="1.6"><rect x="1" y="1" width="103" height="66"/><path d="M52.5 1v66"/><circle cx="52.5" cy="34" r="9"/></g></svg></svg>`;
     return `<div class="pitches">${[...Array(full)].map(()=>one(1)).join('')}${part>.02?one(part):''}</div>`; }
   if(kind==='coin') return `<div class="coins">${[...Array(full)].map(()=>'<i>₪</i>').join('')}${part>.15?'<i class="pt">₪</i>':''}</div>`;
@@ -202,11 +206,12 @@ const GIFS={
        el.insertAdjacentHTML('beforeend',`<div class="yr">${f.y}<small>1948 → 2024</small></div>`);
        legend(el,[['background:#8a8a86',{ar:'بلدة يهودية جديدة (بعد 1948)',he:'יישוב יהודי חדש (אחרי 1948)',en:'new Jewish locality (after 1948)'},'c'],['background:#fff',{ar:'أُقيمت في هذه السنوات',he:'הוקם בשנים אלה',en:'founded in these years'},'c'],['border:1px solid #e9e6df',{ar:'بلدة عربية (موجودة قبل 1948)',he:'יישוב ערבי (קיים לפני 1948)',en:'Arab locality (existed before 1948)'},'c'],['background:#ff5a3c',{ar:'بلدة تركيز بدوية خطّطتها الدولة',he:'יישוב ריכוז בדואי שתכננה המדינה',en:'Bedouin concentration town planned by the state'},'c']]); },
      panel:f=>panelFill({...c,a:cnt('arab',f.y)+cnt('bedouin_town',f.y)||0.0001,j:cnt('jewish',f.y)||0.0001,...(f.fin?{a:A,j:J}:{})},1,true).replace(/<div class="gap"[^]*?<\/div>(?=<div class="src")/,m=>f.fin?m:`<div class="gap"></div>`)}; },
- industry:()=>{ const R=D.istats.rows, m2=f=>{const X=R.filter(f);return X.reduce((s,r)=>s+r.ind_dunam,0)*1000/X.reduce((s,r)=>s+r.pop,0);}, PITCH=7140;
-   const c={no:'03',title:{ar:'الاقتصاد · الأرض الصناعية',he:'כלכלה · קרקע לתעשייה',en:'Economy · industrial land'},kind:'pitch',dec:1,a:m2(r=>r.grp==='arab')*1000/PITCH,j:m2(r=>r.grp==='jewish')*1000/PITCH,sides:{a:S7,j:S11},
-     q:{ar:'لكل 1,000 ساكن — كم ملعب كرة قدم من الأرض الصناعية (مصانع، ورش، أماكن عمل)؟',he:'לכל 1,000 תושבים — כמה מגרשי כדורגל של קרקע תעשייה (מפעלים, סדנאות, מקומות עבודה)?',en:'For every 1,000 residents — how many football pitches of industrial land (factories, workshops, jobs)?'},
-     unit:{ar:'ملعب لكل 1,000 ساكن',he:'מגרשים ל-1,000 תושבים',en:'pitches per 1,000 residents'},
-     src:{ar:'ملعب = 105×68 م (7,140 م²) · طبقات الفريق (ArcGIS): المناطق الصناعية ∩ حدود البلديات · سكان 2026 · إيلات ومتسبي رمون جنوب الإطار ومحسوبتان',he:'מגרש = 105×68 מ׳ (7,140 מ״ר) · שכבות הצוות (ArcGIS): אזורי תעשייה ∩ גבולות שיפוט · אוכלוסייה 2026 · אילת ומצפה רמון מדרום למסגרת ונספרו',en:'pitch = 105×68 m (7,140 m²) · team ArcGIS layers: industrial zones ∩ municipal limits · population 2026 · Eilat and Mitzpe Ramon are south of the frame and counted'}};
+ industry:()=>{ const R=D.istats.rows, m2=f=>{const X=R.filter(f);return X.reduce((s,r)=>s+r.ind_dunam,0)*1000/X.reduce((s,r)=>s+r.pop,0);};
+   const c={no:'03',title:{ar:'الاقتصاد · الأرض الصناعية',he:'כלכלה · קרקע לתעשייה',en:'Economy · industrial land'},kind:'block',dec:0,a:m2(r=>r.grp==='arab'),j:m2(r=>r.grp==='jewish'),sides:{a:S7,j:S11},
+     q:{ar:'كم أرض صناعية (مصانع، ورش، أماكن عمل) لكل 1,000 ساكن؟',he:'כמה קרקע לתעשייה (מפעלים, סדנאות, מקומות עבודה) יש לכל 1,000 תושבים?',en:'How much industrial land (factories, workshops, jobs) is there per 1,000 residents?'},
+     unit:{ar:'دونم لكل 1,000 ساكن',he:'דונם לכל 1,000 תושבים',en:'dunams per 1,000 residents'},
+     src:{ar:'مساحة المكعّب = مساحة الأرض الصناعية · دونم = 1,000 م² · طبقات الفريق (ArcGIS): المناطق الصناعية ∩ حدود البلديات، بعد حذف المكرر وتقسيم عيدان هنيغف 44/56 · سكان 2026 · إيلات ومتسبي رمون جنوب الإطار ومحسوبتان',he:'שטח הקובייה = שטח הקרקע לתעשייה · דונם = 1,000 מ״ר · שכבות הצוות (ArcGIS): אזורי תעשייה ∩ גבולות שיפוט, אחרי הסרת כפילויות וחלוקת עידן הנגב 44/56 · אוכלוסייה 2026 · אילת ומצפה רמון מדרום למסגרת ונספרו',en:'block area = industrial land area · dunam = 1,000 m² · team ArcGIS layers: industrial zones ∩ municipal limits, duplicates removed, Idan HaNegev split 44/56 · population 2026 · Eilat and Mitzpe Ramon are south of the frame and counted'}};
+   BLK_MAX=Math.max(c.a,c.j);
    return {frames:fillSeq(9),map:(ctx,el,f)=>{ base(ctx); [D.indJ,D.indA].forEach(fc=>fc.features.forEach(z=>{path(ctx,z.geometry);ctx.fillStyle='#f2c230';ctx.fill();ctx.strokeStyle='#f2c230';ctx.lineWidth=1.2;ctx.stroke();}));
        labels(el); legend(el,[['background:#f2c230',{ar:'منطقة صناعية داخل حدود البلدة',he:'אזור תעשייה בתוך גבול היישוב',en:'industrial zone inside the town limit'}],LJ,LA]); },panel:f=>panelFill(c,f.t,f.fin)}; },
  arnona:()=>{ const P=D.tprof.rows, wv=g=>{const X=P.filter(r=>r.grp===g&&r.biz_arnona_pc!=null&&r.pop_cbs_2024);const pp=X.reduce((s,r)=>s+r.pop_cbs_2024,0);return X.reduce((s,r)=>s+r.biz_arnona_pc*r.pop_cbs_2024,0)/pp;};

@@ -57,7 +57,7 @@ the two sides in identical units, the gap ×N and the source.
 | `07-no-approved-plan` | Bedouin buildings with no approved plan over them (56%; 28% even inside recognized localities) |
 | `01-homes-off-the-map` | homes outside every recognized limit |
 | `02-new-localities-since-1948` | new localities founded since 1948, Jewish vs Arab |
-| `03-industrial-land` | football pitches of industrial land per 1,000 residents |
+| `03-industrial-land` | industrial land per 1,000 residents, drawn as a yellow block (dunams) |
 | `03-business-tax` | business arnona per resident |
 | `04-bus-stop-walking-distance` | homes within 400 m of a served bus stop |
 | `05-elementary-school-1km` | homes within 1 km of an elementary school |
@@ -67,3 +67,12 @@ the two sides in identical units, the gap ×N and the source.
 
 The frames are drawn by `gif.html` from the same data files and formulas as the site (`gif.html?g=bus&lang=ar` plays one live).
 `python scripts/make_gifs.py . ar` re-exports them (headless Edge/Chrome screenshot + Pillow; `he` / `en` also work as the language).
+
+## Added 24.11.2026
+
+- **Compare button** (header): the red side of the gap cards switches between the unrecognized villages and the recognized Arab towns (ch. 04 bus, 05 school, 06 police, and the ch. 04 pairs player). Where the towns are not behind, the card says so instead of showing ×1.
+- **Night mode** (moon button, or the first row of the layers panel): NASA Black Marble 2016 lights (GIBS tiles, z≤8, so they blur into soft halos close up), street map hidden; light strength slider and black & white switch.
+- **Demolitions 2026** (ch. 01): `data/demolitions_2026.json`, one dashed ring per village (not per house), size ∝ √structures reported, red = demolished by the authorities, orange = self-demolished under orders, white = orders served. Each ring links to its news / NGO source; "Play 2026 month by month" in the card. Sources count different things, so they are not added up.
+- **Ch. 04**: a note on Segev Shalom and Hura (stops only on the main road), from the per-town numbers already in `transit_access.json`.
+- **Ch. 02**: the 1948→2024 timeline runs in about 5 s, starting on the whole country and closing in on the Naqab.
+- Mobile: header and chapter tabs no longer overlap.

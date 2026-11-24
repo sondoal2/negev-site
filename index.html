@@ -176,6 +176,8 @@ body.chap #card{display:block}
 /* 04 player: same-scale pairs (village vs town), 3.2 km windows */
 #pairs{position:absolute;z-index:11;top:72px;inset-inline-start:16px;width:min(760px,calc(100% - 430px));background:#0b0b0b;border:1px solid var(--line);display:none;box-shadow:0 10px 0 rgba(0,0,0,.55)}
 body.pairs #pairs{display:block}
+/* the layers panel opens on the same side: move the comparison over instead of hiding it under the panel */
+body.panel.pairs #pairs{inset-inline-start:332px;width:min(760px,calc(100% - 760px));min-width:420px}
 #pairs .pp{display:grid;grid-template-columns:1fr 1fr}
 #pairs .pq{padding:10px 12px;font-size:17px;font-weight:700;color:#fff;border-bottom:1px solid var(--line);line-height:1.35}
 #pairs .dots{display:flex;flex-wrap:wrap;gap:3px;margin:2px 0 4px;min-height:24px} #pairs .dots i,#pairs .dl i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#e9e6df}
@@ -185,6 +187,8 @@ body.pairs #pairs{display:block}
 #pairs .pn.a .hund i.u{background:var(--red);border-color:var(--red)}
 #pairs .pitches{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;align-content:start;min-height:210px;background:#151514;padding:8px}
 #pairs .pitch{display:block;width:100%;height:auto}
+#pairs .blk{min-height:210px;background:#151514;display:flex;align-items:flex-end;justify-content:center;padding:14px 14px 18px}
+#pairs .blk i{display:block;background:#f2c230;box-shadow:10px -10px 0 #a8861f;transition:width .3s,height .3s}
 #pairs .coins{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;align-content:end;min-height:210px;background:#151514;padding:8px}
 #pairs .coins i{display:flex;align-items:center;justify-content:center;aspect-ratio:1;border-radius:50%;background:#e9e6df;color:#000;font-style:normal;font-weight:800;font-size:12px;border:2px solid #8a8a86}
 #pairs .pn.a .coins i{background:var(--red);border-color:#000} #pairs .coins i.pt{opacity:.45}
@@ -507,7 +511,7 @@ const LAYERMAP = {
   arab:['loc-arab-fill','loc-arab-line','loc-arab-lbl'], jew:['loc-jew-line','loc-jew-lbl'], ind:['loc-ind'], rc:['rc-line'],
   unrec:['un-cluster','un-count','un-pt','un-lbl'], demo:['demo-halo','demo-pt'],
   indJ:['ind-j-fill','ind-j-line'], indA:['ind-a-fill','ind-a-line'], arab7:['arab7-line'],
-  grid:['grid-fill'], frames:['frames-fill','frames-line','frames-line-e','frames-lbl','bld-u','bld-e','bld-e-line'], mask2:['mask2'], nat:['nat-arab','nat-arab-line','nat-jew','nat-new','nat-bt'], routes:['rt-line','rt-miss','rt-miss-lbl'], cbs:['cbs-pt','cbs-new'], transit:['tr-circ','tr-num','tr-name','tr-dest','tr-dest-lbl'], access:['acc-grid','acc-bld','acc-stop'], svc:['svc-grid','svc-sport-l','svc-sport','svc-school','svc-clinic'], econ:['econ-link','econ-link-lbl','econ-sq','econ-zero','econ-num','econ-name'],
+  grid:['grid-fill'], frames:['frames-fill','frames-halo','frames-line','frames-line-e','frames-lbl','bld-u','bld-e','bld-e-line'], mask2:['mask2'], nat:['nat-arab','nat-arab-line','nat-jew','nat-new','nat-bt'], routes:['rt-line','rt-miss','rt-miss-lbl'], cbs:['cbs-pt','cbs-new'], transit:['tr-circ','tr-num','tr-name','tr-dest','tr-dest-lbl'], access:['acc-grid','acc-bld','acc-stop'], svc:['svc-grid','svc-sport-l','svc-sport','svc-school','svc-clinic'], econ:['econ-link','econ-link-lbl','econ-sq','econ-zero','econ-num','econ-name'],
   jew11:['jew11-line'], indBld:['indbld-fill'],
   xplan:['live-xplan'], landuse:['live-landuse'], tmm:['live-tmm'], vatmal:['live-vatmal'],
   noplan:['np-pts'], parks:['pk-grid','pk-plan','pk-act'], safety:['sf-grid','sf-fire','sf-hosp','sf-pt','sf-st']
@@ -573,7 +577,11 @@ map.once('style.load', async ()=>{
 
   // 01 — off-map buildings, 250 m concrete pixels
   map.addSource('grid',{type:'geojson',data:DATA.grid});
-  map.addLayer({id:'grid-fill',type:'fill',source:'grid',maxzoom:10.5,paint:{'fill-color':'#e8452c','fill-opacity':['interpolate',['linear'],['get','n'],1,.25,20,.6,80,.95]}},'loc-ind');
+  // off-map homes as soft red halos (no squares); one halo per 250 m cell, size and glow by the number of homes
+  const cenFC=fc=>({type:'FeatureCollection',features:fc.features.map(f=>{const r=f.geometry.coordinates[0];let x=0,y=0;r.slice(0,-1).forEach(q=>{x+=q[0];y+=q[1];});const k=r.length-1;return {type:'Feature',geometry:{type:'Point',coordinates:[x/k,y/k]},properties:f.properties};})});
+  map.addSource('gridpt',{type:'geojson',data:cenFC(DATA.grid)});
+  map.addLayer({id:'grid-fill',type:'circle',source:'gridpt',maxzoom:10.5,paint:{'circle-color':'#e8452c','circle-blur':.9,'circle-opacity':['interpolate',['linear'],['get','n'],1,.35,20,.65,80,.9],
+    'circle-radius':['interpolate',['linear'],['zoom'],7,['interpolate',['linear'],['get','n'],1,1.5,80,5],10.5,['interpolate',['linear'],['get','n'],1,4,80,14]]}},'loc-ind');
   // closer in: every Bedouin cluster framed, every house red
   map.addSource('bld',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
   map.addLayer({id:'bld-u',type:'fill',source:'bld',minzoom:11.5,filter:['==',['get','c'],'u'],paint:{'fill-color':'#e8452c','fill-opacity':.9}});
@@ -659,9 +667,12 @@ map.once('style.load', async ()=>{
   map.addLayer({id:'rt-miss',type:'line',source:'rtmiss',paint:{'line-color':'#e8452c','line-width':2,'line-dasharray':[1.5,1.5]}});
   map.addLayer({id:'rt-miss-lbl',type:'symbol',source:'rtmiss',layout:{'symbol-placement':'line-center','text-field':'0','text-font':['Noto Sans Bold'],'text-size':16,'text-allow-overlap':true},paint:{'text-color':'#e8452c','text-halo-color':'#000','text-halo-width':3}});
   map.addSource('frames',{type:'geojson',data:DATA.frames});
-  map.addLayer({id:'frames-fill',type:'fill',source:'frames',minzoom:8,paint:{'fill-color':'#e8452c','fill-opacity':.18}});
-  map.addLayer({id:'frames-line',type:'line',source:'frames',minzoom:8,filter:['all',['>=',['get','n'],20],['==',['get','c'],'u']],paint:{'line-color':'#e8452c','line-width':['interpolate',['linear'],['zoom'],10,1,14,2.5]}});
-  map.addLayer({id:'frames-line-e',type:'line',source:'frames',minzoom:8,filter:['all',['>=',['get','n'],20],['==',['get','c'],'e']],paint:{'line-dasharray':[2,1.5],'line-color':'#e8452c','line-width':['interpolate',['linear'],['zoom'],10,1,14,2.5]}});
+  map.addLayer({id:'frames-fill',type:'fill',source:'frames',minzoom:8,paint:{'fill-color':'#e8452c','fill-opacity':0}});
+  map.addSource('framept',{type:'geojson',data:cenFC(DATA.frames)});
+  map.addLayer({id:'frames-halo',type:'circle',source:'framept',minzoom:8,maxzoom:12.5,paint:{'circle-color':'#e8452c','circle-blur':1,'circle-opacity':.55,
+    'circle-radius':['interpolate',['linear'],['zoom'],8,['interpolate',['linear'],['get','n'],1,3,500,16],12,['interpolate',['linear'],['get','n'],1,10,500,60]]}});
+  map.addLayer({id:'frames-line',type:'line',source:'frames',minzoom:8,filter:['all',['>=',['get','n'],20],['==',['get','c'],'u']],paint:{'line-opacity':0,'line-color':'#e8452c','line-width':['interpolate',['linear'],['zoom'],10,1,14,2.5]}});
+  map.addLayer({id:'frames-line-e',type:'line',source:'frames',minzoom:8,filter:['all',['>=',['get','n'],20],['==',['get','c'],'e']],paint:{'line-opacity':0,'line-dasharray':[2,1.5],'line-color':'#e8452c','line-width':['interpolate',['linear'],['zoom'],10,1,14,2.5]}});
   map.addLayer({id:'frames-lbl',type:'symbol',source:'frames',minzoom:10.5,filter:['>=',['get','n'],60],
     layout:{'text-field':['case',['==',['get','en'],'unnamed'],['to-string',['get','n']],['concat',['get',L==='ar'?'ar':'en'],'  ',['to-string',['get','n']]]],'text-font':['Noto Sans Bold'],'text-size':11,'symbol-placement':'point','text-anchor':'bottom','text-offset':[0,-.2]},
     paint:{'text-color':'#000','text-halo-color':'#e8452c','text-halo-width':3}});
@@ -1095,14 +1106,14 @@ const setHi=fs=>map.getSource('hi')&&map.getSource('hi').setData({type:'FeatureC
 function missFC(){ if(!DATA) return {type:'FeatureCollection',features:[]}; const miss=[];
   transitFC().features.filter(f=>TR2POP[f.properties.id]).forEach(f=>['ta','jm'].forEach(d=>{ if(!+f.properties[d]) miss.push({type:'Feature',geometry:{type:'LineString',coordinates:[f.geometry.coordinates,DESTS[d].c]},properties:{}}); }));
   return {type:'FeatureCollection',features:miss}; }
-function resetHi(){ setHi([]); if(map.getLayer('frames-line')){map.setFilter('frames-fill',null);map.setFilter('frames-line',['all',['>=',['get','n'],20],['==',['get','c'],'u']]);map.setFilter('frames-line-e',['all',['>=',['get','n'],20],['==',['get','c'],'e']]);map.setFilter('rt-line',null);map.getSource('rtmiss').setData(missFC());}
+function resetHi(){ setHi([]); if(map.getLayer('frames-line')){map.setFilter('frames-fill',null);map.setFilter('frames-halo',null);map.setFilter('frames-line',['all',['>=',['get','n'],20],['==',['get','c'],'u']]);map.setFilter('frames-line-e',['all',['>=',['get','n'],20],['==',['get','c'],'e']]);map.setFilter('rt-line',null);map.getSource('rtmiss').setData(missFC());}
   if(map.getLayer('tr-circ')){map.setPaintProperty('tr-circ','circle-opacity',1);map.setPaintProperty('tr-num','text-opacity',1);map.setPaintProperty('tr-name','text-opacity',1);} }
 const FRAMES={
  // 01: camera fixed; Bedouin clusters light up from largest to smallest, counter climbs
  land:()=>{ const F=DATA.frames.features, tot=F.length, steps=[25,60,110,180,260,350,450,540,622];
    return steps.map(k=>{const sub=F.filter(f=>f.properties.rank<k), b=sub.reduce((s,f)=>s+f.properties.n,0);
      return {cap:`<b>${b.toLocaleString()}</b>${T4({ar:'بيت بلا اعتراف',he:'בתים ללא הכרה',en:'unrecognized homes'})} · ${Math.min(k,tot)} ${T4({ar:'تجمّعاً',he:'ריכוזים',en:'clusters'})}`,
-       apply:()=>{map.setFilter('frames-fill',['<',['get','rank'],k]);map.setFilter('frames-line',['all',['<',['get','rank'],k],['==',['get','c'],'u']]);map.setFilter('frames-line-e',['all',['<',['get','rank'],k],['==',['get','c'],'e']]);}};}); },
+       apply:()=>{map.setFilter('frames-fill',['<',['get','rank'],k]);map.setFilter('frames-halo',['<',['get','rank'],k]);map.setFilter('frames-line',['all',['<',['get','rank'],k],['==',['get','c'],'u']]);map.setFilter('frames-line-e',['all',['<',['get','rank'],k],['==',['get','c'],'e']]);}};}); },
  // 02: camera fixed on the country; grey polygons accumulate, hatched Arab localities stay frozen
  housing:()=>{ const ys=[]; for(let y=1948;y<=2024;y+=2) ys.push(y); if(ys[ys.length-1]!==2024) ys.push(2024);
    return ys.map(y=>({cap:()=>{const c=tlCounts(y);return `<b>${y}</b><span class="sq g"></span>${c.j} &nbsp; <span class="sq h"></span>${c.a} &nbsp; <span class="sq r"></span>${c.b}`;},apply:()=>setYear(y)})); },
@@ -1110,14 +1121,14 @@ const FRAMES={
  // (football pitches, coins, homes, pupils) fill up together frame by frame - the Arab side stops early; the gap ×N in red at the end.
  // 03: per 1,000 residents, how many football pitches of industrial land? then: business tax per resident in 100-₪ coins
  economy:()=>{ const R=(DATA.istats&&DATA.istats.rows)||[], m2=f=>{const X=R.filter(f);return X.reduce((s,r)=>s+r.ind_dunam,0)*1000/X.reduce((s,r)=>s+r.pop,0);};
-   const PITCH=7140, pA=m2(r=>r.grp==='arab')*1000/PITCH, pJ=m2(r=>r.grp==='jewish')*1000/PITCH;
+   const pA=m2(r=>r.grp==='arab'), pJ=m2(r=>r.grp==='jewish');
    const P=(DATA.tprof&&DATA.tprof.rows)||[], wv=(g,k)=>{const X=P.filter(r=>r.grp===g&&r[k]!=null&&r.pop_cbs_2024);const pp=X.reduce((s,r)=>s+r.pop_cbs_2024,0);return pp?X.reduce((s,r)=>s+r[k]*r.pop_cbs_2024,0)/pp:0;};
    const cA=wv('arab','biz_arnona_pc')/100, cJ=wv('jewish','biz_arnona_pc')/100;
    const sides={a:{ar:'7 بلدات عربية',he:'7 יישובים ערביים',en:'7 Arab towns'},j:{ar:'11 بلدة يهودية',he:'11 יישובים יהודיים',en:'11 Jewish towns'}};
-   return [...fillFrames({kind:'pitch',a:pA,j:pJ,sides,steps:9,dec:1,
-       q:{ar:'لكل 1,000 ساكن — كم ملعب كرة قدم من الأرض الصناعية (مصانع، ورش، أماكن عمل)؟',he:'לכל 1,000 תושבים — כמה מגרשי כדורגל של קרקע תעשייה (מפעלים, סדנאות, מקומות עבודה)?',en:'For every 1,000 residents — how many football pitches of industrial land (factories, workshops, jobs)?'},
-       unit:{ar:'ملعب',he:'מגרשים',en:'pitches'},cap:{ar:'أرض صناعية لكل 1,000 ساكن',he:'קרקע תעשייה לכל 1,000 תושבים',en:'industrial land per 1,000 residents'},
-       src:{ar:'ملعب = 105×68 م (7,140 م²) · طبقات الفريق (ArcGIS): المناطق الصناعية ∩ حدود البلديات · سكان 2026',he:'מגרש = 105×68 מ׳ (7,140 מ״ר) · שכבות הצוות (ArcGIS): אזורי תעשייה ∩ גבולות שיפוט · אוכלוסייה 2026',en:'pitch = 105×68 m (7,140 m²) · team ArcGIS layers: industrial zones ∩ municipal limits · population 2026'}}),
+   return [...fillFrames({kind:'block',a:pA,j:pJ,sides,steps:9,dec:0,
+       q:{ar:'كم أرض صناعية (مصانع، ورش، أماكن عمل) لكل 1,000 ساكن؟',he:'כמה קרקע לתעשייה (מפעלים, סדנאות, מקומות עבודה) יש לכל 1,000 תושבים?',en:'How much industrial land (factories, workshops, jobs) is there per 1,000 residents?'},
+       unit:{ar:'دونم لكل 1,000 ساكن',he:'דונם לכל 1,000 תושבים',en:'dunams per 1,000 residents'},cap:{ar:'أرض صناعية لكل 1,000 ساكن',he:'קרקע תעשייה לכל 1,000 תושבים',en:'industrial land per 1,000 residents'},
+       src:{ar:'مساحة المكعّب = مساحة الأرض الصناعية · دونم = 1,000 م² · طبقات الفريق (ArcGIS): المناطق الصناعية ∩ حدود البلديات · سكان 2026',he:'שטח הקובייה = שטח הקרקע לתעשייה · דונם = 1,000 מ״ר · שכבות הצוות (ArcGIS): אזורי תעשייה ∩ גבולות שיפוט · אוכלוסייה 2026',en:'block area = industrial land area · dunam = 1,000 m² · team ArcGIS layers: industrial zones ∩ municipal limits · population 2026'}}),
      ...fillFrames({kind:'coin',a:cA,j:cJ,sides,steps:6,dec:0,
        q:{ar:'كم تدفع المصانع والمحلات للبلدية (أرنونا) عن كل ساكن في السنة؟ كل قطعة = 100 ₪',he:'כמה משלמים מפעלים ועסקים לרשות (ארנונה) על כל תושב בשנה? כל מטבע = 100 ₪',en:'How much do factories and shops pay the council (arnona) per resident per year? Each coin = ₪100'},
        unit:{ar:'× 100 ₪',he:'× 100 ₪',en:'× ₪100'},cap:{ar:'أرنونا المصالح لكل ساكن',he:'ארנונת עסקים לתושב',en:'business arnona per resident'},
@@ -1219,12 +1230,14 @@ function unitsHTML(kind,v,v2,cls,cells=100){
   if(kind==='pitch'){ const one=f=>`<svg viewBox="0 0 105 68" class="pitch"><rect x="0.8" y="0.8" width="103.4" height="66.4" fill="none" stroke="#5a5a55" stroke-width="1.6" stroke-dasharray="3 3"/>`+
       `<svg x="0" y="0" width="${(105*f).toFixed(1)}" height="68"><rect x="0" y="0" width="105" height="68" fill="#f2c230"/><g fill="none" stroke="#000" stroke-width="1.6"><rect x="1" y="1" width="103" height="66"/><path d="M52.5 1v66"/><circle cx="52.5" cy="34" r="9"/></g></svg></svg>`;
     return `<div class="pitches">${[...Array(full)].map(()=>one(1)).join('')}${part>.02?one(part):''}</div>`; }
+  if(kind==='block'){ const sz=Math.sqrt(Math.max(v,0)/(UNIT_MAX||1))*170; return `<div class="blk"><i style="width:${sz.toFixed(0)}px;height:${sz.toFixed(0)}px"></i></div>`; }
   if(kind==='coin') return `<div class="coins">${[...Array(full)].map(()=>'<i>₪</i>').join('')}${part>.15?'<i class="pt">₪</i>':''}</div>`;
   // home / pupil: a 10×10 grid of identical units
   const n=Math.round(v), n2=Math.round(v2||0);
   return `<div class="hund ${kind}" style="${cells!==100?'aspect-ratio:2':''}">${[...Array(cells).keys()].map(k=>`<i class="${k<n?'u':k<n2?'b':''}"></i>`).join('')}</div>`;
 }
-function showFill(c,t,fin){
+let UNIT_MAX=1;
+function showFill(c,t,fin){ UNIT_MAX=Math.max(c.a,c.j);
   const top=Math.max(c.a,c.j), sv=v=>Math.min(v,t*top), d=v=>(+v).toFixed(c.dec||0);
   const side=(k,cls)=>{ const v=c[k], s=fin?v:sv(v), s2=c[k+'2']!=null?(fin?c[k+'2']:Math.min(c[k+'2'],t*Math.max(c.a2||0,c.j2||0))):null;
     return `<div class="pn ${cls}"><div class="ph"><b>${T4(c.sides[k])}</b></div>${unitsHTML(c.kind,s,s2,cls,c.cells||100)}`+

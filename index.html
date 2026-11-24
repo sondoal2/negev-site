@@ -11,7 +11,7 @@
 <style>
 :root{
   --ink:#0d0d0d; --slab:#1b1b1b; --concrete:#8a8a86; --bone:#e9e6df; --fog:#c9c7c1;
-  --red:#e8452c; --red-deep:#b8301c; --line:#3a3a38;
+  --red:#e8452c; --red-deep:#b8301c; --line:#3a3a38; --tA:#e39a2d; --tA-deep:#b8720f; --tJ:#6f93bd; --tJ-deep:#456a92;
   --font: "Jost","Alexandria","Rubik",system-ui,sans-serif;
 }
 html[lang=ar]{--font:"Alexandria","Jost",system-ui,sans-serif}
@@ -92,6 +92,7 @@ body.panel #panelToggle{background:var(--red);color:#fff;border-color:var(--red)
 #tools button:hover,#tools button.on{background:var(--bone);color:#000}
 #tools svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2}
 #card table.d26t{width:100%;border-collapse:collapse;font-size:12px;margin:8px 0} #card table.d26t td{border-top:1px solid var(--line);padding:6px 4px;vertical-align:top} #card table.d26t td:first-child{white-space:nowrap;color:var(--red);font-weight:700} #card table.d26t a,.maplibregl-popup a{color:#ffb59f}
+#nightBtn{display:none} body.ch-land #nightBtn{display:grid}
 #panel .nset{display:flex;flex-direction:column;gap:6px;padding:4px 14px 10px 40px;font-size:12px;color:var(--concrete)} #panel .nset input[type=range]{width:100%;accent-color:var(--bone)}
 
 /* ---------- compare ---------- */
@@ -153,7 +154,7 @@ body.chap #card{display:block}
 #card .big div{flex:1;padding:8px 10px;border-inline-start:2px solid #000}
 #card .big div:first-child{border:0}
 #card .big b{display:block;font-family:"Jost";font-weight:800;font-size:30px;line-height:1}
-#card .big b.r{color:var(--red-deep)}
+#card .big b.r{color:var(--tA-deep)} #card .big b.v{color:var(--red-deep)} #card .big b.j{color:var(--tJ-deep)}
 #card .big span{font-size:11px;letter-spacing:.04em;text-transform:uppercase}
 #card .src{font-size:11px;color:#444;border-top:1px solid #000;margin-top:10px;padding-top:6px}
 /* unified gap card (end of every chapter): Arab line vs Jewish line, same unit, ×N in red */
@@ -162,7 +163,7 @@ body.chap #card{display:block}
 #card .gap .gq{padding:8px 10px 2px;font-weight:700;font-size:13px;line-height:1.35}
 #card .gap .gr{display:grid;grid-template-columns:1fr auto;align-items:baseline;gap:8px;padding:4px 10px;border-top:1px solid #0002}
 #card .gap .gr b{font-family:"Jost";font-weight:800;font-size:26px;line-height:1.1}
-#card .gap .gr.a b{color:#000} #card .gap .gr.j b{color:#6b6b67}
+#card .gap .gr.a b{color:var(--tA-deep)} #card .gap .gr.a.v b{color:var(--red-deep)} #card .gap .gr.j b{color:var(--tJ-deep)} #card .gap .gr.j.ja b{color:var(--tA-deep)}
 #card .gap .gr span{font-size:12px}
 #card .gap .gx{display:flex;align-items:baseline;gap:8px;padding:6px 10px 8px;border-top:2px solid #000}
 #card .gap .gx b{font-family:"Jost";font-weight:800;font-size:44px;line-height:1;color:var(--red-deep)}
@@ -189,14 +190,14 @@ body.panel.pairs #pairs{inset-inline-start:332px;width:min(760px,calc(100% - 760
 #pairs .dl{font-size:11px;color:var(--concrete);margin-bottom:6px}
 #pairs .hund{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;aspect-ratio:1;background:#151514;padding:8px}
 #pairs .hund i{display:block;border:1px solid #444} #pairs .hund i.u{background:var(--bone);border-color:var(--bone)} #pairs .hund i.b{background:repeating-linear-gradient(45deg,#8a8a86 0 2px,transparent 2px 5px);border-color:#8a8a86}
-#pairs .pn.a .hund i.u{background:var(--red);border-color:var(--red)}
+#pairs .pn.a .hund i.u{background:var(--tA);border-color:var(--tA)} #pairs .pn.a.v .hund i.u{background:var(--red);border-color:var(--red)} #pairs .pn.j .hund i.u{background:var(--tJ);border-color:var(--tJ)}
 #pairs .pitches{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;align-content:start;min-height:210px;background:#151514;padding:8px}
 #pairs .pitch{display:block;width:100%;height:auto}
 #pairs .blk{min-height:210px;background:#151514;display:flex;align-items:flex-end;justify-content:center;padding:14px 14px 18px}
 #pairs .blk i{display:block;background:#f2c230;box-shadow:10px -10px 0 #a8861f;transition:width .3s,height .3s}
 #pairs .coins{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;align-content:end;min-height:210px;background:#151514;padding:8px}
 #pairs .coins i{display:flex;align-items:center;justify-content:center;aspect-ratio:1;border-radius:50%;background:#e9e6df;color:#000;font-style:normal;font-weight:800;font-size:12px;border:2px solid #8a8a86}
-#pairs .pn.a .coins i{background:var(--red);border-color:#000} #pairs .coins i.pt{opacity:.45}
+#pairs .pn.a .coins i{background:var(--tA);border-color:#000} #pairs .pn.a.v .coins i{background:var(--red)} #pairs .pn.j .coins i{background:var(--tJ);border-color:#000} #pairs .coins i.pt{opacity:.45}
 #pairs .hund.home i,#pairs .hund.pupil i{border-radius:2px}
 #pairs .pn{border-inline-start:1px solid var(--line);padding:10px 12px 12px}
 #pairs .pn:first-child{border:0}
@@ -204,7 +205,7 @@ body.panel.pairs #pairs{inset-inline-start:332px;width:min(760px,calc(100% - 760
 #pairs .ph b{font-size:16px;letter-spacing:.04em} #pairs .ph small{font-size:11px;color:var(--concrete);text-transform:uppercase;letter-spacing:.06em}
 #pairs svg{display:block;width:100%;height:auto;background:#151514}
 #pairs .pv{display:flex;align-items:baseline;gap:8px;margin-top:8px}
-#pairs .pv b{font-family:"Jost";font-weight:800;font-size:38px;line-height:1;color:var(--bone)} #pairs .pn.a .pv b{color:var(--red)}
+#pairs .pv b{font-family:"Jost";font-weight:800;font-size:38px;line-height:1;color:var(--tJ)} #pairs .pn.a .pv b{color:var(--tA)} #pairs .pn.a.v .pv b{color:var(--red)}
 #pairs .pv span{font-size:12px;line-height:1.3;color:#d8d5ce}
 #pairs .pf{display:flex;align-items:center;gap:14px;padding:10px 12px;border-top:1px solid var(--line);font-size:12px;color:#d8d5ce;flex-wrap:wrap}
 #pairs .pf .x{font-family:"Jost";font-weight:800;font-size:30px;color:var(--red);line-height:1}
@@ -250,7 +251,7 @@ body.chap #stats{display:none}
 .bl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bt{position:relative;height:14px;background:#0001}
 .bf{position:absolute;inset-block:0;inset-inline-start:0}
-.bf.arab{background:#000} .bf.jewish{background:#8a8a86} .bf.red{background:var(--red)}
+.bf.arab{background:var(--tA)} .bf.jewish{background:var(--tJ)} .bf.red{background:var(--red)}
 .b0{position:absolute;inset-inline-start:4px;top:-2px;color:var(--red-deep);font-weight:800}
 .bv{font-family:"Jost";font-weight:700;text-align:end}
 .bu{font-size:11px;color:#444}
@@ -479,13 +480,13 @@ function baseStyle(){
    glyphs:'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',
    sources:{
      omt:{type:'vector',url:'https://tiles.openfreemap.org/planet'},
-     night:{type:'raster',tiles:['https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_Black_Marble/default/2016-01-01/GoogleMapsCompatible_Level8/{z}/{y}/{x}.png'],tileSize:256,maxzoom:8,attribution:'NASA Black Marble 2016 (GIBS)'},
+     night:{type:'raster',tiles:['https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_CityLights_2012/default/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpg'],tileSize:256,maxzoom:8,attribution:'NASA VIIRS City Lights 2012 (GIBS)'},
      sat:{type:'raster',tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],tileSize:256,maxzoom:19,attribution:'Esri World Imagery'}
    },
    layers:[
     {id:'bg',type:'background',paint:{'background-color':'#151514'}},
     {id:'sat',type:'raster',source:'sat',layout:{visibility:'none'},paint:{'raster-saturation':-1,'raster-contrast':.25,'raster-brightness-max':.85}},
-    {id:'night',type:'raster',source:'night',layout:{visibility:'none'},paint:{'raster-opacity':.9,'raster-saturation':-1,'raster-contrast':.3,'raster-fade-duration':0}},
+    {id:'night',type:'raster',source:'night',layout:{visibility:'none'},paint:{'raster-opacity':.9,'raster-saturation':-1,'raster-contrast':.7,'raster-brightness-min':0,'raster-fade-duration':0}},
     {id:'landuse',type:'fill',source:'omt','source-layer':'landuse',group:'base',paint:{'fill-color':'#1c1c1b'}},
     {id:'water',type:'fill',source:'omt','source-layer':'water',group:'base',paint:{'fill-color':'#070707'}},
     {id:'wadi',type:'line',source:'omt','source-layer':'waterway',group:'base',minzoom:9,paint:{'line-color':'#2a2a28','line-width':['interpolate',['linear'],['zoom'],9,.4,14,1.6]}},
@@ -514,11 +515,12 @@ const state = { // layer id -> visible
   indJ:true, indA:true, arab7:false, grid:false, frames:false, nat:false, routes:false, mask2:false, cbs:false, transit:false, access:false, svc:false, econ:false, jew11:false, indBld:false,
   xplan:false, landuse:false, tmm:false, vatmal:false, noplan:false, night:false
 };
-const NIGHT={op:.9,grey:true}; try{ Object.assign(NIGHT, JSON.parse(localStorage.getItem('offmap-night')||'{}')); }catch(e){}
+const NIGHT={op:.95,grey:false}; try{ Object.assign(NIGHT, JSON.parse(localStorage.getItem('offmap-night')||'{}')); }catch(e){}
 try{ Object.assign(state, JSON.parse(localStorage.getItem('offmap-state')||'{}')); }catch(e){}
+state.night=false; // night lights open only on demand, in chapter 01
 const BASE_IDS=['landuse','water','wadi','bld','rd-minor','rd-mid','rd-major','rail'];
 const LAYERMAP = {
-  basemap:BASE_IDS, sat:['sat'], night:['night'], mask:['mask','negev-edge'], labels:['place-lbl'],
+  basemap:BASE_IDS, sat:['sat'], night:['night-v'], mask:['mask','negev-edge'], labels:['place-lbl'],
   arab:['loc-arab-fill','loc-arab-line','loc-arab-lbl'], jew:['loc-jew-line','loc-jew-lbl'], ind:['loc-ind'], rc:['rc-line'],
   unrec:['un-cluster','un-count','un-pt','un-lbl'], demo:['demo-halo','demo-pt','d26-hit','d26-ring','d26-lbl'],
   indJ:['ind-j-fill','ind-j-line'], indA:['ind-a-fill','ind-a-line'], arab7:['arab7-line'],
@@ -580,6 +582,10 @@ map.once('style.load', async ()=>{
   map.addLayer({id:'un-lbl',type:'symbol',source:'unrec',minzoom:11,filter:['!',['has','point_count']],layout:{'text-field':['get',L],'text-font':['Noto Sans Bold'],'text-size':11,'text-offset':[0,1.3]},paint:{'text-color':'#e8452c','text-halo-color':'#000','text-halo-width':1.5}});
   map.addSource('demo',{type:'geojson',data:DATA.demo});
   map.addLayer({id:'demo-halo',type:'circle',source:'demo',paint:{'circle-radius':18,'circle-color':'#e8452c','circle-opacity':.18,'circle-stroke-color':'#e8452c','circle-stroke-width':1}});
+  // night mode: black everywhere except ~1 km around the unrecognized villages (scripts/night_mask.py)
+  // lights cut to the villages and out of every town's glow radius: scripts/night_villages.py
+  fetch('data/night_villages.json').then(r=>r.json()).then(nv=>{ map.addSource('nightv',{type:'image',url:'data/night_villages.png',coordinates:nv.coordinates});
+    map.addLayer({id:'night-v',type:'raster',source:'nightv',layout:{visibility:state.night?'visible':'none'},paint:{'raster-opacity':.95,'raster-fade-duration':0}},'landuse'); applyState(); }).catch(()=>{});
   // 2026 demolition events: one dashed ring per village (not per house), ring size ∝ √(structures reported)
   if(DATA.d26){ const ring=(c,km)=>{const k=Math.cos(c[1]*Math.PI/180),pts=[];for(let i=0;i<=48;i++){const a=i/48*2*Math.PI;pts.push([c[0]+km/111.32/k*Math.cos(a),c[1]+km/110.57*Math.sin(a)]);}return pts;};
     const ev=DATA.d26.events, P=e=>({id:e.id,m:e.m,kind:e.kind,ar:e.ar,he:e.he,en:e.en,date:e.date});
@@ -798,7 +804,7 @@ function trPopup(e){const p=e.features[0].properties;const v=n=>+n?`<b style="di
 
 /* chapter definitions: layer preset + view + card */
 const CHAPTERS=[
- {no:'01',key:'land',view:{center:[34.86,31.2],zoom:9.7},layers:{mask:true,arab:true,jew:true,rc:false,unrec:false,demo:true,grid:false,frames:true,indJ:false,indA:false,cbs:false,transit:false,xplan:false,landuse:false}},
+ {no:'01',key:'land',view:{center:[34.86,31.2],zoom:9.7},layers:{mask:true,arab:false,jew:false,rc:false,unrec:false,demo:true,grid:false,frames:true,indJ:false,indA:false,cbs:false,transit:false,xplan:false,landuse:false}},
  {no:'02',key:'housing',view:{center:[35.0,31.55],zoom:7.2},layers:{mask:false,mask2:true,arab:false,jew:false,unrec:false,demo:false,grid:false,indJ:false,indA:false,cbs:false,nat:true,transit:false},timeline:true},
  {no:'03',key:'economy',view:{center:[34.85,31.25],zoom:10},layers:{mask:true,arab:false,jew:false,unrec:false,demo:false,grid:false,indJ:true,indA:true,arab7:true,jew11:true,indBld:true,cbs:false,transit:false,econ:true}},
  {no:'04',key:'transit',view:{center:[35.0,31.6],zoom:7.9},layers:{mask:false,routes:true,arab:false,jew:false,unrec:false,demo:false,grid:false,indJ:false,indA:false,arab7:false,jew11:false,indBld:false,cbs:false,transit:true,access:true}},
@@ -813,7 +819,8 @@ const CH_TITLE={ar:{land:'الأرض والاعتراف',housing:'السكن و�
  en:{land:'Land & recognition',housing:'Housing & settlement',economy:'Economy & employment',transit:'Mobility',services:'Education & services',parks:'Public parks',violence:'Violence & safety',plan:'Plan vs ground'}};
 function chapterCard(key){
   const S=DATA.bsum, f=n=>Math.round(n).toLocaleString();
-  const big=(a)=>`<div class="big">${a.map(([v,l,r])=>`<div><b class="${r?'r':''}">${v}</b><span>${l}</span></div>`).join('')}</div>`;
+  // r: 'v' = unrecognized villages (red), 1 = recognized Arab towns (amber), 0 = Jewish towns (blue), none = neutral
+  const big=(a)=>`<div class="big">${a.map(([v,l,r])=>`<div><b class="${r==='v'?'v':r===0?'j':r?'r':''}">${v}</b><span>${l}</span></div>`).join('')}</div>`;
   const T3={ar:{},he:{},en:{}}; // per-language prose
   const tr3=o=>o[L]||o.en;
   // municipal fiscal capacity (MoI audited reports 2024) — what the missing industry costs
@@ -838,7 +845,7 @@ function chapterCard(key){
     return row('arab')+row('jewish'); };
   // unified gap card: one Arab line vs one Jewish line, same unit, and how many times bigger (red)
   const gapCard=({q,a,j,unit,x,xl,src})=>`<div class="gap"><div class="gh">${tr3({ar:'الفجوة',he:'הפער',en:'The gap'})}</div><div class="gq">${tr3(q)}</div>`+
-    `<div class="gr a"><span>${tr3(a.l)}</span><b>${a.v}${unit}</b></div><div class="gr j"><span>${tr3(j.l)}</span><b>${j.v}${unit}</b></div>`+
+    `<div class="gr a${/nrecognized|outside/i.test(a.l.en||'')?' v':''}"><span>${tr3(a.l)}</span><b>${a.v}${unit}</b></div><div class="gr j${/Bedouin|Arab/.test(j.l.en||'')?' ja':''}"><span>${tr3(j.l)}</span><b>${j.v}${unit}</b></div>`+
     (+x<1.1?`<div class="gx"><b>≈</b><span>${tr3({ar:'لا فجوة هنا لصالح البلدات اليهودية — الفجوة في هذا المؤشر هي في القرى غير المعترف بها (بدّلي المقارنة من الزر فوق).',he:'אין כאן פער לטובת היישובים היהודיים — הפער במדד הזה הוא בכפרים הלא מוכרים (החליפי השוואה בכפתור למעלה).',en:'No gap in favour of the Jewish towns here — on this measure the gap is in the unrecognized villages (switch the comparison above).'})}</span></div>`
       :`<div class="gx"><b>×${x}</b><span>${tr3(xl)}</span></div>`)+`<div class="src">${src}</div></div>`;
   const ratio=(hi,lo)=>{const r=hi/lo; return r>=10?Math.round(r):r.toFixed(1);};
@@ -862,6 +869,7 @@ function chapterCard(key){
   const bars=(rows,max,unit)=>`<div class="bars">${rows.map(r=>`<div class="br"><span class="bl">${r.label}</span><span class="bt"><span class="bf ${r.grp}" style="width:${max?Math.max(r.v/max*100,r.v?1.5:0):0}%"></span>${r.v?'':'<span class="b0">0</span>'}</span><span class="bv">${r.v?(+r.v).toLocaleString(undefined,{maximumFractionDigits:1}):''}${r.note||''}</span></div>`).join('')}</div>${unit?`<div class="bu">${unit}</div>`:''}`;
   if(key==='land'){
     const off=S?S.outside_recognized:0, nv=DATA.unrec.features.length;
+    const nightNote=`<button class="go" onclick="state.night=!state.night;applyState();renderPanel();">${tr3({ar:'☾ أضواء الليل: هل يعيش هنا ناس؟',he:'☾ אורות הלילה: האם גרים כאן אנשים?',en:'☾ Night lights: do people live here?'})}</button><p class="note2">${tr3({ar:'صورة الأضواء الليلية من القمر الصناعي (NASA 2012)، ظاهرة فقط فوق القرى غير المعترف بها. كل البلدات، بئر السبع أيضاً، معتّمة عن قصد: الضوء هنا يعني أن هناك حياة حيث تقول الخريطة الرسمية إنه لا يوجد شيء. ضوء المدن يفيض نحو كيلومترات، فالقرى القريبة من بلدة (2–5 كم حسب حجمها) محذوفة، حتى لا نعرض ضوء المدينة على أنه ضوء القرية. اضغطي مرة ثانية للإطفاء.',he:'תמונת אורות הלילה מהלוויין (NASA 2012), מוצגת רק מעל הכפרים הלא מוכרים. כל היישובים, גם באר שבע, מוחשכים בכוונה: אור כאן פירושו חיים במקום שבו המפה הרשמית אומרת שאין כלום. אור הערים זולג לקילומטרים, ולכן כפרים קרובים ליישוב (2–5 ק"מ לפי גודלו) הוסרו, כדי לא להציג את אור העיר כאור הכפר. לחיצה נוספת מכבה.',en:'Satellite night lights (NASA 2012), shown only over the unrecognized villages. Every town, Be\'er Sheva included, is blacked out on purpose: light here means life where the official map shows nothing. City light spills for kilometres, so villages within 2–5 km of a town (by its size) are left out, not to show the city glow as village light. Click again to switch off.'})}</p>`;
     const d26Block=()=>{ const D=DATA.d26; if(!D) return ''; const lk=a=>a.map(([l,u])=>`<a href="${u}" target="_blank" rel="noopener">${l} ↗</a>`).join(' · ');
       const ML={ar:['','كانون2','شباط','آذار','نيسان','أيار','حزيران','تموز','آب','أيلول','تشرين1','تشرين2'],he:['','ינו','פבר','מרץ','אפר','מאי','יוני','יולי','אוג','ספט','אוק','נוב'],en:['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov']}[L];
       return `<h4>${tr3({ar:'الهدم في 2026، قرية بقرية',he:'הריסות 2026, כפר אחר כפר',en:'Demolitions in 2026, village by village'})} <span id="d26m" style="color:var(--red)"></span></h4>`+
@@ -876,9 +884,9 @@ function chapterCard(key){
     T3.en=`<p>Each red square = buildings standing on the ground <b>outside every recognized locality limit</b>: homes with no blue line, no permit, no official water or power — and exposed to demolition.</p>`;
     const top=(S&&S.villages||[]).slice(0,8);
     return leg([['background:#e8452c',{ar:'مبانٍ خارج الحدود (مربع 250م، منظر بعيد)',he:'מבנים מחוץ לגבולות (ריבוע 250 מ\', מבט רחוק)',en:'off-map buildings (250 m cell, far view)'}],['border:2px solid #e8452c',{ar:'إطار تجمّع بدوي (قرّبي)',he:'מסגרת ריכוז בדואי (זום פנימה)',en:'Bedouin cluster frame (zoom in)'}],['background:#e8452c',{ar:'بيت في قرية غير معترف بها (قرّبي)',he:'בית בכפר לא מוכר (זום)',en:'house in unrecognized village (zoom in)'}],['background:#e8452c40;border:2px solid #e8452c',{ar:'بيت توسّع خارج الخط الأزرق',he:'בית בהרחבה מחוץ לקו הכחול',en:'house built beyond a blue line'}],['background:#e8452c;border-radius:50%',{ar:'قرية مرشّحة',he:'כפר מועמד',en:'candidate village'}],['background:#e9e6df',{ar:'بلدة عربية معترف بها',he:'יישוב ערבי מוכר',en:'recognized Arab locality'}],['border:2px solid #8a8a86',{ar:'بلدة يهودية',he:'יישוב יהודי',en:'Jewish locality'}]])+
-     big([[f(off),{ar:'مبنى خارج الحدود',he:'מבנים מחוץ לגבולות',en:'buildings off the map'}[L],1],[nv,{ar:'قرية مرشّحة',he:'כפרים מועמדים',en:'candidate villages'}[L],1]])+T3[L]+
+     big([[f(off),{ar:'مبنى خارج الحدود',he:'מבנים מחוץ לגבולות',en:'buildings off the map'}[L],'v'],[nv,{ar:'قرية مرشّحة',he:'כפרים מועמדים',en:'candidate villages'}[L],'v']])+T3[L]+
      (top.length?`<h4>${tr3({ar:'أكبر التجمعات خارج الحدود (عدد المباني ضمن 2 كم)',he:'הריכוזים הגדולים מחוץ לגבולות (מבנים ברדיוס 2 ק"מ)',en:'Largest off-map clusters (buildings within 2 km)'})}</h4>`+bars(top.map(v=>({label:L==='ar'?v.ar:v.en,v:v.buildings,grp:'red'})),top[0].buildings):'')+
-     d26Block()+
+     nightNote+d26Block()+
      `<div class="todo">${{ar:'قيد العمل: مقارنة البصمات مع صور 2014→2026 (أداة الذكاء الاصطناعي) لتحديد المباني المهدومة + مطابقة مع تقارير منتدى التعايش.',he:'בעבודה: השוואת טביעות המבנים לתצלומי 2014→2026 (כלי AI) לזיהוי מבנים שנהרסו + הצלבה עם דוחות פורום דו-קיום.',en:'In progress: matching footprints against 2014→2026 aerials (AI tool) to flag demolished buildings, cross-checked with NCF reports.'}[L]}</div>`+
      `<div class="src">Microsoft ML Building Footprints (2026) · מנהל התכנון · OSM. ${{ar:'المعيار: مبنى خارج كل الحدود المعترف بها، وعلى بُعد ≤2.5 كم من قرية مرشّحة أو داخل مجلسي نفيه مدبار/القسوم. تقدير أولي للتحقق.',he:'הכלל: מבנה מחוץ לכל גבול מוכר, ובמרחק ≤2.5 ק"מ מכפר מועמד או בתוך מ"א נווה מדבר/אל-קסום. אומדן ראשוני לאימות.',en:'Rule: building outside every recognized limit and ≤2.5 km from a candidate village or inside the Neve Midbar / al-Kasum councils. Preliminary estimate, to be verified.'}[L]}</div>`+landGap();
   }
@@ -1145,6 +1153,7 @@ function buildChapters(){
 }
 function openChapter(key,keepView){
   curChapter=key; document.querySelectorAll('#chapters button').forEach(b=>b.classList.toggle('on',b.dataset.k===key));
+  if(key!=='land') state.night=false; document.body.classList.toggle('ch-land',key==='land');
   const c=CHAPTERS.find(c=>c.key===key); document.body.classList.toggle('tl',!!(c&&c.timeline));
   if(!c){ stopPlayer(); resetHi(); document.getElementById('card').style.display='none'; return; }
   stopPlayer(); resetHi();
@@ -1272,7 +1281,7 @@ function showPair(i,mode='transit'){
   const where={unrec:{ar:'في التجمّع',he:'בריכוז',en:'in the cluster'},arab_town:{ar:'في البلدة',he:'ביישוב',en:'in the town'},jewish_town:{ar:'في البلدة',he:'ביישוב',en:'in the town'}};
   const V=p=>mode==='school'?{pct:p.school.pct_lt1k,med:p.school.median_m,n:p.school.n}:{pct:p.pct_lt400,med:p.median_m,n:p.n};
   const what=mode==='school'?{ar:'من البيوت على بُعد أقل من 1 كم من مدرسة ابتدائية',he:'מהבתים עד 1 ק"מ מבית ספר יסודי',en:'of homes within 1 km of an elementary school'}:{ar:'من البيوت على بُعد أقل من 400 م من محطة',he:'מהבתים עד 400 מ׳ מתחנה',en:'of homes within 400 m of a stop'};
-  const panel=(p,cls)=>{const v=V(p);return `<div class="pn ${cls}"><div class="ph"><b>${nm(p.name)}</b><small>${T4(KIND[p.kind])}</small></div>${pairSVG(p,W,mode)}`+
+  const panel=(p,cls)=>{const v=V(p);return `<div class="pn ${cls}${p.kind==='unrec'?' v':''}"><div class="ph"><b>${nm(p.name)}</b><small>${T4(KIND[p.kind])}</small></div>${pairSVG(p,W,mode)}`+
     `<div class="pv"><b>${v.pct}%</b><span>${T4(what)}<br>${T4({ar:'وسيط المسافة',he:'חציון המרחק',en:'median distance'})} ${v.med.toLocaleString()} ${T4({ar:'م',he:'מ׳',en:'m'})} · ${v.n.toLocaleString()} ${T4({ar:'مبنى',he:'מבנים',en:'buildings'})} ${T4(where[p.kind])}</span></div></div>`;};
   const va=V(P.a), vj=V(P.j);
   const x=va.pct>0?`×${(vj.pct/va.pct).toFixed(1)}`:'0';
@@ -1310,7 +1319,8 @@ let UNIT_MAX=1;
 function showFill(c,t,fin){ UNIT_MAX=Math.max(c.a,c.j);
   const top=Math.max(c.a,c.j), sv=v=>Math.min(v,t*top), d=v=>(+v).toFixed(c.dec||0);
   const side=(k,cls)=>{ const v=c[k], s=fin?v:sv(v), s2=c[k+'2']!=null?(fin?c[k+'2']:Math.min(c[k+'2'],t*Math.max(c.a2||0,c.j2||0))):null;
-    return `<div class="pn ${cls}"><div class="ph"><b>${T4(c.sides[k])}</b></div>${unitsHTML(c.kind,s,s2,cls,c.cells||100)}`+
+    const vv=k==='a'&&/nrecognized|village/i.test((c.sides[k]&&c.sides[k].en)||'')?' v':'';
+    return `<div class="pn ${cls}${vv}"><div class="ph"><b>${T4(c.sides[k])}</b></div>${unitsHTML(c.kind,s,s2,cls,c.cells||100)}`+
       `<div class="pv"><b>${d(s)}</b><span>${T4(c.unit)}${c.kind==='pupil'&&s2!=null?`<br>${Math.round(s2)} ${T4({ar:'معهم بجروت عامةً (المخطّط)',he:'עם בגרות כלשהי (מקווקו)',en:'with any bagrut (hatched)'})}`:''}</span></div></div>`; };
   pairsShow(pq(c.q)+`<div class="pp">${side('a','a')}${side('j','j')}</div>`+
     (fin?`<div class="pf"><span class="x">×${xN(c.j,c.a)}</span><span>${T4({ar:'الفرق بين الجهتين',he:'הפער בין שני הצדדים',en:'the gap between the two sides'})}</span></div>`:'')+
@@ -1340,8 +1350,9 @@ function applyState(){
   if(map.getLayer('place-lbl')&&DATA&&DATA.negevGeom) map.setFilter('place-lbl',state.mask?['all',LBL_BASE,['within',{type:'Feature',geometry:DATA.negevGeom,properties:{}}]]:LBL_BASE);
   Object.entries(LAYERMAP).forEach(([k,ids])=>ids.forEach(id=>map.getLayer(id)&&map.setLayoutProperty(id,'visibility',state[k]?'visible':'none')));
   // night mode: NASA lights as soft halos (the tiles stop at z8, so close up they blur), the street map hidden underneath
-  if(map.getLayer('night')){ map.setPaintProperty('night','raster-opacity',+NIGHT.op); map.setPaintProperty('night','raster-saturation',NIGHT.grey?-1:0);
-    if(state.night) BASE_IDS.forEach(id=>map.getLayer(id)&&map.setLayoutProperty(id,'visibility','none')); }
+  if(map.getLayer('night-v')){ map.setPaintProperty('night-v','raster-opacity',+NIGHT.op); map.setPaintProperty('night-v','raster-saturation',NIGHT.grey?-1:0); }
+  {
+    if(state.night) [...BASE_IDS,...LAYERMAP.frames,...LAYERMAP.grid,'demo-halo'].forEach(id=>map.getLayer(id)&&map.setLayoutProperty(id,'visibility','none')); }
   document.body.classList.toggle('night',!!state.night); const nb=document.getElementById('nightBtn'); if(nb) nb.classList.toggle('on',!!state.night);
   Object.keys(LAZY).forEach(k=>{ if(state[k]&&!lazyDone[k]&&map.getSource(LAZY[k][0][0])){ lazyDone[k]=1; LAZY[k].forEach(([sid,f])=>fetch('data/'+f).then(r=>r.json()).then(d=>map.getSource(sid).setData(d)).catch(()=>{lazyDone[k]=0;})); } });
   try{ localStorage.setItem('offmap-state',JSON.stringify(state)); }catch(e){}
@@ -1354,7 +1365,7 @@ function renderPanel(){
   const sw=(c,dash)=>`<span class="sw" style="${dash?`border-top:2px dashed ${c}`:`background:${c}`}"></span>`;
   const row=(k,label,swatch='',live=false)=>`<label class="row"><input type="checkbox" data-k="${k}" ${state[k]?'checked':''}><span class="box"></span>${label}${live?'<span class="live">LIVE</span>':''}${swatch}</label>`;
   const nightSet=`<div class="nset"><label>${T4({ar:'شدّة الأضواء',he:'עוצמת האורות',en:'Light strength'})} <input type="range" id="nightOp" min="0.2" max="1" step="0.05" value="${NIGHT.op}"></label><label><input type="checkbox" id="nightGrey" ${NIGHT.grey?'checked':''}> ${T4({ar:'أبيض وأسود',he:'שחור-לבן',en:'Black & white'})}</label></div>`;
-  const all=`<h3>${t('base')}</h3>${row('night',T4({ar:'وضع الليل: أضواء البلدات (NASA 2016)',he:'מצב לילה: אורות היישובים (NASA 2016)',en:'Night mode: town lights (NASA 2016)'}),'<span class="sw" style="background:radial-gradient(#fff,#000 70%)"></span>')}${state.night?nightSet:''}${row('basemap',t('basemap'))}${row('sat',t('sat'))}${row('mask',t('mask'))}${row('mask2',t('mask2'))}${row('labels',t('labels'))}
+  const all=`<h3>${t('base')}</h3>${curChapter==='land'?row('night',T4({ar:'أضواء الليل في القرى غير المعترف بها (NASA 2012)',he:'אורות הלילה בכפרים הלא מוכרים (NASA 2012)',en:'Night lights in the unrecognized villages (NASA 2012)'}),'<span class="sw" style="background:radial-gradient(#fff,#000 70%)"></span>'):''}${state.night?nightSet:''}${row('basemap',t('basemap'))}${row('sat',t('sat'))}${row('mask',t('mask'))}${row('mask2',t('mask2'))}${row('labels',t('labels'))}
     <h3>${t('bounds')}</h3>${row('arab',t('arab'),sw('#e9e6df'))}${row('jew',t('jew'),`<span class="sw" style="border:2px solid #8a8a86"></span>`)}${row('ind',t('ind'),sw('#5a5a55'))}${row('rc',t('rc'),sw('#8a8a86',1))}
     <h3>${t('red')}</h3>${row('unrec',t('unrec'),sw('#e8452c'))}${row('grid',CHT('offmapCell'),sw('#e8452c'))}${row('cbs',CH_TITLE[L].housing+' · 1870–2024',sw('#8a8a86'))}${row('transit',CH_TITLE[L].transit+' · GTFS',sw('#e8452c',1))}${row('access',CHT('access')+' · GTFS',sw('#ff5a3c'))}${row('svc',CHT('svc'),sw('#e9e6df'))}${row('noplan',T4({ar:'مبانٍ بلا مخطط مصدّق',he:'מבנים ללא תכנית מאושרת',en:'buildings with no approved plan'}),sw('#e8452c'))}${row('parks',T4({ar:'حدائق: على الورق / على الأرض',he:'גנים: על הנייר / בשטח',en:'Parks: on paper / on the ground'}),sw('#7fbf6a'))}${row('safety',T4({ar:'شرطة وإطفاء ومستشفيات + البُعد',he:'משטרה, כיבוי ובתי חולים + מרחק',en:'Police, fire & hospitals + distance'}),sw('#ff5a3c'))}${row('demo',t('demo'),'<span class="sw" style="color:#e8452c;font-weight:800;text-align:center">✕</span>')}
     <div class="note">${t('unrecNote')}</div>

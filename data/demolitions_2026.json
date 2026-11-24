@@ -1,45 +1,261 @@
 {
  "note": "Village-level demolition events in the Naqab, 2026, collected from news and NGO reports (checked 2026-11-24). Positions are the village, not the house; approx=true means the village location itself is approximate. n = structures (or orders) reported, used only for the ring size. kind: state = demolished by the authorities, self = demolished by the owners under orders, orders = demolition orders served (threat). Sources count different things; do not sum.",
  "totals": [
-  {"ar": "تقدير المجلس الإقليمي للقرى غير المعترف بها: نحو 19,300 مبنى ومنشأة هُدمت في النقب منذ 2023 حتى منتصف تشرين الأول 2026، منها نحو 2,900 بيت سكني (تقدير مبني على تقارير مديرية الإنفاذ في وزارة الأمن القومي).", "he": "הערכת המועצה לכפרים הלא מוכרים: כ-19,300 מבנים ומתקנים נהרסו בנגב מאז 2023 ועד אמצע אוקטובר 2026, מהם כ-2,900 בתי מגורים (הערכה על בסיס דו\"חות מינהלת האכיפה במשרד לביטחון לאומי).", "en": "RCUV estimate: about 19,300 structures demolished in the Naqab from 2023 to mid-October 2026, about 2,900 of them homes (estimate based on the Enforcement Directorate's reports, Ministry of National Security).", "src": [["RCUV (X)", "https://x.com/rcuvnegev/status/2109719329382031688"], ["זו הדרך", "https://zoha.org.il/148627/"]]},
-  {"ar": "عدالة (شباط 2026): أكثر من 14,000 مبنى هُدم منذ 2023.", "he": "עדאלה (פברואר 2026): יותר מ-14,000 מבנים נהרסו מאז 2023.", "en": "Adalah (Feb 2026): more than 14,000 structures demolished since 2023.", "src": [["Adalah — On the Brink (PDF)", "https://www.adalah.org/uploads/uploads/Forced_Displacement_Naqab_2026.pdf"]]}
+  {
+   "ar": "تقدير المجلس الإقليمي للقرى غير المعترف بها: نحو 19,300 مبنى ومنشأة هُدمت في النقب منذ 2023 حتى منتصف تشرين الأول 2026، منها نحو 2,900 بيت سكني (تقدير مبني على تقارير مديرية الإنفاذ في وزارة الأمن القومي).",
+   "he": "הערכת המועצה לכפרים הלא מוכרים: כ-19,300 מבנים ומתקנים נהרסו בנגב מאז 2023 ועד אמצע אוקטובר 2026, מהם כ-2,900 בתי מגורים (הערכה על בסיס דו\"חות מינהלת האכיפה במשרד לביטחון לאומי).",
+   "en": "RCUV estimate: about 19,300 structures demolished in the Naqab from 2023 to mid-October 2026, about 2,900 of them homes (estimate based on the Enforcement Directorate's reports, Ministry of National Security).",
+   "src": [
+    [
+     "RCUV (X)",
+     "https://x.com/rcuvnegev/status/2109719329382031688"
+    ],
+    [
+     "זו הדרך",
+     "https://zoha.org.il/148627/"
+    ]
+   ]
+  },
+  {
+   "ar": "عدالة (شباط 2026): أكثر من 14,000 مبنى هُدم منذ 2023.",
+   "he": "עדאלה (פברואר 2026): יותר מ-14,000 מבנים נהרסו מאז 2023.",
+   "en": "Adalah (Feb 2026): more than 14,000 structures demolished since 2023.",
+   "src": [
+    [
+     "Adalah — On the Brink (PDF)",
+     "https://www.adalah.org/uploads/uploads/Forced_Displacement_Naqab_2026.pdf"
+    ]
+   ]
+  }
  ],
  "events": [
-  {"id": "jrabah", "m": 2, "date": "02.2026", "c": [35.075, 31.052], "approx": true, "kind": "state", "n": 40,
-   "ar": "رأس جرابة", "he": "ראס ג'ראבה", "en": "Ras Jrabah",
-   "t": {"ar": "نحو نصف بيوت القرية هُدمت، ودعاوى الإخلاء لتوسيع ديمونا ما زالت في المحاكم.", "he": "כמחצית מבתי הכפר נהרסו, ותביעות הפינוי להרחבת דימונה עדיין בבתי המשפט.", "en": "About half of the village's homes demolished; eviction suits to expand Dimona still pending."},
-   "src": [["Adalah (PDF)", "https://www.adalah.org/uploads/uploads/Forced_Displacement_Naqab_2026.pdf"]]},
-  {"id": "sir-apr", "m": 4, "date": "20.04.2026", "c": [34.8067, 31.1969], "approx": false, "kind": "state", "n": 40,
-   "ar": "السر", "he": "א-סר", "en": "al-Sir",
-   "t": {"ar": "هدم عشرات البيوت، بعد حملة أواخر 2025 هدمت معظم القرية. نحو 1,500 ساكن مهدّدون بالتهجير.", "he": "הריסת עשרות בתים, אחרי מבצע בסוף 2025 שהרס את רוב הכפר. כ-1,500 תושבים בסכנת עקירה.", "en": "Dozens of homes demolished, after a late-2025 campaign destroyed most of the village; about 1,500 people face displacement."},
-   "src": [["+972 Magazine", "https://www.972mag.com/tel-arad-a-sir-bedouin-naqab-demolitions/"], ["PressTV via GlobalSecurity", "https://www.globalsecurity.org/military/library/news/2026/04/mil-260420-presstv02.htm"]]},
-  {"id": "sir-jun", "m": 6, "date": "16.06.2026", "c": [34.8067, 31.1969], "approx": false, "kind": "self", "n": 20,
-   "ar": "السر", "he": "א-סר", "en": "al-Sir",
-   "t": {"ar": "عائلة الأفشق هدمت نحو 20 بيتاً بأيديها تحت أوامر الهدم.", "he": "משפחת אל-אפשק הרסה בעצמה כ-20 בתים תחת צווי הריסה.", "en": "The al-Afshaq family demolished about 20 of their own homes under demolition orders."},
-   "src": [["ألترا فلسطين", "https://ultrapal.ultrasawt.com/%D8%B3%D9%8A%D8%A7%D8%B3%D8%A9-%D9%85%D8%AA%D8%B5%D8%A7%D8%B9%D8%AF%D8%A9-%D9%87%D8%AF%D9%85-20-%D9%85%D9%86%D8%B2%D9%84%D9%8B%D8%A7-%D9%81%D9%8A-%D8%A7%D9%84%D9%86%D9%82%D8%A8/%D8%A7%D9%84%D8%AA%D8%B1%D8%A7-%D9%81%D9%84%D8%B3%D8%B7%D9%8A%D9%86/%D8%A3%D8%AE%D8%A8%D8%A7%D8%B1"]]},
-  {"id": "telarad", "m": 6, "date": "06.2026", "c": [35.1453, 31.2919], "approx": false, "kind": "self", "n": 30,
-   "ar": "تل عراد", "he": "תל ערד", "en": "Tel Arad",
-   "t": {"ar": "نحو 200 من عائلة النباري أُجبروا على هدم بيوتهم بعد حكم محكمة سنة 2025.", "he": "כ-200 בני משפחת א-נבארי נאלצו להרוס את בתיהם אחרי פסק דין מ-2025.", "en": "About 200 members of the al-Nabari family forced to demolish their homes after a 2025 court ruling."},
-   "src": [["IMEMC", "https://imemc.org/article/israel-forces-tel-arad-families-to-demolish-homes/"], ["+972 Magazine", "https://www.972mag.com/tel-arad-a-sir-bedouin-naqab-demolitions/"]]},
-  {"id": "dahiya", "m": 10, "date": "12.10.2026", "c": [34.765, 31.425], "approx": true, "kind": "state", "n": 80,
-   "ar": "الظحية", "he": "א-ד'היה", "en": "al-Dahiya",
-   "t": {"ar": "هدم نحو 60–80 بيتاً لعائلة أبو وادي ومسجد القرية (نحو 300–400 ساكن)، بعد أن رفضت المحكمة المركزية في بئر السبع تجميد الأوامر.", "he": "הריסת כ-60–80 בתים של משפחת אבו ואדי ומסגד הכפר (כ-300–400 תושבים), אחרי שבית המשפט המחוזי בבאר שבע סירב להקפיא את הצווים.", "en": "About 60–80 homes of the Abu Wadi family and the village mosque demolished (300–400 people), after the Be'er Sheva district court refused to freeze the orders."},
-   "src": [["WAFA", "https://english.wafa.ps/Pages/Details/175758"], ["Al-Monitor", "https://www.al-monitor.com/originals/2026/10/holding-our-ground-israel-demolishes-dozens-bedouin-homes"], ["Middle East Monitor", "https://www.middleeastmonitor.com/20261012-israel-demolishes-80-homes-in-palestinian-village-in-negev-displaces-around-400-people/"]]},
-  {"id": "rahat", "m": 10, "date": "10.2026", "c": [34.7547, 31.3934], "approx": false, "kind": "state", "n": 6,
-   "ar": "رهط", "he": "רהט", "en": "Rahat",
-   "t": {"ar": "هدم بيوت ومنشآت زراعية داخل مدينة رهط.", "he": "הריסת בתים ומבנים חקלאיים בתוך רהט.", "en": "Homes and farm structures demolished inside Rahat."},
-   "src": [["WAFA", "https://english.wafa.ps/Pages/Details/175833"]]},
-  {"id": "qrenat", "m": 10, "date": "10.2026", "c": [34.9716, 31.1457], "approx": false, "kind": "self", "n": 50,
-   "ar": "أبو قرينات", "he": "אבו קרינאת", "en": "Abu Qrenat",
-   "t": {"ar": "السكان هدموا عشرات البيوت بأيديهم خلال نهاية أسبوع واحدة؛ أوامر الهدم شملت 50 بيتاً ومسجداً.", "he": "התושבים הרסו בעצמם עשרות בתים בסוף שבוע אחד; צווי ההריסה חלו על 50 בתי מגורים ומסגד.", "en": "Residents demolished dozens of their own homes over one weekend; the orders covered 50 homes and a mosque."},
-   "src": [["עדאלה", "https://www.adalah.org/he/content/view/11722"]]},
-  {"id": "numayla", "m": 10, "date": "19.10.2026", "c": [34.7745, 31.4135], "approx": true, "kind": "state", "n": 3,
-   "ar": "أم نميلة (الزيادنة)", "he": "אום נמילה (זיאדנה)", "en": "Umm Numayla (Ziyadna)",
-   "t": {"ar": "هدم ثلاثة بيوت، وفي اليوم نفسه منشآت في أبو قرينات.", "he": "הריסת שלושה בתים, ובאותו יום מבנים באבו קרינאת.", "en": "Three homes demolished; structures in Abu Qrenat the same day."},
-   "src": [["WAFA", "https://english.wafa.ps/Pages/Details/176046"]]},
-  {"id": "naam", "m": 11, "date": "22.11.2026", "c": [34.816, 31.162], "approx": true, "kind": "orders", "n": 600,
-   "ar": "وادي النعم", "he": "ואדי אל-נעם", "en": "Wadi al-Na'am",
-   "t": {"ar": "تسليم نحو 600 أمر هدم في واحدة من أكبر القرى غير المعترف بها (الرقم من اللجنة المحلية، غير متحقَّق منه بشكل مستقل).", "he": "חלוקת כ-600 צווי הריסה באחד הכפרים הלא מוכרים הגדולים (המספר מהוועד המקומי, לא אומת באופן עצמאי).", "en": "About 600 demolition orders served in one of the largest unrecognized villages (figure from the local committee, not independently verified)."},
-   "src": [["The New Arab", "https://www.newarab.com/news/israel-threatens-bedouins-demolitions-election-revenge"], ["Negev Coexistence Forum — village page", "https://www.dukium.org/village/wadi-a-naam/"]]}
+  {
+   "id": "jrabah",
+   "m": 2,
+   "date": "02.2026",
+   "c": [
+    35.075,
+    31.052
+   ],
+   "approx": true,
+   "kind": "state",
+   "n": 40,
+   "ar": "رأس جرابة",
+   "he": "ראס ג'ראבה",
+   "en": "Ras Jrabah",
+   "t": {
+    "ar": "نحو نصف بيوت القرية هُدمت، ودعاوى الإخلاء لتوسيع ديمونا ما زالت في المحاكم.",
+    "he": "כמחצית מבתי הכפר נהרסו, ותביעות הפינוי להרחבת דימונה עדיין בבתי המשפט.",
+    "en": "About half of the village's homes demolished; eviction suits to expand Dimona still pending."
+   },
+   "src": [
+    [
+     "Adalah (PDF)",
+     "https://www.adalah.org/uploads/uploads/Forced_Displacement_Naqab_2026.pdf"
+    ]
+   ]
+  },
+  {
+   "id": "sir-apr",
+   "m": 4,
+   "date": "20.04.2026",
+   "c": [
+    34.8067,
+    31.1969
+   ],
+   "approx": false,
+   "kind": "state",
+   "n": 40,
+   "ar": "السر",
+   "he": "א-סר",
+   "en": "al-Sir",
+   "t": {
+    "ar": "هدم عشرات البيوت، بعد حملة أواخر 2025 هدمت معظم القرية. نحو 1,500 ساكن مهدّدون بالتهجير.",
+    "he": "הריסת עשרות בתים, אחרי מבצע בסוף 2025 שהרס את רוב הכפר. כ-1,500 תושבים בסכנת עקירה.",
+    "en": "Dozens of homes demolished, after a late-2025 campaign destroyed most of the village; about 1,500 people face displacement."
+   },
+   "src": [
+    [
+     "+972 Magazine",
+     "https://www.972mag.com/tel-arad-a-sir-bedouin-naqab-demolitions/"
+    ],
+    [
+     "PressTV via GlobalSecurity",
+     "https://www.globalsecurity.org/military/library/news/2026/04/mil-260420-presstv02.htm"
+    ]
+   ]
+  },
+  {
+   "id": "sir-jun",
+   "m": 6,
+   "date": "16.06.2026",
+   "c": [
+    34.8067,
+    31.1969
+   ],
+   "approx": false,
+   "kind": "self",
+   "n": 20,
+   "ar": "السر",
+   "he": "א-סר",
+   "en": "al-Sir",
+   "t": {
+    "ar": "عائلة الأفشق هدمت نحو 20 بيتاً بأيديها تحت أوامر الهدم.",
+    "he": "משפחת אל-אפשק הרסה בעצמה כ-20 בתים תחת צווי הריסה.",
+    "en": "The al-Afshaq family demolished about 20 of their own homes under demolition orders."
+   },
+   "src": [
+    [
+     "ألترا فلسطين",
+     "https://ultrapal.ultrasawt.com/%D8%B3%D9%8A%D8%A7%D8%B3%D8%A9-%D9%85%D8%AA%D8%B5%D8%A7%D8%B9%D8%AF%D8%A9-%D9%87%D8%AF%D9%85-20-%D9%85%D9%86%D8%B2%D9%84%D9%8B%D8%A7-%D9%81%D9%8A-%D8%A7%D9%84%D9%86%D9%82%D8%A8/%D8%A7%D9%84%D8%AA%D8%B1%D8%A7-%D9%81%D9%84%D8%B3%D8%B7%D9%8A%D9%86/%D8%A3%D8%AE%D8%A8%D8%A7%D8%B1"
+    ]
+   ]
+  },
+  {
+   "id": "telarad",
+   "m": 6,
+   "date": "06.2026",
+   "c": [
+    35.1453,
+    31.2919
+   ],
+   "approx": false,
+   "kind": "self",
+   "n": 30,
+   "ar": "تل عراد",
+   "he": "תל ערד",
+   "en": "Tel Arad",
+   "t": {
+    "ar": "نحو 200 من عائلة النباري أُجبروا على هدم بيوتهم بعد حكم محكمة سنة 2025.",
+    "he": "כ-200 בני משפחת א-נבארי נאלצו להרוס את בתיהם אחרי פסק דין מ-2025.",
+    "en": "About 200 members of the al-Nabari family forced to demolish their homes after a 2025 court ruling."
+   },
+   "src": [
+    [
+     "IMEMC",
+     "https://imemc.org/article/israel-forces-tel-arad-families-to-demolish-homes/"
+    ],
+    [
+     "+972 Magazine",
+     "https://www.972mag.com/tel-arad-a-sir-bedouin-naqab-demolitions/"
+    ]
+   ]
+  },
+  {
+   "id": "dahiya",
+   "m": 10,
+   "date": "12.10.2026",
+   "c": [
+    34.765,
+    31.425
+   ],
+   "approx": true,
+   "kind": "state",
+   "n": 80,
+   "ar": "الظحية",
+   "he": "א-ד'היה",
+   "en": "al-Dahiya",
+   "t": {
+    "ar": "هدم نحو 60–80 بيتاً لعائلة أبو وادي ومسجد القرية (نحو 300–400 ساكن)، بعد أن رفضت المحكمة المركزية في بئر السبع تجميد الأوامر.",
+    "he": "הריסת כ-60–80 בתים של משפחת אבו ואדי ומסגד הכפר (כ-300–400 תושבים), אחרי שבית המשפט המחוזי בבאר שבע סירב להקפיא את הצווים.",
+    "en": "About 60–80 homes of the Abu Wadi family and the village mosque demolished (300–400 people), after the Be'er Sheva district court refused to freeze the orders."
+   },
+   "src": [
+    [
+     "WAFA",
+     "https://english.wafa.ps/Pages/Details/175758"
+    ],
+    [
+     "Al-Monitor",
+     "https://www.al-monitor.com/originals/2026/10/holding-our-ground-israel-demolishes-dozens-bedouin-homes"
+    ],
+    [
+     "Middle East Monitor",
+     "https://www.middleeastmonitor.com/20261012-israel-demolishes-80-homes-in-palestinian-village-in-negev-displaces-around-400-people/"
+    ]
+   ]
+  },
+  {
+   "id": "qrenat",
+   "m": 10,
+   "date": "10.2026",
+   "c": [
+    34.9716,
+    31.1457
+   ],
+   "approx": false,
+   "kind": "self",
+   "n": 50,
+   "ar": "أبو قرينات",
+   "he": "אבו קרינאת",
+   "en": "Abu Qrenat",
+   "t": {
+    "ar": "السكان هدموا عشرات البيوت بأيديهم خلال نهاية أسبوع واحدة؛ أوامر الهدم شملت 50 بيتاً ومسجداً.",
+    "he": "התושבים הרסו בעצמם עשרות בתים בסוף שבוע אחד; צווי ההריסה חלו על 50 בתי מגורים ומסגד.",
+    "en": "Residents demolished dozens of their own homes over one weekend; the orders covered 50 homes and a mosque."
+   },
+   "src": [
+    [
+     "עדאלה",
+     "https://www.adalah.org/he/content/view/11722"
+    ]
+   ]
+  },
+  {
+   "id": "numayla",
+   "m": 10,
+   "date": "19.10.2026",
+   "c": [
+    34.7745,
+    31.4135
+   ],
+   "approx": true,
+   "kind": "state",
+   "n": 3,
+   "ar": "أم نميلة (الزيادنة)",
+   "he": "אום נמילה (זיאדנה)",
+   "en": "Umm Numayla (Ziyadna)",
+   "t": {
+    "ar": "هدم ثلاثة بيوت، وفي اليوم نفسه منشآت في أبو قرينات.",
+    "he": "הריסת שלושה בתים, ובאותו יום מבנים באבו קרינאת.",
+    "en": "Three homes demolished; structures in Abu Qrenat the same day."
+   },
+   "src": [
+    [
+     "WAFA",
+     "https://english.wafa.ps/Pages/Details/176046"
+    ]
+   ]
+  },
+  {
+   "id": "naam",
+   "m": 11,
+   "date": "22.11.2026",
+   "c": [
+    34.816,
+    31.162
+   ],
+   "approx": true,
+   "kind": "orders",
+   "n": 600,
+   "ar": "وادي النعم",
+   "he": "ואדי אל-נעם",
+   "en": "Wadi al-Na'am",
+   "t": {
+    "ar": "تسليم نحو 600 أمر هدم في واحدة من أكبر القرى غير المعترف بها (الرقم من اللجنة المحلية، غير متحقَّق منه بشكل مستقل).",
+    "he": "חלוקת כ-600 צווי הריסה באחד הכפרים הלא מוכרים הגדולים (המספר מהוועד המקומי, לא אומת באופן עצמאי).",
+    "en": "About 600 demolition orders served in one of the largest unrecognized villages (figure from the local committee, not independently verified)."
+   },
+   "src": [
+    [
+     "The New Arab",
+     "https://www.newarab.com/news/israel-threatens-bedouins-demolitions-election-revenge"
+    ],
+    [
+     "Negev Coexistence Forum — village page",
+     "https://www.dukium.org/village/wadi-a-naam/"
+    ]
+   ]
+  }
  ]
 }

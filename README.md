@@ -71,10 +71,14 @@ The frames are drawn by `gif.html` from the same data files and formulas as the 
 ## Added 24.11.2026
 
 - **Compare button** (header): the red side of the gap cards switches between the unrecognized villages and the recognized Arab towns (ch. 04 bus, 05 school, 06 police, and the ch. 04 pairs player). Where the towns are not behind, the card says so instead of showing ×1.
-- **Night lights** (ch. 01 only, off by default, moon button or the card button): NASA VIIRS City Lights 2012 cut to ~1 km cells around the unrecognized villages, minus every town's glow radius (2 km + 1.5 km per tenfold population), so Be'er Sheva and the towns stay dark and only the villages' own light shows. Built by `scripts/night_villages.py` into `data/night_villages.png`. Strength slider and black & white switch.
+- **Night mode** (ch. 01 only, off by default, moon button or the card button): the whole map turns into a black & white NASA VIIRS night photo (City Lights 2012, GIBS), and the unrecognized villages glow red on top. The red glow (`data/night_villages.png`, `scripts/night_villages.py`) is the satellite light inside ~1 km cells around the villages, minus every town's glow radius (2 km + 1.5 km per tenfold population).
 - **Demolitions 2026** (ch. 01): `data/demolitions_2026.json`, one dashed ring per village (not per house), size ∝ √structures reported, red = demolished by the authorities, orange = self-demolished under orders, white = orders served. Each ring links to its news / NGO source; "Play 2026 month by month" in the card. Sources count different things, so they are not added up.
 - **Ch. 04**: a note on Segev Shalom and Hura (stops only on the main road), from the per-town numbers already in `transit_access.json`.
 - **Ch. 02**: the 1948→2024 timeline runs in about 5 s, starting on the whole country and closing in on the Naqab.
 - Mobile: header and chapter tabs no longer overlap.
 - **Three colours** across the cards: unrecognized villages red, recognized Arab / Bedouin towns amber, Jewish towns blue (bars, big numbers, gap cards, the pairs player).
 - Ch. 01 map shows the villages only (no town limits); the Rahat demolition item was dropped from the 2026 list for the same reason.
+- **Docked layout** (desktop): the chapter card is a full-height column on one side, the comparison/GIF panel a full-height column on the other, the player a strip on top of the map; tools and layers sit next to the card. The map keeps its centre in the visible part.
+- **Chapter lead**: every card opens with one headline and one line under it (`CH_LEAD`).
+- **Villages / towns mode** also switches the map (ch. 04–07): villages mode hides the Arab towns' layers, towns mode hides the village layers and shows the Arab town limits. Gap cards with no village data (land per resident, sport per youth, bagrut, parks, lethal violence) are hidden in villages mode. Ch. 02 and 03 have no village data: the button is greyed out there and the card says so.
+- **Industrial zones** on the map: Arab amber, Jewish blue, Idan HaNegev (shared, Rahat 44%) striped in both; the per-town squares and the comparison blocks use the same two colours.

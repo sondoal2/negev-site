@@ -29,7 +29,7 @@ header{position:fixed;inset:0 0 auto 0;height:64px;background:#000;display:flex;
 .section{font-weight:500;letter-spacing:.12em;text-transform:uppercase;font-size:17px;margin-inline-start:10px}
 .demo-link{margin-inline-start:auto;color:#000;background:var(--red);font-weight:700;font-size:13px;padding:7px 10px;text-decoration:none;white-space:nowrap}
 .tour-link{background:var(--bone)} .tour-link+.demo-link{margin-inline-start:6px}
-.cmp-link{margin-inline-start:6px;border:0;cursor:pointer;background:#2a2a28;color:var(--bone)} .cmp-link b{color:var(--red)}
+.cmp-link{margin-inline-start:6px;border:0;cursor:pointer;background:#2a2a28;color:var(--bone)} .cmp-link b{color:var(--red)} .cmp-link.off{opacity:.3;pointer-events:none}
 .cmp-link .sm{display:none} @media (max-width:900px){.cmp-link .lg{display:none}.cmp-link .sm{display:inline}.cmp-link{padding:7px 6px}}
 @media (max-width:600px){header .brand{display:none} header .demo-link{font-size:11px;padding:6px 6px} header{gap:4px;padding:0 8px} .nav button{width:32px!important} .nav{gap:0}}
 .brand{margin-inline-start:14px;font-weight:800;font-size:30px;letter-spacing:-.01em;font-family:"Jost",sans-serif;direction:ltr;white-space:nowrap}
@@ -194,7 +194,7 @@ body.panel.pairs #pairs{inset-inline-start:332px;width:min(760px,calc(100% - 760
 #pairs .pitches{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;align-content:start;min-height:210px;background:#151514;padding:8px}
 #pairs .pitch{display:block;width:100%;height:auto}
 #pairs .blk{min-height:210px;background:#151514;display:flex;align-items:flex-end;justify-content:center;padding:14px 14px 18px}
-#pairs .blk i{display:block;background:#f2c230;box-shadow:10px -10px 0 #a8861f;transition:width .3s,height .3s}
+#pairs .blk i{display:block;background:var(--tJ);box-shadow:10px -10px 0 #3e5d80;transition:width .3s,height .3s} #pairs .pn.a .blk i{background:var(--tA);box-shadow:10px -10px 0 #9a6210}
 #pairs .coins{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;align-content:end;min-height:210px;background:#151514;padding:8px}
 #pairs .coins i{display:flex;align-items:center;justify-content:center;aspect-ratio:1;border-radius:50%;background:#e9e6df;color:#000;font-style:normal;font-weight:800;font-size:12px;border:2px solid #8a8a86}
 #pairs .pn.a .coins i{background:var(--tA);border-color:#000} #pairs .pn.a.v .coins i{background:var(--red)} #pairs .pn.j .coins i{background:var(--tJ);border-color:#000} #pairs .coins i.pt{opacity:.45}
@@ -278,6 +278,25 @@ body.chap #stats{display:none}
   #about .wrap{grid-template-columns:1fr}
   #yearL{left:8px} #yearR{right:60px}
 }
+/* ---------- docked layout (desktop) ---------- */
+:root{--cardW:390px;--pairsW:min(600px,42vw)}
+@media (min-width:901px){
+  body.chap #card{top:0;bottom:0;inset-inline-end:0;width:var(--cardW);max-height:none;box-shadow:none;border-inline-start:3px solid #000}
+  body.chap #player{left:auto;right:auto;top:0;inset-inline-start:0;inset-inline-end:var(--cardW);transform:none;max-width:none;width:auto;border-width:0 0 1px 0}
+  body.chap #pairs{top:45px;bottom:0;inset-inline-start:0;width:var(--pairsW);min-width:0;overflow:auto;box-shadow:none;border-width:0;border-inline-end:2px solid #000}
+  body.panel.pairs #pairs{inset-inline-start:0;width:var(--pairsW);min-width:0}
+  body.chap #tools{top:12px!important;inset-inline-end:calc(var(--cardW) + 12px);inset-inline-start:auto}
+  body.chap.pl #tools{top:57px!important}
+  body.chap #panel{top:12px!important;inset-inline-start:auto;inset-inline-end:calc(var(--cardW) + 66px);max-height:calc(100% - 24px)!important}
+  body.chap.pl #panel{top:57px!important}
+  body.chap #timeline{left:auto;right:auto;transform:none;inset-inline-start:0;inset-inline-end:var(--cardW);margin:0 auto;width:fit-content}
+}
+/* chapter lead: one headline + one line under it */
+#card .lead{background:#000;color:var(--bone);padding:0 14px 12px}
+#card .lead b{display:block;font-size:20px;line-height:1.25;font-weight:800}
+#card .lead span{display:block;font-size:13px;line-height:1.4;color:var(--fog);margin-top:4px}
+#card .scope{font-size:11px;background:#000;color:var(--bone);padding:5px 10px;margin-bottom:10px}
+body.cmp-unrec #card .only-towns{display:none}
 </style>
 </head>
 <body>
@@ -449,6 +468,9 @@ async function loadData(){
   const tprof = await get('town_profile.json').catch(()=>null);
   const d26 = await get('demolitions_2026.json').catch(()=>null);
   indJ.features.forEach(f=>f.properties.grp='jewish'); indA.features.forEach(f=>f.properties.grp='arab');
+  // Idan HaNegev is shared (Rahat 44% / Lehavim and partners 56%, team table): one striped polygon instead of two copies
+  { const seen=new Set(); [indA,indJ].forEach(fc=>{ fc.features=fc.features.filter(f=>{ const p=f.properties, nm=p.NAME_1||p.NAME||'';
+      if(nm.startsWith('עידן הנגב')){ p.grp='shared'; const k=p.FID_INDUSTRIAL; if(seen.has(k)) return false; seen.add(k); } return true; }); }); }
   bldJ.features.forEach(f=>f.properties.grp='jewish'); bldA.features.forEach(f=>f.properties.grp='arab');
   const ind = {type:'FeatureCollection',features:[...indJ.features,...indA.features]};
   const indBld = {type:'FeatureCollection',features:[...bldJ.features,...bldA.features]};
@@ -486,7 +508,7 @@ function baseStyle(){
    layers:[
     {id:'bg',type:'background',paint:{'background-color':'#151514'}},
     {id:'sat',type:'raster',source:'sat',layout:{visibility:'none'},paint:{'raster-saturation':-1,'raster-contrast':.25,'raster-brightness-max':.85}},
-    {id:'night',type:'raster',source:'night',layout:{visibility:'none'},paint:{'raster-opacity':.9,'raster-saturation':-1,'raster-contrast':.7,'raster-brightness-min':0,'raster-fade-duration':0}},
+    {id:'night',type:'raster',source:'night',layout:{visibility:'none'},paint:{'raster-opacity':.8,'raster-saturation':-1,'raster-contrast':.35,'raster-brightness-max':.9,'raster-fade-duration':0}},
     {id:'landuse',type:'fill',source:'omt','source-layer':'landuse',group:'base',paint:{'fill-color':'#1c1c1b'}},
     {id:'water',type:'fill',source:'omt','source-layer':'water',group:'base',paint:{'fill-color':'#070707'}},
     {id:'wadi',type:'line',source:'omt','source-layer':'waterway',group:'base',minzoom:9,paint:{'line-color':'#2a2a28','line-width':['interpolate',['linear'],['zoom'],9,.4,14,1.6]}},
@@ -520,10 +542,10 @@ try{ Object.assign(state, JSON.parse(localStorage.getItem('offmap-state')||'{}')
 state.night=false; // night lights open only on demand, in chapter 01
 const BASE_IDS=['landuse','water','wadi','bld','rd-minor','rd-mid','rd-major','rail'];
 const LAYERMAP = {
-  basemap:BASE_IDS, sat:['sat'], night:['night-v'], mask:['mask','negev-edge'], labels:['place-lbl'],
+  basemap:BASE_IDS, sat:['sat'], night:['night','night-v'], mask:['mask','negev-edge'], labels:['place-lbl'],
   arab:['loc-arab-fill','loc-arab-line','loc-arab-lbl'], jew:['loc-jew-line','loc-jew-lbl'], ind:['loc-ind'], rc:['rc-line'],
   unrec:['un-cluster','un-count','un-pt','un-lbl'], demo:['demo-halo','demo-pt','d26-hit','d26-ring','d26-lbl'],
-  indJ:['ind-j-fill','ind-j-line'], indA:['ind-a-fill','ind-a-line'], arab7:['arab7-line'],
+  indJ:['ind-j-fill','ind-j-line'], indA:['ind-a-fill','ind-a-line','ind-s-fill','ind-s-line','ind-s-lbl'], arab7:['arab7-line'],
   grid:['grid-fill'], frames:['frames-fill','frames-halo','frames-line','frames-line-e','frames-lbl','bld-u','bld-e','bld-e-line'], mask2:['mask2'], nat:['nat-arab','nat-arab-line','nat-jew','nat-new','nat-bt'], routes:['rt-line','rt-miss','rt-miss-lbl'], cbs:['cbs-pt','cbs-new'], transit:['tr-circ','tr-num','tr-name','tr-dest','tr-dest-lbl'], access:['acc-grid','acc-bld','acc-stop'], svc:['svc-grid','svc-sport-l','svc-sport','svc-school','svc-clinic'], econ:['econ-link','econ-link-lbl','econ-sq','econ-zero','econ-num','econ-name'],
   jew11:['jew11-line'], indBld:['indbld-fill'],
   xplan:['live-xplan'], landuse:['live-landuse'], tmm:['live-tmm'], vatmal:['live-vatmal'],
@@ -560,10 +582,15 @@ map.once('style.load', async ()=>{
   map.addSource('arab7',{type:'geojson',data:DATA.arab7});
   map.addLayer({id:'arab7-line',type:'line',source:'arab7',paint:{'line-color':'#e9e6df','line-width':2.5,'line-dasharray':[1,1.5]}});
   map.addSource('ind',{type:'geojson',data:DATA.ind});
-  map.addLayer({id:'ind-j-fill',type:'fill',source:'ind',filter:['==',['get','grp'],'jewish'],paint:{'fill-color':'#f2c230','fill-opacity':.55}});
-  map.addLayer({id:'ind-j-line',type:'line',source:'ind',filter:['==',['get','grp'],'jewish'],paint:{'line-color':'#f2c230','line-width':1.2}});
-  map.addLayer({id:'ind-a-fill',type:'fill',source:'ind',filter:['==',['get','grp'],'arab'],paint:{'fill-color':'#f2c230','fill-opacity':.95}});
+  { const c=document.createElement('canvas'); c.width=c.height=12; const g=c.getContext('2d'); g.fillStyle='#6f93bd'; g.fillRect(0,0,12,12); g.strokeStyle='#e39a2d'; g.lineWidth=4; [-12,0,12].forEach(o=>{g.beginPath();g.moveTo(o,12);g.lineTo(o+12,0);g.stroke();});
+    map.addImage('idan-stripe',g.getImageData(0,0,12,12)); }
+  map.addLayer({id:'ind-j-fill',type:'fill',source:'ind',filter:['==',['get','grp'],'jewish'],paint:{'fill-color':'#6f93bd','fill-opacity':.75}});
+  map.addLayer({id:'ind-j-line',type:'line',source:'ind',filter:['==',['get','grp'],'jewish'],paint:{'line-color':'#9db8d6','line-width':1.2}});
+  map.addLayer({id:'ind-a-fill',type:'fill',source:'ind',filter:['==',['get','grp'],'arab'],paint:{'fill-color':'#e39a2d','fill-opacity':.95}});
   map.addLayer({id:'ind-a-line',type:'line',source:'ind',filter:['==',['get','grp'],'arab'],paint:{'line-color':'#000','line-width':2}});
+  map.addLayer({id:'ind-s-fill',type:'fill',source:'ind',filter:['==',['get','grp'],'shared'],paint:{'fill-pattern':'idan-stripe','fill-opacity':.95}});
+  map.addLayer({id:'ind-s-line',type:'line',source:'ind',filter:['==',['get','grp'],'shared'],paint:{'line-color':'#fff','line-width':1.5,'line-dasharray':[2,1]}});
+  map.addLayer({id:'ind-s-lbl',type:'symbol',source:'ind',minzoom:11,filter:['==',['get','grp'],'shared'],layout:{'text-field':L==='en'?'Idan HaNegev · Rahat 44%':(L==='ar'?'عيدان هنيغف · رهط 44%':'עידן הנגב · רהט 44%'),'text-font':['Noto Sans Bold'],'text-size':11},paint:{'text-color':'#fff','text-halo-color':'#000','text-halo-width':1.5}});
   map.addSource('indbld',{type:'geojson',data:DATA.indBld});
   map.addLayer({id:'indbld-fill',type:'fill',source:'indbld',minzoom:11,paint:{'fill-color':'#111','fill-outline-color':'#000'}});
   map.addSource('jew11',{type:'geojson',data:DATA.jew11});
@@ -585,7 +612,8 @@ map.once('style.load', async ()=>{
   // night mode: black everywhere except ~1 km around the unrecognized villages (scripts/night_mask.py)
   // lights cut to the villages and out of every town's glow radius: scripts/night_villages.py
   fetch('data/night_villages.json').then(r=>r.json()).then(nv=>{ map.addSource('nightv',{type:'image',url:'data/night_villages.png',coordinates:nv.coordinates});
-    map.addLayer({id:'night-v',type:'raster',source:'nightv',layout:{visibility:state.night?'visible':'none'},paint:{'raster-opacity':.95,'raster-fade-duration':0}},'landuse'); applyState(); }).catch(()=>{});
+    map.addLayer({id:'night-v',type:'raster',source:'nightv',layout:{visibility:state.night?'visible':'none'},paint:{'raster-opacity':1,'raster-fade-duration':0}},map.getLayer('mask')?'mask':undefined);
+    if(map.getLayer('night')&&map.getLayer('mask')) map.moveLayer('night','night-v'); applyState(); }).catch(()=>{});
   // 2026 demolition events: one dashed ring per village (not per house), ring size ∝ √(structures reported)
   if(DATA.d26){ const ring=(c,km)=>{const k=Math.cos(c[1]*Math.PI/180),pts=[];for(let i=0;i<=48;i++){const a=i/48*2*Math.PI;pts.push([c[0]+km/111.32/k*Math.cos(a),c[1]+km/110.57*Math.sin(a)]);}return pts;};
     const ev=DATA.d26.events, P=e=>({id:e.id,m:e.m,kind:e.kind,ar:e.ar,he:e.he,en:e.en,date:e.date});
@@ -667,17 +695,17 @@ map.once('style.load', async ()=>{
     x.beginPath(); x.moveTo(-2,10); x.lineTo(10,-2); x.moveTo(-2,2); x.lineTo(2,-2); x.moveTo(6,10); x.lineTo(10,6); x.stroke();
     map.addImage('hatch',{width:8,height:8,data:x.getImageData(0,0,8,8).data}); }
   // 03 — yellow square per town, AREA = m² of industrial land per resident (icon size ∝ √value)
-  { const c=document.createElement('canvas'); c.width=c.height=64; const x=c.getContext('2d'); x.fillStyle='#000'; x.fillRect(0,0,64,64); x.fillStyle='#f2c230'; x.fillRect(3,3,58,58);
-    map.addImage('sqY',{width:64,height:64,data:x.getImageData(0,0,64,64).data}); }
+  [['sqA','#e39a2d'],['sqJ','#6f93bd']].forEach(([id,col])=>{ const c=document.createElement('canvas'); c.width=c.height=64; const x=c.getContext('2d'); x.fillStyle='#000'; x.fillRect(0,0,64,64); x.fillStyle=col; x.fillRect(3,3,58,58);
+    map.addImage(id,{width:64,height:64,data:x.getImageData(0,0,64,64).data}); });
   map.addSource('econ',{type:'geojson',data:econFC()});
   map.addSource('econlink',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
   map.addLayer({id:'econ-link',type:'line',source:'econlink',layout:{visibility:'none'},paint:{'line-color':'#e9e6df','line-width':2,'line-dasharray':[2,2]}});
   map.addLayer({id:'econ-link-lbl',type:'symbol',source:'econlink',layout:{visibility:'none','symbol-placement':'line-center','text-field':['concat',['to-string',['get','km']],' km'],'text-font':['Noto Sans Bold'],'text-size':12,'text-offset':[0,-.8]},paint:{'text-color':'#e9e6df','text-halo-color':'#000','text-halo-width':2}});
-  map.addLayer({id:'econ-sq',type:'symbol',source:'econ',filter:['>',['get','v'],0],layout:{visibility:'none','icon-image':'sqY','icon-allow-overlap':true,'icon-ignore-placement':true,
+  map.addLayer({id:'econ-sq',type:'symbol',source:'econ',filter:['>',['get','v'],0],layout:{visibility:'none','icon-image':['match',['get','grp'],'arab','sqA','sqJ'],'icon-allow-overlap':true,'icon-ignore-placement':true,
     'icon-size':['interpolate',['linear'],['sqrt',['get','v']],0,0,13.1,1.25]}});
   map.addLayer({id:'econ-zero',type:'symbol',source:'econ',filter:['==',['get','v'],0],layout:{visibility:'none','text-field':'0','text-font':['Noto Sans Bold'],'text-size':16,'text-allow-overlap':true},paint:{'text-color':'#e8452c','text-halo-color':'#000','text-halo-width':3}});
   map.addLayer({id:'econ-num',type:'symbol',source:'econ',filter:['>',['get','v'],0],layout:{visibility:'none','text-field':['concat',['to-string',['get','v']],' m²'],'text-font':['Noto Sans Bold'],'text-size':13,'text-allow-overlap':true},
-    paint:{'text-color':'#000','text-halo-color':'#f2c230','text-halo-width':2.5}});
+    paint:{'text-color':'#000','text-halo-color':['match',['get','grp'],'arab','#e39a2d','#6f93bd'],'text-halo-width':2.5}});
   map.addLayer({id:'econ-name',type:'symbol',source:'econ',layout:{visibility:'none','text-field':['get','name'],'text-font':['Noto Sans Bold'],'text-size':12,'text-anchor':'top','text-allow-overlap':true,
     'text-offset':['case',['>',['get','v'],60],['literal',[0,3.4]],['literal',[0,1.6]]]},paint:{'text-color':['match',['get','grp'],'arab','#fff','#b9b6ae'],'text-halo-color':'#000','text-halo-width':2}});
   // 02 — national locality polygons by founding year
@@ -844,7 +872,7 @@ function chapterCard(key){
       R.filter(r=>r.grp===g).sort((a,b)=>b.ind_pct-a.ind_pct).map(r=>`<div class="tl" title="${(r[L]||r.en)}: ${Math.round(r.total_dunam).toLocaleString()} / ${Math.round(r.ind_dunam).toLocaleString()} ${t('dunam')}"><div class="tl-box ${g}" style="width:${px(r.total_dunam)}px;height:${px(r.total_dunam)}px"><div class="tl-ind" style="width:${px(r.ind_dunam)}px;height:${px(r.ind_dunam)}px"></div></div><div class="tl-n">${r[L]||r.en}</div><div class="tl-p">${r.ind_pct.toFixed(1)}%</div></div>`).join('')}</div></div>`;
     return row('arab')+row('jewish'); };
   // unified gap card: one Arab line vs one Jewish line, same unit, and how many times bigger (red)
-  const gapCard=({q,a,j,unit,x,xl,src})=>`<div class="gap"><div class="gh">${tr3({ar:'الفجوة',he:'הפער',en:'The gap'})}</div><div class="gq">${tr3(q)}</div>`+
+  const gapCard=({q,a,j,unit,x,xl,src,only})=>`<div class="gap${only?' only-'+only:''}"><div class="gh">${tr3({ar:'الفجوة',he:'הפער',en:'The gap'})}</div><div class="gq">${tr3(q)}</div>`+
     `<div class="gr a${/nrecognized|outside/i.test(a.l.en||'')?' v':''}"><span>${tr3(a.l)}</span><b>${a.v}${unit}</b></div><div class="gr j${/Bedouin|Arab/.test(j.l.en||'')?' ja':''}"><span>${tr3(j.l)}</span><b>${j.v}${unit}</b></div>`+
     (+x<1.1?`<div class="gx"><b>≈</b><span>${tr3({ar:'لا فجوة هنا لصالح البلدات اليهودية — الفجوة في هذا المؤشر هي في القرى غير المعترف بها (بدّلي المقارنة من الزر فوق).',he:'אין כאן פער לטובת היישובים היהודיים — הפער במדד הזה הוא בכפרים הלא מוכרים (החליפי השוואה בכפתור למעלה).',en:'No gap in favour of the Jewish towns here — on this measure the gap is in the unrecognized villages (switch the comparison above).'})}</span></div>`
       :`<div class="gx"><b>×${x}</b><span>${tr3(xl)}</span></div>`)+`<div class="src">${src}</div></div>`;
@@ -856,7 +884,7 @@ function chapterCard(key){
     const mA=per(r=>r.grp==='arab'), mJ=per(r=>r.grp==='jewish'), mJs=per(r=>r.grp==='jewish'&&!BIG.includes(r.key));
     const S=DATA.bsum, off=S?S.outside_recognized:0, inA=S?S.by_group.arab.buildings:0, sh=off&&inA?Math.round(off/(off+inA)*100):null;
     const f=v=>Math.round(v).toLocaleString();
-    return gapCard({q:{ar:'كم متراً مربعاً من أرض البلدية (منطقة النفوذ) لكل ساكن؟',he:'כמה מ״ר משטח השיפוט של הרשות יש לכל תושב?',en:'How many m² of municipal jurisdiction per resident?'},
+    return gapCard({only:'towns',q:{ar:'كم متراً مربعاً من أرض البلدية (منطقة النفوذ) لكل ساكن؟',he:'כמה מ״ר משטח השיפוט של הרשות יש לכל תושב?',en:'How many m² of municipal jurisdiction per resident?'},
       a:{l:{ar:'7 بلدات عربية',he:'7 יישובים ערביים',en:'7 Arab towns'},v:f(mA)},j:{l:{ar:'11 بلدة يهودية',he:'11 יישובים יהודיים',en:'11 Jewish towns'},v:f(mJ)},
       unit:' '+tr3({ar:'م²',he:'מ״ר',en:'m²'}),x:ratio(mJ,mA),
       xl:{ar:`ضعف — أغلب الفرق من مناطق نفوذ واسعة لبلدات صحراوية (ديمونا، عراد، متسبيه رامون، إيلات، يروحام)؛ بدونها ${f(mJs)} م² (×${ratio(mJs,mA)}).${sh?` وفوق ذلك ${off.toLocaleString()} مبنى بدوي (≈${sh}%) خارج أي حدود معترف بها أصلاً.`:''}`,
@@ -869,7 +897,7 @@ function chapterCard(key){
   const bars=(rows,max,unit)=>`<div class="bars">${rows.map(r=>`<div class="br"><span class="bl">${r.label}</span><span class="bt"><span class="bf ${r.grp}" style="width:${max?Math.max(r.v/max*100,r.v?1.5:0):0}%"></span>${r.v?'':'<span class="b0">0</span>'}</span><span class="bv">${r.v?(+r.v).toLocaleString(undefined,{maximumFractionDigits:1}):''}${r.note||''}</span></div>`).join('')}</div>${unit?`<div class="bu">${unit}</div>`:''}`;
   if(key==='land'){
     const off=S?S.outside_recognized:0, nv=DATA.unrec.features.length;
-    const nightNote=`<button class="go" onclick="state.night=!state.night;applyState();renderPanel();">${tr3({ar:'☾ أضواء الليل: هل يعيش هنا ناس؟',he:'☾ אורות הלילה: האם גרים כאן אנשים?',en:'☾ Night lights: do people live here?'})}</button><p class="note2">${tr3({ar:'صورة الأضواء الليلية من القمر الصناعي (NASA 2012)، ظاهرة فقط فوق القرى غير المعترف بها. كل البلدات، بئر السبع أيضاً، معتّمة عن قصد: الضوء هنا يعني أن هناك حياة حيث تقول الخريطة الرسمية إنه لا يوجد شيء. ضوء المدن يفيض نحو كيلومترات، فالقرى القريبة من بلدة (2–5 كم حسب حجمها) محذوفة، حتى لا نعرض ضوء المدينة على أنه ضوء القرية. اضغطي مرة ثانية للإطفاء.',he:'תמונת אורות הלילה מהלוויין (NASA 2012), מוצגת רק מעל הכפרים הלא מוכרים. כל היישובים, גם באר שבע, מוחשכים בכוונה: אור כאן פירושו חיים במקום שבו המפה הרשמית אומרת שאין כלום. אור הערים זולג לקילומטרים, ולכן כפרים קרובים ליישוב (2–5 ק"מ לפי גודלו) הוסרו, כדי לא להציג את אור העיר כאור הכפר. לחיצה נוספת מכבה.',en:'Satellite night lights (NASA 2012), shown only over the unrecognized villages. Every town, Be\'er Sheva included, is blacked out on purpose: light here means life where the official map shows nothing. City light spills for kilometres, so villages within 2–5 km of a town (by its size) are left out, not to show the city glow as village light. Click again to switch off.'})}</p>`;
+    const nightNote=`<button class="go" onclick="state.night=!state.night;applyState();renderPanel();">${tr3({ar:'☾ أضواء الليل: هل يعيش هنا ناس؟',he:'☾ אורות הלילה: האם גרים כאן אנשים?',en:'☾ Night lights: do people live here?'})}</button><p class="note2">${tr3({ar:'الخريطة كلها تصير صورة ليلية من القمر الصناعي (NASA، أبيض وأسود)، والقرى غير المعترف بها تضيء فوقها بالأحمر: هناك حياة حيث تقول الخريطة الرسمية إنه لا يوجد شيء. ضوء المدن يفيض نحو كيلومترات، فالتوهّج الأحمر لا يشمل القرى القريبة من بلدة (2–5 كم حسب حجمها)، حتى لا نعرض ضوء المدينة على أنه ضوء القرية. اضغطي مرة ثانية للإطفاء.',he:'כל המפה הופכת לצילום לילה מהלוויין (NASA, שחור-לבן), והכפרים הלא מוכרים זוהרים מעליה באדום: יש חיים במקום שבו המפה הרשמית אומרת שאין כלום. אור הערים זולג לקילומטרים, ולכן הזוהר האדום לא כולל כפרים קרובים ליישוב (2–5 ק"מ לפי גודלו), כדי לא להציג את אור העיר כאור הכפר. לחיצה נוספת מכבה.',en:'The whole map becomes a black & white satellite night photo (NASA), and the unrecognized villages glow red on top: there is life where the official map shows nothing. City light spills for kilometres, so the red glow leaves out villages within 2–5 km of a town (by its size), not to show the city glow as village light. Click again to switch off.'})}</p>`;
     const d26Block=()=>{ const D=DATA.d26; if(!D) return ''; const lk=a=>a.map(([l,u])=>`<a href="${u}" target="_blank" rel="noopener">${l} ↗</a>`).join(' · ');
       const ML={ar:['','كانون2','شباط','آذار','نيسان','أيار','حزيران','تموز','آب','أيلول','تشرين1','تشرين2'],he:['','ינו','פבר','מרץ','אפר','מאי','יוני','יולי','אוג','ספט','אוק','נוב'],en:['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov']}[L];
       return `<h4>${tr3({ar:'الهدم في 2026، قرية بقرية',he:'הריסות 2026, כפר אחר כפר',en:'Demolitions in 2026, village by village'})} <span id="d26m" style="color:var(--red)"></span></h4>`+
@@ -942,7 +970,7 @@ function chapterCard(key){
       unit:' '+tr3({ar:'م²',he:'מ״ר',en:'m²'}),x:ratio(mJ,mA),
       xl:bA&&bJ?{ar:`ضعف — وأرنونا المصالح والصناعة للساكن ${Math.round(bA).toLocaleString()} ₪ مقابل ${Math.round(bJ).toLocaleString()} ₪ (×${ratio(bJ,bA)})`,he:`פעמים — וארנונה מעסקים ותעשייה לתושב ${Math.round(bA).toLocaleString()} ₪ לעומת ${Math.round(bJ).toLocaleString()} ₪ (×${ratio(bJ,bA)})`,en:`times — and business arnona per resident ₪${Math.round(bA).toLocaleString()} vs ₪${Math.round(bJ).toLocaleString()} (×${ratio(bJ,bA)})`}:{ar:'ضعف',he:'פעמים',en:'times'},
       src:tr3({ar:'طبقات الفريق (ArcGIS): المناطق الصناعية ∩ حدود البلديات، سكان 2026 · وزارة الداخلية — تقارير مالية مدققة 2024 (data.gov.il)، موزونة بسكان הלמ"ס 2024',he:'שכבות הצוות (ArcGIS): אזורי תעשייה ∩ גבולות שיפוט, אוכלוסייה 2026 · משרד הפנים — דוחות כספיים מבוקרים 2024 (data.gov.il), משוקלל באוכלוסיית הלמ"ס 2024',en:'Team ArcGIS layers: industrial zones ∩ municipal limits, population 2026 · Ministry of Interior audited financial reports 2024 (data.gov.il), weighted by CBS 2024 population'})});
-    return leg([['background:#f2c230;outline:2px solid #000;outline-offset:-3px',{ar:'منطقة صناعية – بلدة عربية',he:'אזור תעשייה – יישוב ערבי',en:'industrial zone – Arab town'}],['background:#f2c230;opacity:.55',{ar:'منطقة صناعية – بلدة يهودية',he:'אזור תעשייה – יישוב יהודי',en:'industrial zone – Jewish town'}],['background:#111;border:1px solid #f2c230',{ar:'مبنى قائم داخل المنطقة (قرّبي)',he:'מבנה קיים באזור (זום פנימה)',en:'existing building in zone (zoom in)'}],['border-top:2px dashed #e9e6df',{ar:'البلدات العربية السبع',he:'7 היישובים הערביים',en:'the 7 Arab towns'}],['border-top:2px dashed #8a8a86',{ar:'11 بلدة يهودية للمقارنة',he:'11 יישובים יהודיים להשוואה',en:'11 Jewish comparison towns'}]])+
+    return leg([['background:#e39a2d;outline:2px solid #000;outline-offset:-3px',{ar:'منطقة صناعية – بلدة عربية',he:'אזור תעשייה – יישוב ערבי',en:'industrial zone – Arab town'}],['background:#6f93bd',{ar:'منطقة صناعية – بلدة يهودية',he:'אזור תעשייה – יישוב יהודי',en:'industrial zone – Jewish town'}],['background:repeating-linear-gradient(45deg,#e39a2d 0 3px,#6f93bd 3px 6px)',{ar:'عيدان هنيغف – مشتركة: رهط 44%، لهافيم والشركاء 56%',he:'עידן הנגב – משותף: רהט 44%, להבים והשותפים 56%',en:'Idan HaNegev – shared: Rahat 44%, Lehavim and partners 56%'}],['background:#111;border:1px solid #e39a2d',{ar:'مبنى قائم داخل المنطقة (قرّبي)',he:'מבנה קיים באזור (זום פנימה)',en:'existing building in zone (zoom in)'}],['border-top:2px dashed #e9e6df',{ar:'البلدات العربية السبع',he:'7 היישובים הערביים',en:'the 7 Arab towns'}],['border-top:2px dashed #8a8a86',{ar:'11 بلدة يهودية للمقارنة',he:'11 יישובים יהודיים להשוואה',en:'11 Jewish comparison towns'}]])+
      plot+
      big([[pa.toFixed(1),tr3({ar:'دونم صناعة لكل 1000 ساكن — عربية',he:'דונם תעשייה ל-1000 תושבים — ערבי',en:'industrial dunam / 1,000 residents — Arab'}),1],[pj.toFixed(1),tr3({ar:'دونم لكل 1000 — يهودية',he:'דונם ל-1000 — יהודי',en:'dunam / 1,000 — Jewish'}),0]])+
      big([[nb('arab'),tr3({ar:'مبنى قائم في مناطق صناعية عربية',he:'מבנים באזורי תעשייה ערביים',en:'buildings in Arab industrial zones'}),1],[nb('jewish').toLocaleString(),tr3({ar:'مبنى في مناطق صناعية يهودية',he:'מבנים באזורי תעשייה יהודיים',en:'buildings in Jewish industrial zones'}),0]])+T3[L]+
@@ -1009,7 +1037,7 @@ function chapterCard(key){
         he:`ביישובים המוכרים המגרש לרוב קרוב, אבל צפוף: הרבה פחות מתקנים לכל צעיר. בכפרים הלא מוכרים אין דבר קרוב בכלל: רק ${V.groups.unrec.pct_lt1k}% מהבתים עד 1 ק"מ מאולם או מגרש (חציון ${V.groups.unrec.median_m.toLocaleString()} מ׳).`,
         en:`In recognized towns a pitch is usually close but crowded: far fewer facilities per young person. In the unrecognized villages there is nothing close at all: only ${V.groups.unrec.pct_lt1k}% of homes are within 1 km of a hall or pitch (median ${V.groups.unrec.median_m.toLocaleString()} m).`})}</p>`:'')+
      `<div class="src">${src}</div>`+
-     gapCard({q:{ar:'لكل 1,000 شاب (6–18): كم قاعة أو ملعب أو بركة؟',he:'לכל 1,000 בני 6–18: כמה אולמות, מגרשים או בריכות?',en:'Per 1,000 young people (6–18): how many sports halls, pitches or pools?'},
+     gapCard({only:'towns',q:{ar:'لكل 1,000 شاب (6–18): كم قاعة أو ملعب أو بركة؟',he:'לכל 1,000 בני 6–18: כמה אולמות, מגרשים או בריכות?',en:'Per 1,000 young people (6–18): how many sports halls, pitches or pools?'},
        a:{l:{ar:`${G.arab_towns.towns} بلدات عربية`,he:`${G.arab_towns.towns} יישובים ערביים`,en:`${G.arab_towns.towns} Arab towns`},v:G.arab_towns.per_1000_youth},
        j:{l:{ar:`${G.jewish_towns.towns} بلدة يهودية`,he:`${G.jewish_towns.towns} יישובים יהודיים`,en:`${G.jewish_towns.towns} Jewish towns`},v:G.jewish_towns.per_1000_youth},unit:'',
        x:ratio(G.jewish_towns.per_1000_youth,G.arab_towns.per_1000_youth),
@@ -1050,7 +1078,7 @@ function chapterCard(key){
        a:{l:cmpL(G),v:cmpG(G).pct_lt1k},j:{l:{ar:`${nJ} بلدات يهودية`,he:`${nJ} יישובים יהודיים`,en:`${nJ} Jewish towns`},v:G.jewish_towns.pct_lt1k},unit:'%',
        x:ratio(G.jewish_towns.pct_lt1k,cmpG(G).pct_lt1k),xl:{ar:`ضعف — وسيط المسافة ${cmpG(G).median_m.toLocaleString()} م مقابل ${G.jewish_towns.median_m.toLocaleString()} م`,he:`פעמים — חציון המרחק ${cmpG(G).median_m.toLocaleString()} מ׳ לעומת ${G.jewish_towns.median_m.toLocaleString()} מ׳`,en:`times — median distance ${cmpG(G).median_m.toLocaleString()} m vs ${G.jewish_towns.median_m.toLocaleString()} m`},
        src:tr3({ar:'وزارة التربية (data.gov.il) · Microsoft · OSM',he:'משרד החינוך (data.gov.il) · Microsoft · OSM',en:'Ministry of Education (data.gov.il) · Microsoft · OSM'})})+
-     (B?gapCard({q:{ar:'من كل 100 طالب صف 12، كم يحصل على بجروت تفتح باب الجامعة؟',he:'מכל 100 תלמידי יב, כמה מקבלים בגרות שפותחת את שערי האוניברסיטה?',en:'Of every 100 12th graders, how many get a bagrut that opens the university door?'},
+     (B?gapCard({only:'towns',q:{ar:'من كل 100 طالب صف 12، كم يحصل على بجروت تفتح باب الجامعة؟',he:'מכל 100 תלמידי יב, כמה מקבלים בגרות שפותחת את שערי האוניברסיטה?',en:'Of every 100 12th graders, how many get a bagrut that opens the university door?'},
        a:{l:{ar:'7 بلدات عربية',he:'7 יישובים ערביים',en:'7 Arab towns'},v:Math.round(uA)},j:{l:{ar:'11 بلدة يهودية',he:'11 יישובים יהודיים',en:'11 Jewish towns'},v:Math.round(uJ)},unit:'%',
        x:ratio(uJ,uA),xl:{ar:'ضعف',he:'פעמים',en:'times'},src:srcBag}):'');
   }
@@ -1067,7 +1095,7 @@ function chapterCard(key){
       he:"מנהל התכנון, \"מדריך הקצאות לצרכי ציבור\" (2016), עמ' 116 (סף הבית) · על הנייר: Xplan ייעודי קרקע, קוד מבא\"ת 670, תכניות מאושרות בלבד · בשטח: OpenStreetMap (Geofabrik 11.2026) park + recreation_ground · בתים: Microsoft Building Footprints (ערבים) ומבני OSM (יהודים) · אוכלוסייה: הלמ\"ס 2024 · ניתוח: חברת צוות. scripts/safety_parks_prep.py",
       en:"Planning Administration, \"Guide to public-needs allocation\" (2016), p. 116 · on paper: Xplan land use, code 670, approved plans only · on the ground: OpenStreetMap (Geofabrik 11.2026) park + recreation_ground · homes: Microsoft Building Footprints (Arab) and OSM buildings (Jewish) · population: CBS 2024 · analysis: a team member. scripts/safety_parks_prep.py"});
     return leg([['border:2px solid #7fbf6a',{ar:'حديقة على الورق',he:'גן על הנייר',en:'park on paper'}],['background:#7fbf6a',{ar:'حديقة على الأرض',he:'גן בשטח',en:'park on the ground'}],...SEG.map(([c,l])=>[`background:${c}`,{ar:l,he:l,en:l}])])+
-      gapCard({q:{ar:'من كل 100 بيت، كم بيت عنده حديقة على الأرض على بُعد 500 م؟',he:'מכל 100 בתים, לכמה יש גן בשטח במרחק 500 מ\'?',en:'Of every 100 homes, how many have a park on the ground within 500 m?'},
+      gapCard({only:'towns',q:{ar:'من كل 100 بيت، كم بيت عنده حديقة على الأرض على بُعد 500 م؟',he:'מכל 100 בתים, לכמה יש גן בשטח במרחק 500 מ\'?',en:'Of every 100 homes, how many have a park on the ground within 500 m?'},
         a:{l:{ar:'بلدات وقرى عربية معترف بها',he:'יישובים וכפרים ערביים מוכרים',en:'Recognized Arab towns and villages'},v:Math.round(A.arab.ground_pct)},j:{l:{ar:'بلدات يهودية',he:'יישובים יהודיים',en:'Jewish towns'},v:Math.round(A.jewish.ground_pct)},unit:'',
         x:ratio(A.jewish.ground_pct,A.arab.ground_pct),xl:{ar:`ضعف — وعلى الورق تقريباً متساوون: ${Math.round(A.arab.paper_pct)} مقابل ${Math.round(A.jewish.paper_pct)}`,he:`פעמים — ועל הנייר כמעט שווים: ${Math.round(A.arab.paper_pct)} לעומת ${Math.round(A.jewish.paper_pct)}`,en:`times — and on paper almost equal: ${Math.round(A.arab.paper_pct)} vs ${Math.round(A.jewish.paper_pct)}`},src})+
       T3[L]+
@@ -1123,7 +1151,7 @@ function chapterCard(key){
         `<p class="note2">${tr3({ar:'في البلدات المعترف بها لم نجد علاقة مباشرة بين البُعد عن الشرطة والعنف المسجّل (المحطات أُقيمت حيث الجريمة أعلى، والقرب يرفع التسجيل). التقاطع الواضح في القرى: بُعد عن الخدمات، بلا عنوان ولا رمز بلدة، وبلا بيانات.',he:'ביישובים המוכרים לא נמצא קשר ישיר בין המרחק מהמשטרה לבין האלימות המדווחת (התחנות הוקמו היכן שהפשיעה גבוהה, וקרבה מעלה רישום). החפיפה הברורה היא בכפרים: מרחק מהשירותים, בלי כתובת ובלי סמל יישוב, ובלי נתונים.',en:'In the recognized towns we found no direct link between distance from the police and recorded violence (stations were built where crime is higher, and proximity raises recording). The clear overlap is in the villages: far from services, without an address or locality code, and without data.'})}</p>`+
         `<div class="src">${srcS}</div>`; };
     return sfLeg+T3[L]+
-      gapCard({q:{ar:'من كل 10,000 ساكن، كم ملف قتل أو محاولة قتل يُفتح في السنة؟',he:'מכל 10,000 תושבים, כמה תיקי רצח או ניסיון לרצח נפתחים בשנה?',en:'Per 10,000 residents, how many murder or attempted-murder files are opened a year?'},
+      gapCard({only:'towns',q:{ar:'من كل 10,000 ساكن، كم ملف قتل أو محاولة قتل يُفتح في السنة؟',he:'מכל 10,000 תושבים, כמה תיקי רצח או ניסיון לרצח נפתחים בשנה?',en:'Per 10,000 residents, how many murder or attempted-murder files are opened a year?'},
         a:{l:{ar:'7 بلدات بدوية',he:'7 יישובים בדואיים',en:'7 Bedouin towns'},v:A.lethal_per10k_yr},j:{l:{ar:'11 بلدة يهودية',he:'11 יישובים יהודיים',en:'11 Jewish towns'},v:J.lethal_per10k_yr},unit:'',
         x:ratio(A.lethal_per10k_yr,J.lethal_per10k_yr),xl:{ar:`ضعف — ${A.lethal_3y} ملفاً مقابل ${J.lethal_3y} في 2023–2025، مع أن سكان البلدات اليهودية أكثر بمرّتين`,he:`פעמים — ${A.lethal_3y} תיקים לעומת ${J.lethal_3y} ב-2023–2025, אף שביישובים היהודיים גרים פי שניים תושבים`,en:`times — ${A.lethal_3y} files vs ${J.lethal_3y} in 2023–2025, though the Jewish towns have twice the population`},src:srcV})+
       `<h4>${tr3({ar:'ملفات قتل ومحاولة قتل لكل 10,000 ساكن في السنة · 2023–2025',he:'תיקי רצח וניסיון לרצח לכל 10,000 תושבים בשנה · 2023–2025',en:'Murder and attempted-murder files per 10,000 residents a year · 2023–2025'})}</h4>`+
@@ -1135,6 +1163,9 @@ function chapterCard(key){
   }
   return '';
 }
+const CH_LEAD={"land": {"h": {"ar": "45,004 بيت بدوي خارج أي حدود معترف بها", "he": "45,004 בתים בדואיים מחוץ לכל גבול מוכר", "en": "45,004 Bedouin homes outside every recognized limit"}, "s": {"ar": "39 من كل 100 مبنى بدوي في النقب: بلا خط أزرق، بلا ترخيص، وتحت تهديد الهدم.", "he": "39 מכל 100 מבנים בדואיים בנגב: בלי קו כחול, בלי היתר, ותחת איום הריסה.", "en": "39 of every 100 Bedouin buildings in the Naqab: no blue line, no permit, under threat of demolition."}}, "housing": {"h": {"ar": "منذ 1948: 799 بلدة يهودية جديدة و18 عربية", "he": "מאז 1948: 799 יישובים יהודיים חדשים ו-18 ערביים", "en": "Since 1948: 799 new Jewish localities, 18 Arab"}, "s": {"ar": "وكل الـ18 بلدات تركيز خطّطتها الدولة لتجميع البدو.", "he": "וכל ה-18 הם יישובי ריכוז שתכננה המדינה כדי לרכז את הבדואים.", "en": "All 18 are concentration towns the state planned to gather the Bedouin."}}, "economy": {"h": {"ar": "أرض صناعية أقل بـ3.7 مرّات لكل ساكن", "he": "פי 3.7 פחות קרקע לתעשייה לכל תושב", "en": "3.7 times less industrial land per resident"}, "s": {"ar": "16 مقابل 60 دونم لكل 1,000 ساكن، وأكثر من نصف العاملين يخرجون من بلدتهم للعمل.", "he": "16 מול 60 דונם לכל 1,000 תושבים, ויותר ממחצית העובדים יוצאים מהיישוב לעבוד.", "en": "16 vs 60 dunams per 1,000 residents, and over half of workers leave town to work."}}, "transit": {"h": {"ar": "3.5 من كل 100 بيت في القرى قريب من محطة باص", "he": "3.5 מכל 100 בתים בכפרים קרובים לתחנת אוטובוס", "en": "3.5 in 100 village homes are near a bus stop"}, "s": {"ar": "مقابل 90 في البلدات اليهودية. وحتى في شقيب السلام وحورة المحطات على الشارع الرئيسي فقط.", "he": "לעומת 90 ביישובים היהודיים. וגם בשגב שלום ובחורה התחנות רק על הכביש הראשי.", "en": "Against 90 in the Jewish towns. Even in Segev Shalom and Hura the stops are only on the main road."}}, "services": {"h": {"ar": "15 من كل 100 بيت في القرى قريب من مدرسة ابتدائية", "he": "15 מכל 100 בתים בכפרים קרובים לבית ספר יסודי", "en": "15 in 100 village homes are near an elementary school"}, "s": {"ar": "على بُعد كيلومتر، مقابل 82 في البلدات اليهودية. ومنشآت الرياضة لكل شاب أقل بـ3.6 مرّات في البلدات العربية.", "he": "עד קילומטר, לעומת 82 ביישובים היהודיים. ומתקני ספורט לכל צעיר: פי 3.6 פחות ביישובים הערביים.", "en": "Within a kilometre, against 82 in the Jewish towns. Sports facilities per young person: 3.6 times fewer in the Arab towns."}}, "parks": {"h": {"ar": "على الورق نفس الحدائق، على الأرض لا", "he": "על הנייר אותם גנים, בשטח לא", "en": "The same parks on paper, not on the ground"}, "s": {"ar": "حديقة على بُعد 500 م: 19 من كل 100 بيت عربي مقابل 93 يهودي. في القرى: صفر.", "he": "גן במרחק 500 מ׳: 19 מכל 100 בתים ערביים לעומת 93 יהודיים. בכפרים: אפס.", "en": "A park within 500 m: 19 in 100 Arab homes vs 93 Jewish. In the villages: zero."}}, "violence": {"h": {"ar": "مركز الشرطة بعيد، والقتل أكثر", "he": "תחנת המשטרה רחוקה, והרצח שכיח יותר", "en": "The police are far, and murder is more common"}, "s": {"ar": "1.8% من مباني القرى على بُعد 2 كم من مركز شرطة. ملفات القتل لكل ساكن ×3.8 في البلدات العربية.", "he": "1.8% ממבני הכפרים עד 2 ק\"מ מתחנת משטרה. תיקי רצח לתושב: פי 3.8 ביישובים הערביים.", "en": "1.8% of village buildings are within 2 km of a police station. Murder files per resident: ×3.8 in the Arab towns."}}, "plan": {"h": {"ar": "56 من كل 100 مبنى بدوي بلا مخطط مصدّق", "he": "56 מכל 100 מבנים בדואיים בלי תכנית מאושרת", "en": "56 in 100 Bedouin buildings have no approved plan"}, "s": {"ar": "وحتى داخل البلدات والقرى المعترف بها: 28%.", "he": "וגם בתוך היישובים והכפרים המוכרים: 28%.", "en": "Even inside the recognized towns and villages: 28%."}}};
+// chapters with no data for the unrecognized villages: the compare button does not apply there
+const TOWNS_ONLY=['housing','economy'];
 let curChapter=null;
 // 2026 month by month: rings of the current month drawn thick, earlier months stay thin
 let d26Timer=null;
@@ -1158,8 +1189,11 @@ function openChapter(key,keepView){
   if(!c){ stopPlayer(); resetHi(); document.getElementById('card').style.display='none'; return; }
   stopPlayer(); resetHi();
   document.getElementById('card').style.display=''; Object.assign(state,{frames:false,nat:false,routes:false,mask2:false,access:false,svc:false,econ:false,noplan:false,parks:false,safety:false},c.layers); applyState(); renderPanel();
+  map.setPadding(innerWidth>900?{[document.documentElement.dir==='rtl'?'left':'right']:390,top:0,bottom:0,[document.documentElement.dir==='rtl'?'right':'left']:0}:{top:0,bottom:0,left:0,right:0});
   if(!keepView) map.flyTo({...c.view,duration:1600});
-  document.getElementById('card').innerHTML=`<div class="hd"><span class="no">${c.no}</span><h2>${CH_TITLE[L][key]}</h2></div><div class="bd">${chapterCard(key)}</div>`;
+  document.body.classList.toggle('cmp-unrec',CMP!=='towns'&&!TOWNS_ONLY.includes(key)); cmpBtn.classList.toggle('off',TOWNS_ONLY.includes(key));
+  const ld=CH_LEAD[key], scope=TOWNS_ONLY.includes(key)?`<div class="scope">${T4({ar:'هذا الفصل عن البلدات المعترف بها: لا توجد بيانات للقرى غير المعترف بها (خارج كل بلدية، فلا أرض صناعية ولا أرنونا ولا سنة تأسيس).',he:'הפרק הזה עוסק ביישובים המוכרים: אין נתונים לכפרים הלא מוכרים (מחוץ לכל רשות, ולכן אין קרקע לתעשייה, ארנונה או שנת ייסוד).',en:'This chapter is about the recognized towns: there is no data for the unrecognized villages (outside every council, so no industrial land, arnona or founding year).'})}</div>`:'';
+  document.getElementById('card').innerHTML=`<div class="hd"><span class="no">${c.no}</span><h2>${CH_TITLE[L][key]}</h2></div>${ld?`<div class="lead"><b>${T4(ld.h)}</b><span>${T4(ld.s)}</span></div>`:''}<div class="bd">${scope}${chapterCard(key)}</div>`;
   foldCard();
   if(c.timeline) setYear(tlRange.value);
   setTimeout(()=>{ if(curChapter===key) startPlayer(key); }, keepView?300:1700);
@@ -1350,9 +1384,15 @@ function applyState(){
   if(map.getLayer('place-lbl')&&DATA&&DATA.negevGeom) map.setFilter('place-lbl',state.mask?['all',LBL_BASE,['within',{type:'Feature',geometry:DATA.negevGeom,properties:{}}]]:LBL_BASE);
   Object.entries(LAYERMAP).forEach(([k,ids])=>ids.forEach(id=>map.getLayer(id)&&map.setLayoutProperty(id,'visibility',state[k]?'visible':'none')));
   // night mode: NASA lights as soft halos (the tiles stop at z8, so close up they blur), the street map hidden underneath
-  if(map.getLayer('night-v')){ map.setPaintProperty('night-v','raster-opacity',+NIGHT.op); map.setPaintProperty('night-v','raster-saturation',NIGHT.grey?-1:0); }
+  if(map.getLayer('night-v')){ map.setPaintProperty('night-v','raster-opacity',1); }
+  if(map.getLayer('night')){ map.setPaintProperty('night','raster-opacity',+NIGHT.op*.85); }
   {
-    if(state.night) [...BASE_IDS,...LAYERMAP.frames,...LAYERMAP.grid,'demo-halo'].forEach(id=>map.getLayer(id)&&map.setLayoutProperty(id,'visibility','none')); }
+    if(state.night) [...LAYERMAP.frames,...LAYERMAP.grid,'demo-halo'].forEach(id=>map.getLayer(id)&&map.setLayoutProperty(id,'visibility','none')); }
+  // compare mode on the map: villages mode hides the recognized Arab towns' layers, towns mode hides the village layers
+  if(curChapter&&!TOWNS_ONLY.includes(curChapter)&&curChapter!=='land'){
+    const hide=CMP==='towns'?[...LAYERMAP.frames,...LAYERMAP.grid,...LAYERMAP.unrec,...LAYERMAP.demo,'acc-grid','svc-grid']:[...LAYERMAP.arab,...LAYERMAP.arab7,...LAYERMAP.indA];
+    hide.forEach(id=>map.getLayer(id)&&map.setLayoutProperty(id,'visibility','none'));
+    if(CMP==='towns') LAYERMAP.arab.forEach(id=>map.getLayer(id)&&map.setLayoutProperty(id,'visibility','visible')); }
   document.body.classList.toggle('night',!!state.night); const nb=document.getElementById('nightBtn'); if(nb) nb.classList.toggle('on',!!state.night);
   Object.keys(LAZY).forEach(k=>{ if(state[k]&&!lazyDone[k]&&map.getSource(LAZY[k][0][0])){ lazyDone[k]=1; LAZY[k].forEach(([sid,f])=>fetch('data/'+f).then(r=>r.json()).then(d=>map.getSource(sid).setData(d)).catch(()=>{lazyDone[k]=0;})); } });
   try{ localStorage.setItem('offmap-state',JSON.stringify(state)); }catch(e){}
@@ -1364,12 +1404,12 @@ function renderPanel(){
   { const lb=document.querySelector('#panelToggle .lbl'); if(lb) lb.textContent=T4({ar:'الطبقات',he:'שכבות',en:'Layers'}); }
   const sw=(c,dash)=>`<span class="sw" style="${dash?`border-top:2px dashed ${c}`:`background:${c}`}"></span>`;
   const row=(k,label,swatch='',live=false)=>`<label class="row"><input type="checkbox" data-k="${k}" ${state[k]?'checked':''}><span class="box"></span>${label}${live?'<span class="live">LIVE</span>':''}${swatch}</label>`;
-  const nightSet=`<div class="nset"><label>${T4({ar:'شدّة الأضواء',he:'עוצמת האורות',en:'Light strength'})} <input type="range" id="nightOp" min="0.2" max="1" step="0.05" value="${NIGHT.op}"></label><label><input type="checkbox" id="nightGrey" ${NIGHT.grey?'checked':''}> ${T4({ar:'أبيض وأسود',he:'שחור-לבן',en:'Black & white'})}</label></div>`;
+  const nightSet=`<div class="nset"><label>${T4({ar:'شدّة صورة الليل',he:'עוצמת צילום הלילה',en:'Night photo strength'})} <input type="range" id="nightOp" min="0.2" max="1" step="0.05" value="${NIGHT.op}"></label></div>`;
   const all=`<h3>${t('base')}</h3>${curChapter==='land'?row('night',T4({ar:'أضواء الليل في القرى غير المعترف بها (NASA 2012)',he:'אורות הלילה בכפרים הלא מוכרים (NASA 2012)',en:'Night lights in the unrecognized villages (NASA 2012)'}),'<span class="sw" style="background:radial-gradient(#fff,#000 70%)"></span>'):''}${state.night?nightSet:''}${row('basemap',t('basemap'))}${row('sat',t('sat'))}${row('mask',t('mask'))}${row('mask2',t('mask2'))}${row('labels',t('labels'))}
     <h3>${t('bounds')}</h3>${row('arab',t('arab'),sw('#e9e6df'))}${row('jew',t('jew'),`<span class="sw" style="border:2px solid #8a8a86"></span>`)}${row('ind',t('ind'),sw('#5a5a55'))}${row('rc',t('rc'),sw('#8a8a86',1))}
     <h3>${t('red')}</h3>${row('unrec',t('unrec'),sw('#e8452c'))}${row('grid',CHT('offmapCell'),sw('#e8452c'))}${row('cbs',CH_TITLE[L].housing+' · 1870–2024',sw('#8a8a86'))}${row('transit',CH_TITLE[L].transit+' · GTFS',sw('#e8452c',1))}${row('access',CHT('access')+' · GTFS',sw('#ff5a3c'))}${row('svc',CHT('svc'),sw('#e9e6df'))}${row('noplan',T4({ar:'مبانٍ بلا مخطط مصدّق',he:'מבנים ללא תכנית מאושרת',en:'buildings with no approved plan'}),sw('#e8452c'))}${row('parks',T4({ar:'حدائق: على الورق / على الأرض',he:'גנים: על הנייר / בשטח',en:'Parks: on paper / on the ground'}),sw('#7fbf6a'))}${row('safety',T4({ar:'شرطة وإطفاء ومستشفيات + البُعد',he:'משטרה, כיבוי ובתי חולים + מרחק',en:'Police, fire & hospitals + distance'}),sw('#ff5a3c'))}${row('demo',t('demo'),'<span class="sw" style="color:#e8452c;font-weight:800;text-align:center">✕</span>')}
     <div class="note">${t('unrecNote')}</div>
-    <h3>${t('econ')}</h3>${row('econ',T4({ar:'أرض صناعية لكل ساكن (مربع)',he:'קרקע תעשייה לתושב (ריבוע)',en:'industrial land per resident (square)'}),'<span class="sw" style="background:#f2c230;outline:2px solid #000;outline-offset:-2px"></span>')}${row('indA',t('indA'),'<span class="sw" style="background:#f2c230;outline:2px solid #000;outline-offset:-3px"></span>')}${row('indJ',t('indJ'),'<span class="sw" style="background:#f2c230;opacity:.55"></span>')}${row('arab7',t('arab7'),sw('#e9e6df',1))}
+    <h3>${t('econ')}</h3>${row('econ',T4({ar:'أرض صناعية لكل ساكن (مربع)',he:'קרקע תעשייה לתושב (ריבוע)',en:'industrial land per resident (square)'}),'<span class="sw" style="background:linear-gradient(90deg,#e39a2d 50%,#6f93bd 50%);outline:2px solid #000;outline-offset:-2px"></span>')}${row('indA',t('indA'),'<span class="sw" style="background:linear-gradient(90deg,#e39a2d 50%,#6f93bd 50%);outline:2px solid #000;outline-offset:-3px"></span>')}${row('indJ',t('indJ'),'<span class="sw" style="background:#f2c230;opacity:.55"></span>')}${row('arab7',t('arab7'),sw('#e9e6df',1))}
     <h3>${t('plan')}</h3>${row('xplan',t('xplan'),'',1)}${row('landuse',t('landuse'),'',1)}${row('tmm',t('tmm'),'',1)}${row('vatmal',t('vatmal'),'',1)}
     <div class="note">${t('liveNote')}</div>`;
   const c=CHAPTERS.find(c=>c.key===curChapter), tmp=document.createElement('div'); tmp.innerHTML=all;
@@ -1391,8 +1431,8 @@ function renderStats(){
     <div class="stat"><div class="n">${Math.round(a)}</div><div class="l">${t('sArab')}</div></div>
     <div class="stat"><div class="n">${Math.round(j)}</div><div class="l">${t('sJew')}</div></div>`+
    (DATA.ind.features.length?(()=>{const g=grp=>DATA.ind.features.filter(f=>f.properties.grp===grp);const km=fs=>fs.reduce((s,f)=>s+(+f.properties.BRUTOAREA||0),0)/1e6;
-     const A=g('arab'),J=g('jewish');return `<div class="stat"><div class="n" style="color:#f2c230">${km(A).toFixed(1)}</div><div class="l">${t('sIndA')} · ${A.length} ${t('zones')}</div></div>
-     <div class="stat"><div class="n" style="color:#f2c230">${km(J).toFixed(1)}</div><div class="l">${t('sIndJ')} · ${J.length} ${t('zones')}</div></div>`;})():'');
+     const A=g('arab'),J=g('jewish');return `<div class="stat"><div class="n" style="color:#e39a2d">${km(A).toFixed(1)}</div><div class="l">${t('sIndA')} · ${A.length} ${t('zones')}</div></div>
+     <div class="stat"><div class="n" style="color:#6f93bd">${km(J).toFixed(1)}</div><div class="l">${t('sIndJ')} · ${J.length} ${t('zones')}</div></div>`;})():'');
 }
 
 /* ---------------- popups (SOS card) ---------------- */
@@ -1404,8 +1444,8 @@ function bindPopups(){
   map.on('click','demo-pt',e=>{const p=e.features[0].properties,n=JSON.parse(p.note);new maplibregl.Popup({maxWidth:'300px'}).setLngLat(e.lngLat).setHTML(card('',t('demo'),`<b>${p[L]||p.ar}</b>${n[L]}`)).addTo(map);});
   ['loc-arab-fill','loc-jew-line'].forEach(id=>map.on('click',id,e=>{if(map.queryRenderedFeatures(e.point,{layers:['un-pt','demo-pt','un-cluster','ind-a-fill','ind-j-fill'].filter(id=>map.getLayer(id))}).length)return;const p=e.features[0].properties;
     new maplibregl.Popup({maxWidth:'280px'}).setLngLat(e.lngLat).setHTML(card(p.grp==='arab'?'bone':'grey',t(p.grp==='arab'?'arab':'jew'),`<b>${nm(p)}</b>${t('area')}: ${p.km2} km²${p.council?`<br>${t('council')}: ${p.council}`:''}<div class="src">${t('source')}: מנהל התכנון · גבולות שיפוט / ועדים מקומיים</div>`)).addTo(map);}));
-  ['ind-a-fill','ind-j-fill'].forEach(id=>map.on('click',id,e=>{const p=e.features[0].properties,du=v=>v?Math.round(+v/1000).toLocaleString()+' '+t('dunam'):'—';
-    new maplibregl.Popup({maxWidth:'300px'}).setLngLat(e.lngLat).setHTML(`<div class="card"><div class="hd" style="background:#f2c230">${t(p.grp==='arab'?'indA':'indJ')}</div><div class="bd"><b>${p.NAME||p.NAME_1||p.City_Name||''}</b>${t('auth')}: ${p.AUTHORITY||p.City_Name||'—'}<br>${t('gross')}: ${du(p.BRUTOAREA)}<br>${t('net')}: ${du(p.INDNETAREA)}<br>${t('planNo')}: ${p.TABA_NUM||'—'}${p.OWNER&&p.OWNER.trim()?`<br>${t('owner')}: ${p.OWNER}`:''}<div class="src">${t('source')}: ${t('teamSrc')}</div></div></div>`).addTo(map);e.preventDefault&&e.preventDefault();}));
+  ['ind-a-fill','ind-j-fill','ind-s-fill'].forEach(id=>map.on('click',id,e=>{const p=e.features[0].properties,du=v=>v?Math.round(+v/1000).toLocaleString()+' '+t('dunam'):'—';
+    new maplibregl.Popup({maxWidth:'300px'}).setLngLat(e.lngLat).setHTML(`<div class="card"><div class="hd" style="background:${p.grp==='arab'?'#e39a2d':p.grp==='shared'?'repeating-linear-gradient(45deg,#e39a2d 0 6px,#6f93bd 6px 12px)':'#6f93bd'}">${p.grp==='shared'?T4({ar:'عيدان هنيغف – مشتركة: رهط 44%',he:'עידן הנגב – משותף: רהט 44%',en:'Idan HaNegev – shared: Rahat 44%'}):t(p.grp==='arab'?'indA':'indJ')}</div><div class="bd"><b>${p.NAME||p.NAME_1||p.City_Name||''}</b>${t('auth')}: ${p.AUTHORITY||p.City_Name||'—'}<br>${t('gross')}: ${du(p.BRUTOAREA)}<br>${t('net')}: ${du(p.INDNETAREA)}<br>${t('planNo')}: ${p.TABA_NUM||'—'}${p.OWNER&&p.OWNER.trim()?`<br>${t('owner')}: ${p.OWNER}`:''}<div class="src">${t('source')}: ${t('teamSrc')}</div></div></div>`).addTo(map);e.preventDefault&&e.preventDefault();}));
   ['un-pt','un-cluster','demo-pt','loc-arab-fill','loc-jew-line','ind-a-fill','ind-j-fill'].forEach(id=>{map.on('mouseenter',id,()=>map.getCanvas().style.cursor='pointer');map.on('mouseleave',id,()=>map.getCanvas().style.cursor='');});
 }
 

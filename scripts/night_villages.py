@@ -1,7 +1,7 @@
 """Night lights over the unrecognized villages only.
 Downloads NASA VIIRS City Lights 2012 (GIBS, web-mercator z8 tiles), takes the light (red channel above the navy background),
 keeps it only inside ~1 km cells around the unrecognized clusters (cluster_frames c='u'),
-and writes a transparent PNG with soft warm halos + its corner coordinates for a MapLibre image source.
+and writes a transparent PNG with soft red halos (they glow over a black & white night photo) + its corner coordinates for a MapLibre image source.
   night_villages.py <site_dir> <tile_cache_dir>   ->  data/night_villages.png, data/night_villages.json"""
 import sys, os, json, math, urllib.request
 from PIL import Image, ImageFilter
@@ -54,7 +54,7 @@ for py in range(H * K):
         v = int(max(0, rr - 70) * 1.6)  # navy background has red ~12-20; town glow spills ~1 km, so only clear lights pass
         if v: A[px, py] = min(255, v); lit += 1
 alpha = alpha.filter(ImageFilter.GaussianBlur(K))
-out = Image.new('RGBA', up.size, (255, 214, 140, 0)); out.putalpha(alpha)
+out = Image.new('RGBA', up.size, (255, 96, 52, 0)); out.putalpha(alpha)
 out.save(os.path.join(site, 'data', 'night_villages.png'), optimize=True)
 coords = [[lon(0), lat(0)], [lon(W), lat(0)], [lon(W), lat(H)], [lon(0), lat(H)]]
 json.dump({'coordinates': [[round(a, 6), round(b, 6)] for a, b in coords], 'source': 'NASA VIIRS City Lights 2012 via GIBS, masked to ~1 km cells around the unrecognized villages'},

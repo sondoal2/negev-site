@@ -296,7 +296,7 @@ body.chap #stats{display:none}
 #card .lead b{display:block;font-size:20px;line-height:1.25;font-weight:800}
 #card .lead span{display:block;font-size:13px;line-height:1.4;color:var(--fog);margin-top:4px}
 #card .scope{font-size:11px;background:#000;color:var(--bone);padding:5px 10px;margin-bottom:10px}
-body.cmp-unrec #card .only-towns{display:none} body.cmp-towns #card .only-vil{display:none}
+#card .vhide{display:none!important} body.cmp-unrec #card .only-towns{display:none} body.cmp-towns #card .only-vil{display:none}
 </style>
 </head>
 <body>
@@ -1212,6 +1212,10 @@ function openChapter(key,keepView){
   document.body.classList.toggle('cmp-unrec',CMP!=='towns'&&!TOWNS_ONLY.includes(key)); document.body.classList.toggle('cmp-towns',CMP==='towns'||TOWNS_ONLY.includes(key)); cmpBtn.classList.toggle('off',TOWNS_ONLY.includes(key));
   const ld=(CMP==='towns'&&CH_LEAD_T[key])||(CMP!=='towns'&&CH_LEAD_V[key])||CH_LEAD[key], scope=TOWNS_ONLY.includes(key)?`<div class="scope">${T4({ar:'هذا الفصل عن البلدات المعترف بها: لا توجد بيانات للقرى غير المعترف بها (خارج كل بلدية، فلا أرض صناعية ولا أرنونا ولا سنة تأسيس).',he:'הפרק הזה עוסק ביישובים המוכרים: אין נתונים לכפרים הלא מוכרים (מחוץ לכל רשות, ולכן אין קרקע לתעשייה, ארנונה או שנת ייסוד).',en:'This chapter is about the recognized towns: there is no data for the unrecognized villages (outside every council, so no industrial land, arnona or founding year).'})}</div>`:'';
   document.getElementById('card').innerHTML=`<div class="hd"><span class="no">${c.no}</span><h2>${CH_TITLE[L][key]}</h2></div>${ld?`<div class="lead"><b>${T4(ld.h)}</b><span>${T4(ld.s)}</span></div>`:''}<div class="bd">${scope}${chapterCard(key)}</div>`;
+  // villages mode: bar charts that list only towns (no village row) are not about the villages, so they go
+  if(document.body.classList.contains('cmp-unrec')) document.querySelectorAll('#card .bars').forEach(b=>{ if(b.querySelector('.bf.red')) return;
+    b.classList.add('vhide'); const pv=b.previousElementSibling, nx=b.nextElementSibling;
+    if(pv&&pv.tagName==='H4') pv.classList.add('vhide'); if(nx&&nx.classList.contains('bu')) nx.classList.add('vhide'); });
   foldCard();
   if(c.timeline) setYear(tlRange.value);
   // 02 has no slow GIF player: the year timeline runs by itself, fast, on the whole country
@@ -1592,8 +1596,7 @@ fsBtn.onclick=()=>document.fullscreenElement?document.exitFullscreen():document.
 homeBtn.onclick=()=>map.flyTo(NEGEV_VIEW);
 grainBtn.onclick=()=>{document.body.classList.toggle('nograin');grainBtn.classList.toggle('on');};
 panelToggle.onclick=()=>document.body.classList.toggle('panel');
-try{ if(localStorage.getItem('offmap-panel')==='1') document.body.classList.add('panel'); }catch(e){}
-panelToggle.addEventListener('click',()=>{try{localStorage.setItem('offmap-panel',document.body.classList.contains('panel')?'1':'0');}catch(e){}});
+// the layers panel always starts closed: the labelled button opens it
 setLang(L);
 </script>
 </body>
